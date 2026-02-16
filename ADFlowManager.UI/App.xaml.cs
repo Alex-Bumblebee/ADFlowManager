@@ -385,12 +385,19 @@ namespace ADFlowManager.UI
             try
             {
                 _logger.Information("🔍 Vérification mises à jour...");
+                
+                // Log version actuelle
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                _logger.Information("Version actuelle : {CurrentVersion}", currentVersion);
 
                 var updateUrl = "https://github.com/Alex-Bumblebee/ADFlowManager";
+                _logger.Information("URL GitHub : {UpdateUrl}", updateUrl);
+                
                 var source = new GithubSource(updateUrl, null, false);
                 var mgr = new UpdateManager(source);
 
                 // Check nouvelle version
+                _logger.Information("Interrogation GitHub Releases...");
                 var newVersion = await mgr.CheckForUpdatesAsync();
 
                 if (newVersion != null)
@@ -399,6 +406,7 @@ namespace ADFlowManager.UI
                     _logger.Information("📦 Nouvelle version disponible : {Version}", newVer);
 
                     // Download update en arrière-plan
+                    _logger.Information("Téléchargement de la mise à jour...");
                     await mgr.DownloadUpdatesAsync(newVersion);
 
                     _logger.Information("✅ Mise à jour téléchargée");
@@ -423,12 +431,16 @@ namespace ADFlowManager.UI
                 }
                 else
                 {
-                    _logger.Information("✅ Application à jour");
+                    _logger.Information("✅ Application à jour (aucune nouvelle version détectée)");
                 }
             }
             catch (Exception ex)
             {
-                _logger.Warning(ex, "⚠️ Échec vérification mises à jour");
+                _logger.Error(ex, "⚠️ Échec vérification mises à jour - Détails: {Message}", ex.Message);
+                if (ex.InnerException != null)
+                {
+                    _logger.Error("Exception interne: {InnerMessage}", ex.InnerException.Message);
+                }
             }
         }
 
