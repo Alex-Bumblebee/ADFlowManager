@@ -387,8 +387,7 @@ namespace ADFlowManager.UI
                 _logger.Information("🔍 Vérification mises à jour...");
 
                 var updateUrl = "https://github.com/Alex-Bumblebee/ADFlowManager";
-                var token = Environment.GetEnvironmentVariable("ADFLOW_GITHUB_TOKEN");
-                var source = new GithubSource(updateUrl, token, false);
+                var source = new GithubSource(updateUrl, null, false);
                 var mgr = new UpdateManager(source);
 
                 // Check nouvelle version
