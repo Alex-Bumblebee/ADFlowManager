@@ -393,7 +393,7 @@ namespace ADFlowManager.UI
                 var updateUrl = "https://github.com/Alex-Bumblebee/ADFlowManager";
                 _logger.Information("URL GitHub : {UpdateUrl}", updateUrl);
                 
-                var source = new GithubSource(updateUrl, null, false);
+                var source = new GithubSource(updateUrl, null, true);
                 var mgr = new UpdateManager(source);
 
                 // Check nouvelle version

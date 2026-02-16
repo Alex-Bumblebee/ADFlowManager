@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.4-beta] - 2025-02-17
+
+Correction for automatic update
+
 ## [0.1.0-beta] - 2025-02-16
 
 **⚠️ Beta Release** - This is a pre-release version for testing purposes. All planned features are complete, but the software may contain bugs.

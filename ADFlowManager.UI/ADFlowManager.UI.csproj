@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,16 +9,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <!-- Velopack properties DEV -->
-    <PackageId>ADFlowManager-DEV</PackageId>
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <PackageId>ADFlowManager</PackageId>
+    <Version>0.1.4-beta</Version>
+    <AssemblyVersion>0.1.4.0</AssemblyVersion>
+    <FileVersion>0.1.4.0</FileVersion>
     <Authors>Alex Bumblebee</Authors>
     <Company>Alex Bumblebee</Company>
     <Product>ADFlowManager</Product>
     <Description>Gestion moderne d'Active Directory</Description>
-    <Copyright>Copyright © 2025 - GPLv3</Copyright>
+    <Copyright>Copyright Â© 2025 - GPLv3</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,3 +50,11 @@
   </ItemGroup>
 
 </Project>
+
+
+
+
+
+
+
+
