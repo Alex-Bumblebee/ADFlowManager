@@ -6,7 +6,7 @@
 
 **Modern Active Directory Management Tool**
 
-Significantly faster than PowerShell • Privacy-First • Open Source
+Faster AD Management • Modern Interface • Native Performance • Privacy-First • Open Source
 
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4.svg?logo=dotnet)](https://dotnet.microsoft.com/)
@@ -26,7 +26,13 @@ Significantly faster than PowerShell • Privacy-First • Open Source
 
 ### Why ADFlowManager?
 
-Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error-prone. **ADFlowManager** replaces that workflow with a native .NET 10 desktop application that is **significantly faster**, features an **intelligent SQLite cache**, and provides a **modern WPF-UI interface** — all while keeping your data **100% local**.
+Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error-prone. **ADFlowManager** replaces that workflow with a **modern desktop application** built on .NET 10, featuring:
+
+- **Faster AD Management** — Native .NET APIs with intelligent SQLite caching
+- **Modern Interface** — Intuitive WPF-UI design (dark theme, responsive)
+- **Native Performance** — No PowerShell overhead, async operations throughout
+- **Privacy-First** — Zero telemetry, 100% local data processing
+- **Open Source** — GPLv3 licensed, fully transparent codebase
 
 > **v0.1.0-beta** — First public beta. All planned features are implemented. Feedback welcome!
 
@@ -303,7 +309,13 @@ This project is licensed under the **GNU General Public License v3.0** — see t
 
 ### Pourquoi ADFlowManager ?
 
-Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et source d'erreurs. **ADFlowManager** remplace ce workflow par une application native .NET 10 **significativement plus rapide**, dotée d'un **cache intelligent SQLite** et d'une **interface moderne WPF-UI** — tout en gardant vos données **100 % locales**.
+Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et source d'erreurs. **ADFlowManager** remplace ce workflow par une **application de bureau moderne** construite sur .NET 10, avec :
+
+- **Gestion AD Plus Rapide** — APIs .NET natives avec cache SQLite intelligent
+- **Interface Moderne** — Design WPF-UI intuitif (thème sombre, responsive)
+- **Performance Native** — Aucune surcharge PowerShell, opérations async partout
+- **Privacy-First** — Zéro télémétrie, traitement 100 % local des données
+- **Open Source** — Licence GPLv3, code entièrement transparent
 
 > **v0.1.0-beta** — Première bêta publique. Toutes les fonctionnalités prévues sont implémentées. Vos retours sont les bienvenus !
 
