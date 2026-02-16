@@ -1,0 +1,42 @@
+<Window
+    x:Class="ADFlowManager.UI.Views.Windows.LoginWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="ADFlowManager - Connexion"
+    Width="500"
+    Height="700"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    ResizeMode="NoResize"
+    Background="Transparent"
+    AllowsTransparency="True">
+
+    <Grid>
+        <Frame x:Name="PageHost" NavigationUIVisibility="Hidden" />
+
+        <!-- Badge DEV (en overlay) -->
+        <Border 
+            Background="#F59E0B"
+            CornerRadius="0,0,8,0"
+            Padding="12,6"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Panel.ZIndex="999">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock 
+                    Text="⚠️"
+                    FontSize="12"
+                    Foreground="White"
+                    Margin="0,0,6,0"/>
+                <TextBlock 
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="White">
+                    <Run Text="DEV "/>
+                    <Run x:Name="VersionRun" Text="0.0.0"/>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</Window>

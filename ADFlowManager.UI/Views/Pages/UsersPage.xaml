@@ -1,0 +1,755 @@
+<Page
+    x:Class="ADFlowManager.UI.Views.Pages.UsersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:converters="clr-namespace:ADFlowManager.UI.Converters"
+    xmlns:local="clr-namespace:ADFlowManager.UI.Views.Pages"
+    xmlns:ext="clr-namespace:ADFlowManager.UI.Extensions"
+    Title="{ext:Localized Nav_Users}"
+    d:DesignHeight="800"
+    d:DesignWidth="1200"
+    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:InitialsConverter x:Key="InitialsConverter" />
+        <converters:BoolToStatusColorConverter x:Key="BoolToStatusColorConverter" />
+        <converters:BoolToStatusTextConverter x:Key="BoolToStatusTextConverter" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+    </Page.Resources>
+
+    <!-- FIX 1 : Pas de scroll général, tout tient en 1920x1080 -->
+    <Grid Margin="24,8,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- FIX 2 : Header supprimé (déjà affiché par le breadcrumb navigation) -->
+        <!-- === TOOLBAR === -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Search box -->
+            <ui:TextBox
+                Grid.Column="0"
+                PlaceholderText="{ext:Localized Users_SearchPlaceholder}"
+                Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                Background="#2D2D30"
+                Foreground="#F5F5F5"
+                BorderBrush="#3F3F46"
+                Height="44"
+                FontSize="14"
+                Margin="0,0,16,0">
+                <ui:TextBox.Icon>
+                    <ui:SymbolIcon Symbol="Search24" Foreground="#8B5CF6" />
+                </ui:TextBox.Icon>
+            </ui:TextBox>
+
+            <!-- Actions toolbar -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button
+                    Content="{ext:Localized Users_SelectAll}"
+                    Appearance="Secondary"
+                    Command="{Binding SelectAllCommand}"
+                    Height="44"
+                    Margin="0,0,8,0"
+                    Padding="16,0" />
+                <ui:Button
+                    Content="{ext:Localized Users_DeselectAll}"
+                    Appearance="Secondary"
+                    Command="{Binding DeselectAllCommand}"
+                    Height="44"
+                    Margin="0,0,8,0"
+                    Padding="16,0" />
+                <ui:Button
+                    Content="{ext:Localized Users_Compare}"
+                    Appearance="Secondary"
+                    Click="CompareUsersButton_Click"
+                    IsEnabled="{Binding CanCompareUsers}"
+                    ToolTip="{ext:Localized Users_CompareTooltip}"
+                    Height="44"
+                    Margin="0,0,8,0"
+                    Padding="16,0">
+                    <ui:Button.Icon>
+                        <ui:SymbolIcon Symbol="ArrowSwap24" />
+                    </ui:Button.Icon>
+                </ui:Button>
+                <ui:Button
+                    Appearance="Secondary"
+                    Command="{Binding RefreshCommand}"
+                    ToolTip="{ext:Localized Users_Refresh}"
+                    Height="44"
+                    Width="44">
+                    <ui:Button.Icon>
+                        <ui:SymbolIcon Symbol="ArrowSync24" />
+                    </ui:Button.Icon>
+                </ui:Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- === CONTENT: DataGrid + Details === -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- === LEFT: DataGrid === -->
+            <Border
+                Grid.Column="0"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8"
+                ClipToBounds="True"
+                MaxHeight="800"
+                VerticalAlignment="Top">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                <DataGrid
+                    Grid.Row="0"
+                    x:Name="UsersDataGrid"
+                    ItemsSource="{Binding Users}"
+                    SelectedItem="{Binding SelectedUser, Mode=TwoWay}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    SelectionMode="Single"
+                    CanUserSortColumns="True"
+                    CanUserResizeColumns="True"
+                    CanUserReorderColumns="False"
+                    HeadersVisibility="Column"
+                    GridLinesVisibility="None"
+                    Background="Transparent"
+                    Foreground="#F5F5F5"
+                    BorderThickness="0"
+                    RowHeaderWidth="0"
+                    FontSize="13"
+                    MouseDoubleClick="UsersDataGrid_MouseDoubleClick"
+                    ScrollViewer.CanContentScroll="True"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    VirtualizingPanel.IsVirtualizing="True"
+                    VirtualizingPanel.VirtualizationMode="Recycling"
+                    EnableRowVirtualization="True">
+
+                    <DataGrid.Resources>
+                        <!-- Row style -->
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderBrush" Value="#2D2D30" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter Property="MinHeight" Value="48" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#2D2D30" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#3B2D5E" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+
+                        <!-- FIX 4 : Cell style uniforme avec Background transparent pour laisser le Row gérer -->
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Foreground" Value="#F5F5F5" />
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border
+                                            Background="Transparent"
+                                            Padding="12,8">
+                                            <ContentPresenter VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Foreground" Value="#F5F5F5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+
+                        <!-- Column header style -->
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#161616" />
+                            <Setter Property="Foreground" Value="#A1A1AA" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="Padding" Value="12,10" />
+                            <Setter Property="BorderBrush" Value="#2D2D30" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        </Style>
+                    </DataGrid.Resources>
+
+                    <!-- Context Menu -->
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{ext:Localized Users_CopyLogin}" Command="{Binding CopyUserNameCommand}" />
+                            <MenuItem Header="{ext:Localized Users_CopyEmail}" Command="{Binding CopyEmailCommand}" />
+                            <MenuItem Header="{ext:Localized Users_CopyDn}" Command="{Binding CopyDnCommand}" />
+                            <Separator />
+                            <MenuItem Header="{ext:Localized Users_Edit}" Command="{Binding EditUserCommand}" />
+                            <MenuItem Header="{ext:Localized Users_ManageGroups}" Command="{Binding ManageGroupsCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+
+                    <DataGrid.Columns>
+                        <!-- Checkbox -->
+                        <DataGridTemplateColumn Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox
+                                        IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Margin="-8,0,-8,0" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- Nom complet -->
+                        <DataGridTemplateColumn Header="{ext:Localized Users_ColName}" Width="2*" SortMemberPath="User.DisplayName">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <!-- Avatar initiales -->
+                                        <Border
+                                            Width="32" Height="32"
+                                            CornerRadius="16"
+                                            Background="#3B2D5E"
+                                            Margin="0,0,10,0">
+                                            <TextBlock
+                                                Text="{Binding User.DisplayName, Converter={StaticResource InitialsConverter}}"
+                                                Foreground="#8B5CF6"
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock
+                                                Text="{Binding User.DisplayName}"
+                                                FontWeight="SemiBold"
+                                                Foreground="#F5F5F5"
+                                                FontSize="13" />
+                                            <TextBlock
+                                                Text="{Binding User.UserName}"
+                                                Foreground="#71717A"
+                                                FontSize="11" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- FIX 4 : Email en TemplateColumn pour style uniforme -->
+                        <DataGridTemplateColumn Header="{ext:Localized Users_ColEmail}" Width="2*" SortMemberPath="User.Email">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Text="{Binding User.Email}"
+                                        Foreground="#F5F5F5"
+                                        FontSize="13"
+                                        VerticalAlignment="Center"
+                                        TextTrimming="CharacterEllipsis" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- FIX 4 : Statut avec badge texte complet -->
+                        <DataGridTemplateColumn Header="{ext:Localized Users_ColStatus}" Width="120" SortMemberPath="User.IsEnabled">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        CornerRadius="4"
+                                        Padding="8,4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#1A10B981" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding User.IsEnabled}" Value="False">
+                                                        <Setter Property="Background" Value="#1AEF4444" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock
+                                            Text="{Binding User.IsEnabled, Converter={StaticResource BoolToStatusTextConverter}}"
+                                            FontSize="12"
+                                            FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#10B981" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding User.IsEnabled}" Value="False">
+                                                            <Setter Property="Foreground" Value="#EF4444" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                    <!-- Pagination footer -->
+                    <Border
+                        Grid.Row="1"
+                        Background="#252525"
+                        Padding="16,10"
+                        BorderBrush="#3F3F46"
+                        BorderThickness="0,1,0,0">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="#71717A"
+                            HorizontalAlignment="Center">
+                            <Run Text="{ext:Localized Users_ShowingOf}"/>
+                            <Run Text="{Binding Users.Count, Mode=OneWay}" FontWeight="SemiBold" Foreground="#8B5CF6"/>
+                            <Run Text="{ext:Localized Users_UserCount}"/>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- === RIGHT: Details Panel === -->
+            <!-- Placeholder quand aucun user sélectionné -->
+            <Border
+                Grid.Column="2"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="24"
+                MaxHeight="800"
+                VerticalAlignment="Top"
+                Visibility="{Binding SelectedUser, Converter={StaticResource InverseNullToVisibilityConverter}}">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ui:SymbolIcon
+                        Symbol="Person24"
+                        FontSize="48"
+                        Foreground="#3F3F46"
+                        HorizontalAlignment="Center" />
+                    <TextBlock
+                        Text="{ext:Localized Users_SelectUser}"
+                        FontSize="16"
+                        Foreground="#71717A"
+                        HorizontalAlignment="Center"
+                        Margin="0,16,0,4" />
+                    <TextBlock
+                        Text="{ext:Localized Users_ToViewDetails}"
+                        FontSize="14"
+                        Foreground="#52525B"
+                        HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- ======================================================= -->
+            <!-- Détails utilisateur sélectionné (1 seul user cliqué)    -->
+            <!-- Masqué si HasMultipleChecked = true                     -->
+            <!-- ======================================================= -->
+            <Border
+                Grid.Column="2"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8"
+                MaxHeight="800"
+                VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="{Binding SelectedUser, Converter={StaticResource NullToVisibilityConverter}}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasMultipleChecked}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="24">
+                        <!-- Avatar + Nom -->
+                        <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                            <Border
+                                Width="72" Height="72"
+                                CornerRadius="36"
+                                Background="#3B2D5E"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,12">
+                                <TextBlock
+                                    Text="{Binding SelectedUser.User.DisplayName, Converter={StaticResource InitialsConverter}}"
+                                    Foreground="#8B5CF6"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.DisplayName}"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Foreground="#F5F5F5"
+                                HorizontalAlignment="Center" />
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.UserName}"
+                                FontSize="14"
+                                Foreground="#A1A1AA"
+                                HorizontalAlignment="Center"
+                                Margin="0,4,0,8" />
+
+                            <!-- Badge statut -->
+                            <Border
+                                HorizontalAlignment="Center"
+                                CornerRadius="12"
+                                Padding="12,4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#1A10B981" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedUser.User.IsEnabled}" Value="False">
+                                                <Setter Property="Background" Value="#1AEF4444" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock
+                                    Text="{Binding SelectedUser.User.IsEnabled, Converter={StaticResource BoolToStatusTextConverter}}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    HorizontalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#10B981" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedUser.User.IsEnabled}" Value="False">
+                                                    <Setter Property="Foreground" Value="#EF4444" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Séparateur -->
+                        <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
+
+                        <!-- Informations détaillées -->
+                        <TextBlock
+                            Text="{ext:Localized Users_Information}"
+                            FontSize="11"
+                            FontWeight="Bold"
+                            Foreground="#71717A"
+                            Margin="0,0,0,12" />
+
+                        <!-- Prénom -->
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="{ext:Localized Users_FirstName}" FontSize="11" Foreground="#71717A" />
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.FirstName}"
+                                FontSize="14" Foreground="#F5F5F5"
+                                Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- Nom -->
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="{ext:Localized Users_LastName}" FontSize="11" Foreground="#71717A" />
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.LastName}"
+                                FontSize="14" Foreground="#F5F5F5"
+                                Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- Email -->
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="{ext:Localized Users_Email}" FontSize="11" Foreground="#71717A" />
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.Email}"
+                                FontSize="14" Foreground="#F5F5F5"
+                                Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- Description -->
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="{ext:Localized Users_Description}" FontSize="11" Foreground="#71717A" />
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.Description}"
+                                FontSize="14" Foreground="#F5F5F5"
+                                TextWrapping="Wrap"
+                                Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- DN -->
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="{ext:Localized Users_DistinguishedName}" FontSize="11" Foreground="#71717A" />
+                            <TextBlock
+                                Text="{Binding SelectedUser.User.DistinguishedName}"
+                                FontSize="12" Foreground="#A1A1AA"
+                                TextWrapping="Wrap"
+                                Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- Séparateur -->
+                        <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
+
+                        <!-- Groupes -->
+                        <TextBlock
+                            Text="{ext:Localized Users_Groups}"
+                            FontSize="11"
+                            FontWeight="Bold"
+                            Foreground="#71717A"
+                            Margin="0,0,0,12" />
+
+                        <ItemsControl ItemsSource="{Binding SelectedUser.User.Groups}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Background="#2D2D30"
+                                        CornerRadius="6"
+                                        Padding="10,6"
+                                        Margin="0,0,0,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon
+                                                Symbol="PeopleTeam16"
+                                                FontSize="14"
+                                                Foreground="#8B5CF6"
+                                                Margin="0,0,8,0" />
+                                            <TextBlock
+                                                Text="{Binding GroupName}"
+                                                FontSize="13"
+                                                Foreground="#F5F5F5"
+                                                VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Séparateur -->
+                        <Border Height="1" Background="#3F3F46" Margin="0,16,0,20" />
+
+                        <!-- Actions (single user) -->
+                        <TextBlock
+                            Text="{ext:Localized Users_Actions}"
+                            FontSize="11"
+                            FontWeight="Bold"
+                            Foreground="#71717A"
+                            Margin="0,0,0,12" />
+
+                        <ui:Button
+                            Content="{ext:Localized Users_EditUser}"
+                            Appearance="Primary"
+                            Click="EditUserButton_Click"
+                            HorizontalAlignment="Stretch"
+                            Height="40"
+                            Margin="0,0,0,8">
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="PersonEdit24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+
+                        <ui:Button
+                            Content="{ext:Localized Users_ManageGroups}"
+                            Appearance="Secondary"
+                            Click="ManageGroupsButton_Click"
+                            HorizontalAlignment="Stretch"
+                            Height="40"
+                            Margin="0,0,0,8">
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="PeopleTeam24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+
+                        <ui:Button
+                            Click="DisableUserButton_Click"
+                            Appearance="Secondary"
+                            HorizontalAlignment="Stretch"
+                            Height="40">
+                            <ui:Button.Content>
+                                <TextBlock VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{ext:Localized Users_DisableAccount}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedUser.User.IsEnabled}" Value="False">
+                                                    <Setter Property="Text" Value="{ext:Localized Users_EnableAccount}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </ui:Button.Content>
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="PersonProhibited24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- ======================================================= -->
+            <!-- Panel multi-sélection (quand plusieurs cochés)           -->
+            <!-- ======================================================= -->
+            <Border
+                Grid.Column="2"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8"
+                MaxHeight="800"
+                VerticalAlignment="Top"
+                Padding="24">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasMultipleChecked}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <StackPanel>
+                    <!-- Header -->
+                    <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                        <Border
+                            Width="72" Height="72"
+                            CornerRadius="36"
+                            Background="#3B2D5E"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,12">
+                            <ui:SymbolIcon
+                                Symbol="People24"
+                                FontSize="32"
+                                Foreground="#8B5CF6"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock
+                            FontSize="20"
+                            FontWeight="Bold"
+                            Foreground="#F5F5F5"
+                            HorizontalAlignment="Center">
+                            <Run Text="{Binding SelectedCount, Mode=OneWay}" />
+                            <Run Text="{ext:Localized Users_UserCount}" />
+                        </TextBlock>
+                        <TextBlock
+                            Text="{ext:Localized Users_Selected}"
+                            FontSize="14"
+                            Foreground="#A1A1AA"
+                            HorizontalAlignment="Center"
+                            Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <!-- Séparateur -->
+                    <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
+
+                    <!-- Actions bulk -->
+                    <TextBlock
+                        Text="{ext:Localized Users_BulkActions}"
+                        FontSize="11"
+                        FontWeight="Bold"
+                        Foreground="#71717A"
+                        Margin="0,0,0,12" />
+
+                    <ui:Button
+                        Content="{ext:Localized Users_ManageGroups}"
+                        Appearance="Primary"
+                        Click="BulkAddToGroupsButton_Click"
+                        HorizontalAlignment="Stretch"
+                        Height="40"
+                        Margin="0,0,0,8">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="PeopleTeam24" />
+                        </ui:Button.Icon>
+                    </ui:Button>
+
+                    <ui:Button
+                        Content="{ext:Localized Users_DisableAccount}"
+                        Appearance="Secondary"
+                        Click="BulkDisableButton_Click"
+                        HorizontalAlignment="Stretch"
+                        Height="40"
+                        Margin="0,0,0,8">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="PersonProhibited24" />
+                        </ui:Button.Icon>
+                    </ui:Button>
+
+                    <ui:Button
+                        Content="{ext:Localized Users_Compare}"
+                        Appearance="Secondary"
+                        Click="CompareUsersButton_Click"
+                        IsEnabled="{Binding CanCompareUsers}"
+                        ToolTip="{ext:Localized Users_CompareTooltip}"
+                        HorizontalAlignment="Stretch"
+                        Height="40">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="ArrowSwap24" />
+                        </ui:Button.Icon>
+                    </ui:Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Loader overlay -->
+        <Border
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Background="#CC0F0F0F"
+            Panel.ZIndex="999">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <ui:ProgressRing
+                    IsIndeterminate="True"
+                    Width="48"
+                    Height="48"
+                    Foreground="#8B5CF6"
+                    Margin="0,0,0,16"/>
+                <TextBlock
+                    Text="{ext:Localized Common_Loading}"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Foreground="#F5F5F5"
+                    HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

@@ -1,0 +1,61 @@
+﻿# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.cache
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Build output
+publish/
+Releases/
+
+# User-specific
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# SQLite databases (runtime data)
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# Velopack
+*.RELEASES
+
+# Application data (runtime)
+AppData/
+Audit/
+Templates/
+Cache/
+
+# Temporary files
+*.tmp
+*.temp
+
+# AI-generated files/Workflows
+.specstory/
+.github/

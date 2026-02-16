@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ===== NAVIGATION ===== -->
+  <data name="Nav_Home" xml:space="preserve"><value>Accueil</value></data>
+  <data name="Nav_Users" xml:space="preserve"><value>Utilisateurs</value></data>
+  <data name="Nav_Groups" xml:space="preserve"><value>Groupes</value></data>
+  <data name="Nav_CreateUser" xml:space="preserve"><value>Créer user</value></data>
+  <data name="Nav_History" xml:space="preserve"><value>Historique</value></data>
+  <data name="Nav_Templates" xml:space="preserve"><value>Templates</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Paramètres</value></data>
+
+  <!-- ===== DASHBOARD ===== -->
+  <data name="Dashboard_Version" xml:space="preserve"><value>Version</value></data>
+  <data name="Dashboard_Subtitle" xml:space="preserve"><value>Gestion moderne d'Active Directory</value></data>
+  <data name="Dashboard_Connected" xml:space="preserve"><value>Connecté :</value></data>
+  <data name="Dashboard_Refresh" xml:space="preserve"><value>Actualiser</value></data>
+  <data name="Dashboard_Users" xml:space="preserve"><value>Utilisateurs</value></data>
+  <data name="Dashboard_ActiveDirectory" xml:space="preserve"><value>Active Directory</value></data>
+  <data name="Dashboard_ActiveAccounts" xml:space="preserve"><value>comptes actifs</value></data>
+  <data name="Dashboard_Groups" xml:space="preserve"><value>Groupes</value></data>
+  <data name="Dashboard_SecurityDistribution" xml:space="preserve"><value>Sécurité &amp; Distribution</value></data>
+  <data name="Dashboard_ConfiguredGroups" xml:space="preserve"><value>groupes configurés</value></data>
+  <data name="Dashboard_Activity" xml:space="preserve"><value>Activité</value></data>
+  <data name="Dashboard_Today" xml:space="preserve"><value>Aujourd'hui</value></data>
+  <data name="Dashboard_ActionsPerformed" xml:space="preserve"><value>actions effectuées</value></data>
+  <data name="Dashboard_RecentActivity" xml:space="preserve"><value>Activité récente</value></data>
+  <data name="Dashboard_NoRecentActivity" xml:space="preserve"><value>Aucune activité récente</value></data>
+  <data name="Dashboard_NoRecentActivitySub" xml:space="preserve"><value>Les actions effectuées apparaîtront ici</value></data>
+  <data name="Dashboard_QuickActions" xml:space="preserve"><value>Actions rapides</value></data>
+  <data name="Dashboard_NewUser" xml:space="preserve"><value>Nouvel utilisateur</value></data>
+  <data name="Dashboard_NewGroup" xml:space="preserve"><value>Nouveau groupe</value></data>
+  <data name="Dashboard_ManageTemplates" xml:space="preserve"><value>Gérer les templates</value></data>
+  <data name="Dashboard_ViewHistory" xml:space="preserve"><value>Voir l'historique</value></data>
+  <data name="Dashboard_Disconnect" xml:space="preserve"><value>Déconnexion</value></data>
+
+  <!-- ===== TIME AGO ===== -->
+  <data name="Time_JustNow" xml:space="preserve"><value>À l'instant</value></data>
+  <data name="Time_MinutesAgo" xml:space="preserve"><value>Il y a {0} min</value></data>
+  <data name="Time_HoursAgo" xml:space="preserve"><value>Il y a {0}h</value></data>
+  <data name="Time_DaysAgo" xml:space="preserve"><value>Il y a {0}j</value></data>
+
+  <!-- ===== DISCONNECT DIALOG ===== -->
+  <data name="Disconnect_Confirm" xml:space="preserve"><value>Voulez-vous vraiment vous déconnecter ?</value></data>
+  <data name="Disconnect_Title" xml:space="preserve"><value>Déconnexion</value></data>
+
+  <!-- ===== USERS PAGE ===== -->
+  <data name="Users_SearchPlaceholder" xml:space="preserve"><value>Rechercher par nom, login ou email...</value></data>
+  <data name="Users_SelectAll" xml:space="preserve"><value>Tout sélectionner</value></data>
+  <data name="Users_DeselectAll" xml:space="preserve"><value>Tout désélectionner</value></data>
+  <data name="Users_Compare" xml:space="preserve"><value>Comparer</value></data>
+  <data name="Users_CompareTooltip" xml:space="preserve"><value>Comparer les groupes de 2 utilisateurs sélectionnés</value></data>
+  <data name="Users_Refresh" xml:space="preserve"><value>Rafraîchir</value></data>
+  <data name="Users_ColName" xml:space="preserve"><value>NOM</value></data>
+  <data name="Users_ColEmail" xml:space="preserve"><value>EMAIL</value></data>
+  <data name="Users_ColStatus" xml:space="preserve"><value>STATUT</value></data>
+  <data name="Users_ShowingOf" xml:space="preserve"><value>Affichage de </value></data>
+  <data name="Users_UserCount" xml:space="preserve"><value> utilisateur(s)</value></data>
+  <data name="Users_SelectUser" xml:space="preserve"><value>Sélectionnez un utilisateur</value></data>
+  <data name="Users_ToViewDetails" xml:space="preserve"><value>pour voir ses détails</value></data>
+  <data name="Users_Information" xml:space="preserve"><value>INFORMATIONS</value></data>
+  <data name="Users_FirstName" xml:space="preserve"><value>Prénom</value></data>
+  <data name="Users_LastName" xml:space="preserve"><value>Nom</value></data>
+  <data name="Users_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Users_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Users_DistinguishedName" xml:space="preserve"><value>Distinguished Name</value></data>
+  <data name="Users_Groups" xml:space="preserve"><value>GROUPES</value></data>
+  <data name="Users_Actions" xml:space="preserve"><value>ACTIONS</value></data>
+  <data name="Users_EditUser" xml:space="preserve"><value>Modifier l'utilisateur</value></data>
+  <data name="Users_ManageGroups" xml:space="preserve"><value>Gérer les groupes</value></data>
+  <data name="Users_DisableAccount" xml:space="preserve"><value>Désactiver le compte</value></data>
+  <data name="Users_EnableAccount" xml:space="preserve"><value>Activer le compte</value></data>
+  <data name="Users_CopyLogin" xml:space="preserve"><value>Copier le login</value></data>
+  <data name="Users_CopyEmail" xml:space="preserve"><value>Copier l'email</value></data>
+  <data name="Users_CopyDn" xml:space="preserve"><value>Copier le DN</value></data>
+  <data name="Users_Edit" xml:space="preserve"><value>Modifier</value></data>
+  <data name="Users_Selected" xml:space="preserve"><value>sélectionnés</value></data>
+  <data name="Users_BulkActions" xml:space="preserve"><value>ACTIONS EN MASSE</value></data>
+  <data name="Users_CopyRights" xml:space="preserve"><value>Copier les droits vers</value></data>
+
+  <!-- ===== GROUPS PAGE ===== -->
+  <data name="Groups_SearchPlaceholder" xml:space="preserve"><value>Rechercher un groupe (nom, description...)</value></data>
+  <data name="Groups_GroupCount" xml:space="preserve"><value> groupe(s)</value></data>
+  <data name="Groups_SelectAll" xml:space="preserve"><value>Tout sélectionner</value></data>
+  <data name="Groups_DeselectAll" xml:space="preserve"><value>Tout désélectionner</value></data>
+  <data name="Groups_Refresh" xml:space="preserve"><value>Rafraîchir</value></data>
+  <data name="Groups_Create" xml:space="preserve"><value>Créer un groupe</value></data>
+  <data name="Groups_ColName" xml:space="preserve"><value>NOM DU GROUPE</value></data>
+  <data name="Groups_ColDescription" xml:space="preserve"><value>DESCRIPTION</value></data>
+  <data name="Groups_ColMembers" xml:space="preserve"><value>MEMBRES</value></data>
+  <data name="Groups_SelectGroup" xml:space="preserve"><value>Sélectionnez un groupe</value></data>
+  <data name="Groups_ToViewMembers" xml:space="preserve"><value>pour voir les membres</value></data>
+  <data name="Groups_Information" xml:space="preserve"><value>INFORMATIONS</value></data>
+  <data name="Groups_MemberCount" xml:space="preserve"><value> membre(s)</value></data>
+  <data name="Groups_DoubleClick" xml:space="preserve"><value>Double-clic pour détails</value></data>
+  <data name="Groups_NoMembers" xml:space="preserve"><value>Aucun membre dans ce groupe</value></data>
+  <data name="Groups_Actions" xml:space="preserve"><value>ACTIONS</value></data>
+  <data name="Groups_AddMembers" xml:space="preserve"><value>Ajouter des membres</value></data>
+  <data name="Groups_GroupsWord" xml:space="preserve"><value> groupes</value></data>
+  <data name="Groups_Selected" xml:space="preserve"><value>sélectionnés</value></data>
+  <data name="Groups_BulkActions" xml:space="preserve"><value>ACTIONS EN MASSE</value></data>
+  <data name="Groups_BulkAddMembers" xml:space="preserve"><value>Ajouter des membres aux groupes</value></data>
+  <data name="Groups_CopyName" xml:space="preserve"><value>Copier le nom du groupe</value></data>
+  <data name="Groups_CopyDn" xml:space="preserve"><value>Copier le DN</value></data>
+  <data name="Groups_RemoveTooltip" xml:space="preserve"><value>Retirer du groupe</value></data>
+  <data name="Groups_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Groups_NameRequired" xml:space="preserve"><value>Le nom du groupe est obligatoire.</value></data>
+  <data name="Groups_OURequired" xml:space="preserve"><value>L'OU de destination est obligatoire.</value></data>
+  <data name="Groups_CreateSuccess" xml:space="preserve"><value>Groupe "{0}" créé avec succès dans :
+{1}</value></data>
+  <data name="Templates_ConfirmDelete" xml:space="preserve"><value>Supprimer le template '{0}' ?</value></data>
+  <data name="Templates_ImportTitle" xml:space="preserve"><value>Importer un template</value></data>
+  <data name="History_ExportTitle" xml:space="preserve"><value>Exporter l'historique</value></data>
+
+  <!-- ===== CREATE USER PAGE ===== -->
+  <data name="CreateUser_Template" xml:space="preserve"><value>Template</value></data>
+  <data name="CreateUser_Copy" xml:space="preserve"><value>Copier</value></data>
+  <data name="CreateUser_SearchUser" xml:space="preserve"><value>Rechercher un utilisateur...</value></data>
+  <data name="CreateUser_SaveTemplate" xml:space="preserve"><value>Sauvegarder template</value></data>
+  <data name="CreateUser_TabIdentity" xml:space="preserve"><value>Identité</value></data>
+  <data name="CreateUser_TabContact" xml:space="preserve"><value>Contact</value></data>
+  <data name="CreateUser_TabOrganization" xml:space="preserve"><value>Organisation</value></data>
+  <data name="CreateUser_IdentityInfo" xml:space="preserve"><value>INFORMATIONS D'IDENTITÉ</value></data>
+  <data name="CreateUser_FirstNameReq" xml:space="preserve"><value>Prénom *</value></data>
+  <data name="CreateUser_LastNameReq" xml:space="preserve"><value>Nom *</value></data>
+  <data name="CreateUser_DisplayNameAuto" xml:space="preserve"><value>Nom d'affichage (auto)</value></data>
+  <data name="CreateUser_AutoGenerated" xml:space="preserve"><value>Généré automatiquement</value></data>
+  <data name="CreateUser_LoginAuto" xml:space="preserve"><value>Login (sAMAccountName) (auto)</value></data>
+  <data name="CreateUser_UpnAuto" xml:space="preserve"><value>UPN (auto)</value></data>
+  <data name="CreateUser_ContactInfo" xml:space="preserve"><value>COORDONNÉES</value></data>
+  <data name="CreateUser_EmailAuto" xml:space="preserve"><value>Email (auto)</value></data>
+  <data name="CreateUser_OfficePhone" xml:space="preserve"><value>Téléphone fixe</value></data>
+  <data name="CreateUser_MobilePhone" xml:space="preserve"><value>Téléphone mobile</value></data>
+  <data name="CreateUser_ProfessionalInfo" xml:space="preserve"><value>INFORMATIONS PROFESSIONNELLES</value></data>
+  <data name="CreateUser_JobTitle" xml:space="preserve"><value>Poste / Fonction</value></data>
+  <data name="CreateUser_Department" xml:space="preserve"><value>Service</value></data>
+  <data name="CreateUser_Company" xml:space="preserve"><value>Société</value></data>
+  <data name="CreateUser_Office" xml:space="preserve"><value>Bureau</value></data>
+  <data name="CreateUser_TabGroups" xml:space="preserve"><value>Groupes</value></data>
+  <data name="CreateUser_TabOptions" xml:space="preserve"><value>Options</value></data>
+  <data name="CreateUser_Password" xml:space="preserve"><value>Mot de passe</value></data>
+  <data name="CreateUser_ConfirmPassword" xml:space="preserve"><value>Confirmer le mot de passe</value></data>
+  <data name="CreateUser_CreateButton" xml:space="preserve"><value>Créer l'utilisateur</value></data>
+  <data name="CreateUser_Creating" xml:space="preserve"><value>Création en cours...</value></data>
+  <data name="CreateUser_Preview" xml:space="preserve"><value>APERÇU</value></data>
+  <data name="CreateUser_GroupSearch" xml:space="preserve"><value>Rechercher un groupe...</value></data>
+  <data name="CreateUser_SelectedGroups" xml:space="preserve"><value>sélectionné(s)</value></data>
+  <data name="CreateUser_PasswordReq" xml:space="preserve"><value>Mot de passe *</value></data>
+  <data name="CreateUser_Generate" xml:space="preserve"><value>Générer</value></data>
+  <data name="CreateUser_ConfirmReq" xml:space="preserve"><value>Confirmation *</value></data>
+  <data name="CreateUser_AccountOptions" xml:space="preserve"><value>OPTIONS DU COMPTE</value></data>
+  <data name="CreateUser_ChangePasswordNextLogon" xml:space="preserve"><value>Changer le mot de passe à la prochaine connexion</value></data>
+  <data name="CreateUser_ChangePasswordNextLogonDesc" xml:space="preserve"><value>L'utilisateur devra définir un nouveau mot de passe</value></data>
+  <data name="CreateUser_PasswordNeverExpires" xml:space="preserve"><value>Le mot de passe n'expire jamais</value></data>
+  <data name="CreateUser_PasswordNeverExpiresDesc" xml:space="preserve"><value>Déconseillé pour les comptes utilisateur standard</value></data>
+  <data name="CreateUser_CreateDisabled" xml:space="preserve"><value>Créer le compte désactivé</value></data>
+  <data name="CreateUser_CreateDisabledDesc" xml:space="preserve"><value>Le compte sera créé mais l'accès bloqué</value></data>
+  <data name="CreateUser_Details" xml:space="preserve"><value>DÉTAILS</value></data>
+  <data name="CreateUser_OULabel" xml:space="preserve"><value>Unité organisationnelle</value></data>
+  <data name="CreateUser_Validation" xml:space="preserve"><value>VALIDATION</value></data>
+  <data name="CreateUser_ValidationName" xml:space="preserve"><value>Prénom et nom renseignés</value></data>
+  <data name="CreateUser_ValidationLogin" xml:space="preserve"><value>Login généré</value></data>
+  <data name="CreateUser_ValidationPassword" xml:space="preserve"><value>Mot de passe valide (8+ car.)</value></data>
+  <data name="CreateUser_SuccessDetail" xml:space="preserve"><value>Utilisateur créé avec succès !
+
+Login : {0}
+Nom : {1}
+OU : {2}
+Groupes : {3}</value></data>
+  <data name="CreateUser_ErrorOUNotFound" xml:space="preserve"><value>L'OU sélectionnée n'existe pas ou est inaccessible sur le domaine.
+OU : {0}
+
+Vérifiez que cette OU existe dans Active Directory.</value></data>
+  <data name="CreateUser_ErrorAlreadyExists" xml:space="preserve"><value>L'utilisateur '{0}' existe déjà dans Active Directory.</value></data>
+  <data name="CreateUser_ErrorPasswordPolicy" xml:space="preserve"><value>Le mot de passe ne respecte pas la politique de sécurité du domaine.
+Vérifiez la complexité et la longueur minimale.</value></data>
+  <data name="CreateUser_ErrorCreation" xml:space="preserve"><value>Erreur lors de la création :
+
+{0}</value></data>
+  <data name="CreateUser_SaveTemplateTitle" xml:space="preserve"><value>Sauvegarder comme template</value></data>
+  <data name="CreateUser_SaveTemplateName" xml:space="preserve"><value>Nom du template :</value></data>
+  <data name="CreateUser_SaveTemplateNameHint" xml:space="preserve"><value>Ex: Stagiaire IT, Manager RH</value></data>
+  <data name="CreateUser_SaveTemplateDescTitle" xml:space="preserve"><value>Description template</value></data>
+  <data name="CreateUser_SaveTemplateDesc" xml:space="preserve"><value>Description (optionnel) :</value></data>
+  <data name="CreateUser_SaveTemplateDescHint" xml:space="preserve"><value>Ex: Configuration standard pour stagiaires</value></data>
+  <data name="CreateUser_TemplateSaved" xml:space="preserve"><value>Template '{0}' sauvegardé avec succès !</value></data>
+
+  <!-- ===== HISTORY PAGE ===== -->
+  <data name="History_Title" xml:space="preserve"><value>Historique des actions</value></data>
+  <data name="History_Total" xml:space="preserve"><value>Total :</value></data>
+  <data name="History_Today" xml:space="preserve"><value> | Aujourd'hui :</value></data>
+  <data name="History_ThisWeek" xml:space="preserve"><value> | Cette semaine :</value></data>
+  <data name="History_ExportCsv" xml:space="preserve"><value>Exporter CSV</value></data>
+  <data name="History_Refresh" xml:space="preserve"><value>Rafraîchir</value></data>
+  <data name="History_SearchPlaceholder" xml:space="preserve"><value>Rechercher par utilisateur...</value></data>
+  <data name="History_Filter" xml:space="preserve"><value>Filtrer</value></data>
+  <data name="History_ResetFilters" xml:space="preserve"><value>Réinitialiser les filtres</value></data>
+  <data name="History_Loading" xml:space="preserve"><value>Chargement...</value></data>
+  <data name="History_NoActions" xml:space="preserve"><value>Aucune action enregistrée</value></data>
+  <data name="History_NoActionsSub" xml:space="preserve"><value>Les actions AD seront tracées ici automatiquement</value></data>
+  <data name="History_ColDate" xml:space="preserve"><value>Date</value></data>
+  <data name="History_ColUser" xml:space="preserve"><value>Utilisateur</value></data>
+  <data name="History_ColAction" xml:space="preserve"><value>Action</value></data>
+  <data name="History_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="History_ColEntity" xml:space="preserve"><value>Entité</value></data>
+  <data name="History_ColResult" xml:space="preserve"><value>Résultat</value></data>
+  <data name="History_ColDetails" xml:space="preserve"><value>Détails</value></data>
+
+  <!-- ===== TEMPLATES PAGE ===== -->
+  <data name="Templates_Title" xml:space="preserve"><value>Templates Utilisateur</value></data>
+  <data name="Templates_Subtitle" xml:space="preserve"><value>Gérez vos templates de création utilisateur</value></data>
+  <data name="Templates_ImportTooltip" xml:space="preserve"><value>Importer un template JSON</value></data>
+  <data name="Templates_Import" xml:space="preserve"><value>Importer</value></data>
+  <data name="Templates_RefreshTooltip" xml:space="preserve"><value>Rafraîchir la liste</value></data>
+  <data name="Templates_ColName" xml:space="preserve"><value>Nom</value></data>
+  <data name="Templates_ColDescription" xml:space="preserve"><value>Description</value></data>
+  <data name="Templates_ColGroups" xml:space="preserve"><value>Groupes</value></data>
+  <data name="Templates_ColCreatedBy" xml:space="preserve"><value>Créé par</value></data>
+  <data name="Templates_ColCreatedAt" xml:space="preserve"><value>Créé le</value></data>
+  <data name="Templates_ColActions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Templates_Export" xml:space="preserve"><value>Exporter</value></data>
+  <data name="Templates_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Templates_NoTemplates" xml:space="preserve"><value>Aucun template</value></data>
+  <data name="Templates_NoTemplatesSub" xml:space="preserve"><value>Créez votre premier template depuis la page Création utilisateur</value></data>
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <data name="Login_Subtitle" xml:space="preserve"><value>Gestion Active Directory moderne</value></data>
+  <data name="Login_DomainPlaceholder" xml:space="preserve"><value>Ex: entreprise.local</value></data>
+  <data name="Login_UsernamePlaceholder" xml:space="preserve"><value>Ex: admin ou admin@entreprise.local</value></data>
+  <data name="Login_PasswordPlaceholder" xml:space="preserve"><value>Mot de passe</value></data>
+  <data name="Login_RememberMe" xml:space="preserve"><value>Se souvenir de mes identifiants</value></data>
+  <data name="Login_CredentialStorage" xml:space="preserve"><value>🔒 Stockage chiffré via Windows Credential Manager</value></data>
+  <data name="Login_Connect" xml:space="preserve"><value>Se connecter</value></data>
+  <data name="Login_Connecting" xml:space="preserve"><value>Connexion en cours...</value></data>
+  <data name="Login_AllFieldsRequired" xml:space="preserve"><value>Tous les champs sont requis</value></data>
+  <data name="Login_Timeout" xml:space="preserve"><value>Délai de connexion dépassé (15s). Vérifiez votre réseau et le domaine.</value></data>
+  <data name="Login_Failed" xml:space="preserve"><value>Échec de la connexion. Vérifiez vos identifiants et le domaine.</value></data>
+  <data name="Login_Error" xml:space="preserve"><value>Erreur : {0}</value></data>
+
+  <!-- ===== SETTINGS PAGE ===== -->
+  <data name="Settings_General" xml:space="preserve"><value>Général</value></data>
+  <data name="Settings_ActiveDirectory" xml:space="preserve"><value>Active Directory</value></data>
+  <data name="Settings_Cache" xml:space="preserve"><value>Cache</value></data>
+  <data name="Settings_Logs" xml:space="preserve"><value>Logs</value></data>
+  <data name="Settings_History" xml:space="preserve"><value>Historique</value></data>
+  <data name="Settings_Templates" xml:space="preserve"><value>Templates</value></data>
+  <data name="Settings_About" xml:space="preserve"><value>À propos</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Langue</value></data>
+  <data name="Settings_LanguageDesc" xml:space="preserve"><value>Langue de l'interface (redémarrage requis)</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Thème</value></data>
+  <data name="Settings_ThemeDesc" xml:space="preserve"><value>Apparence de l'application</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Sauvegarder</value></data>
+  <data name="Settings_Export" xml:space="preserve"><value>Exporter</value></data>
+  <data name="Settings_Import" xml:space="preserve"><value>Importer</value></data>
+  <data name="Settings_RestartRequired" xml:space="preserve"><value>Changement de langue. Veuillez redémarrer l'application.</value></data>
+  <data name="Settings_RestartTitle" xml:space="preserve"><value>Redémarrage requis</value></data>
+  <data name="Settings_ThemeDark" xml:space="preserve"><value>Sombre</value></data>
+  <data name="Settings_ThemeLight" xml:space="preserve"><value>Clair</value></data>
+  <data name="Settings_AD" xml:space="preserve"><value>Active Directory</value></data>
+  <data name="Settings_DefaultOU" xml:space="preserve"><value>OU de création par défaut</value></data>
+  <data name="Settings_Users" xml:space="preserve"><value>Utilisateurs</value></data>
+  <data name="Settings_Groups" xml:space="preserve"><value>Groupes</value></data>
+  <data name="Settings_BrowseOUs" xml:space="preserve"><value>Parcourir les OUs</value></data>
+  <data name="Settings_DisabledOU" xml:space="preserve"><value>Départ / Désactivation</value></data>
+  <data name="Settings_DisabledOUDesc" xml:space="preserve"><value>Si renseigné, l'utilisateur désactivé sera déplacé dans cette OU. À la réactivation, il sera remis dans l'OU de création.</value></data>
+  <data name="Settings_IncludedOUs" xml:space="preserve"><value>OUs utilisateurs incluses</value></data>
+  <data name="Settings_IncludedOUsDesc" xml:space="preserve"><value>Seuls les utilisateurs dans ces OUs seront affichés</value></data>
+  <data name="Settings_AddOUFromAD" xml:space="preserve"><value>Ajouter une OU depuis AD</value></data>
+  <data name="Settings_OneOUPerLine" xml:space="preserve"><value>Une OU par ligne</value></data>
+  <data name="Settings_ExcludedOUs" xml:space="preserve"><value>OUs utilisateurs exclues</value></data>
+  <data name="Settings_ExcludedOUsDesc" xml:space="preserve"><value>Les utilisateurs dans ces OUs ne seront pas affichés</value></data>
+  <data name="Settings_OneOUPerLineEx" xml:space="preserve"><value>Une OU par ligne (ex: OU=ServiceAccounts,DC=contoso,DC=local)</value></data>
+  <data name="Settings_CacheTitle" xml:space="preserve"><value>Cache SQLite</value></data>
+  <data name="Settings_CacheDesc" xml:space="preserve"><value>Le cache accélère le chargement des utilisateurs et groupes. Les données sont rafraîchies automatiquement selon le TTL configuré.</value></data>
+  <data name="Settings_LastRefresh" xml:space="preserve"><value>DERNIER RAFRAÎCHISSEMENT</value></data>
+  <data name="Settings_CacheUsers" xml:space="preserve"><value>UTILISATEURS</value></data>
+  <data name="Settings_CacheGroups" xml:space="preserve"><value>GROUPES</value></data>
+  <data name="Settings_InCache" xml:space="preserve"><value> en cache</value></data>
+  <data name="Settings_ClearCache" xml:space="preserve"><value>Vider le cache</value></data>
+  <data name="Settings_RefreshNow" xml:space="preserve"><value>Rafraîchir maintenant</value></data>
+  <data name="Settings_Refreshing" xml:space="preserve"><value>Rafraîchissement...</value></data>
+  <data name="Settings_CacheTTL" xml:space="preserve"><value>Durée de vie du cache (TTL)</value></data>
+  <data name="Settings_EnableCache" xml:space="preserve"><value>Activer le cache local (SQLite)</value></data>
+  <data name="Settings_LogsTitle" xml:space="preserve"><value>Journalisation</value></data>
+  <data name="Settings_LocalLogs" xml:space="preserve"><value>Logs locaux (obligatoire)</value></data>
+  <data name="Settings_OpenLogsFolder" xml:space="preserve"><value>Ouvrir le dossier des logs</value></data>
+  <data name="Settings_NetworkLogs" xml:space="preserve"><value>Activer les logs réseau (audit)</value></data>
+  <data name="Settings_NetworkPath" xml:space="preserve"><value>Chemin réseau</value></data>
+  <data name="Settings_NetworkLogsDesc" xml:space="preserve"><value>Les actions critiques seront enregistrées sur le réseau pour audit</value></data>
+  <data name="Settings_HistoryTitle" xml:space="preserve"><value>Historique des actions</value></data>
+  <data name="Settings_HistoryDesc" xml:space="preserve"><value>Configurez le stockage des logs d'audit pour tracer toutes les actions AD.</value></data>
+  <data name="Settings_EnableAudit" xml:space="preserve"><value>Activer l'historique des actions</value></data>
+  <data name="Settings_StorageMode" xml:space="preserve"><value>Mode de stockage</value></data>
+  <data name="Settings_AuditLocalDesc" xml:space="preserve"><value>Local : chaque poste a sa propre base.</value></data>
+  <data name="Settings_AuditNetworkDesc" xml:space="preserve"><value>Réseau partagé : tous les utilisateurs partagent la même base (audit centralisé).</value></data>
+  <data name="Settings_AuditNetworkPath" xml:space="preserve"><value>Chemin base de données réseau</value></data>
+  <data name="Settings_AuditNetworkPathDesc" xml:space="preserve"><value>Tous les postes utilisant ce chemin partageront le même historique.</value></data>
+  <data name="Settings_RetentionDays" xml:space="preserve"><value>Rétention des logs (jours)</value></data>
+  <data name="Settings_RetentionUnlimited" xml:space="preserve"><value>  (0 = illimité)</value></data>
+  <data name="Settings_OpenAuditFolder" xml:space="preserve"><value>Ouvrir le dossier de la base audit</value></data>
+  <data name="Settings_TemplatesTitle" xml:space="preserve"><value>Templates Utilisateur</value></data>
+  <data name="Settings_TemplatesDesc" xml:space="preserve"><value>Les templates permettent de pré-remplir rapidement les formulaires de création utilisateur avec des configurations standard.</value></data>
+  <data name="Settings_TemplateLocalDesc" xml:space="preserve"><value>Local : templates stockés dans AppData (par poste).</value></data>
+  <data name="Settings_TemplateNetworkDesc" xml:space="preserve"><value>Réseau partagé : templates partagés entre tous les utilisateurs.</value></data>
+  <data name="Settings_LocalFolder" xml:space="preserve"><value>Dossier local</value></data>
+  <data name="Settings_NetworkFolder" xml:space="preserve"><value>Dossier réseau partagé</value></data>
+  <data name="Settings_TemplateNetworkPathDesc" xml:space="preserve"><value>Chemin UNC du dossier réseau. Tous les utilisateurs avec accès partageront les mêmes templates.</value></data>
+  <data name="Settings_OpenTemplatesFolder" xml:space="preserve"><value>Ouvrir le dossier templates</value></data>
+  <data name="Settings_GitHub" xml:space="preserve"><value>GitHub - Code source</value></data>
+  <data name="Settings_ExportConfig" xml:space="preserve"><value>Exporter la configuration</value></data>
+  <data name="Settings_ImportConfig" xml:space="preserve"><value>Importer une configuration</value></data>
+  <data name="Settings_FooterRestart" xml:space="preserve"><value>Les modifications nécessitent un redémarrage de l'application</value></data>
+
+  <!-- ===== USER DETAILS WINDOW ===== -->
+  <data name="UserDetails_ViewMode" xml:space="preserve"><value>Consultation</value></data>
+  <data name="UserDetails_EditMode" xml:space="preserve"><value>Modification</value></data>
+  <data name="UserDetails_TabGeneral" xml:space="preserve"><value>Général</value></data>
+  <data name="UserDetails_TabContact" xml:space="preserve"><value>Contact</value></data>
+  <data name="UserDetails_TabOrganization" xml:space="preserve"><value>Organisation</value></data>
+  <data name="UserDetails_TabGroups" xml:space="preserve"><value>Groupes</value></data>
+  <data name="UserDetails_TabHistory" xml:space="preserve"><value>Historique</value></data>
+  <data name="UserDetails_FirstName" xml:space="preserve"><value>Prénom</value></data>
+  <data name="UserDetails_LastName" xml:space="preserve"><value>Nom</value></data>
+  <data name="UserDetails_DisplayName" xml:space="preserve"><value>Nom d'affichage</value></data>
+  <data name="UserDetails_Login" xml:space="preserve"><value>Login (SAM)</value></data>
+  <data name="UserDetails_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="UserDetails_AccountStatus" xml:space="preserve"><value>Statut du compte</value></data>
+  <data name="UserDetails_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="UserDetails_Phone" xml:space="preserve"><value>Téléphone</value></data>
+  <data name="UserDetails_Mobile" xml:space="preserve"><value>Mobile</value></data>
+  <data name="UserDetails_DistinguishedName" xml:space="preserve"><value>Distinguished Name</value></data>
+  <data name="UserDetails_JobTitle" xml:space="preserve"><value>Poste</value></data>
+  <data name="UserDetails_Department" xml:space="preserve"><value>Département</value></data>
+  <data name="UserDetails_Company" xml:space="preserve"><value>Entreprise</value></data>
+  <data name="UserDetails_Office" xml:space="preserve"><value>Bureau</value></data>
+  <data name="UserDetails_Save" xml:space="preserve"><value>Sauvegarder</value></data>
+  <data name="UserDetails_ResetPassword" xml:space="preserve"><value>Réinitialiser le mot de passe</value></data>
+  <data name="UserDetails_DisableAccount" xml:space="preserve"><value>Désactiver le compte</value></data>
+  <data name="UserDetails_EnableAccount" xml:space="preserve"><value>Activer le compte</value></data>
+  <data name="UserDetails_AddGroup" xml:space="preserve"><value>Ajouter</value></data>
+  <data name="UserDetails_SearchGroup" xml:space="preserve"><value>Rechercher un groupe à ajouter...</value></data>
+  <data name="UserDetails_RemoveGroup" xml:space="preserve"><value>Retirer du groupe</value></data>
+  <data name="UserDetails_NoHistory" xml:space="preserve"><value>Aucun historique</value></data>
+  <data name="UserDetails_WindowTitle" xml:space="preserve"><value>Détails utilisateur</value></data>
+  <data name="UserDetails_AccountEnabled" xml:space="preserve"><value>Compte activé</value></data>
+  <data name="UserDetails_AccountDisabled" xml:space="preserve"><value>Compte désactivé</value></data>
+
+  <!-- ===== COMMON / SHARED ===== -->
+  <data name="Common_Yes" xml:space="preserve"><value>Oui</value></data>
+  <data name="Common_No" xml:space="preserve"><value>Non</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Common_Error" xml:space="preserve"><value>Erreur</value></data>
+  <data name="Common_Success" xml:space="preserve"><value>Succès</value></data>
+  <data name="Common_Warning" xml:space="preserve"><value>Attention</value></data>
+  <data name="Common_Loading" xml:space="preserve"><value>Chargement...</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Rechercher</value></data>
+  <data name="Common_Enabled" xml:space="preserve"><value>Actif</value></data>
+  <data name="Common_Disabled" xml:space="preserve"><value>Désactivé</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Common_Confirm" xml:space="preserve"><value>Confirmer</value></data>
+
+  <!-- ===== GROUPS CREATE DIALOG ===== -->
+  <data name="GroupCreate_Title" xml:space="preserve"><value>Créer un nouveau groupe</value></data>
+  <data name="GroupCreate_Name" xml:space="preserve"><value>Nom du groupe *</value></data>
+  <data name="GroupCreate_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="GroupCreate_OU" xml:space="preserve"><value>Unité d'organisation (OU)</value></data>
+  <data name="GroupCreate_Create" xml:space="preserve"><value>Créer le groupe</value></data>
+
+  <!-- ===== SETTINGS VM KEYS ===== -->
+  <data name="Settings_SaveSuccess" xml:space="preserve"><value>Paramètres sauvegardés avec succès !</value></data>
+  <data name="Settings_SaveError" xml:space="preserve"><value>Erreur sauvegarde : {0}</value></data>
+  <data name="Settings_CacheNever" xml:space="preserve"><value>Jamais</value></data>
+  <data name="Settings_CacheClearConfirm" xml:space="preserve"><value>Vider le cache ?
+
+Le prochain chargement sera plus lent (données récupérées depuis AD).</value></data>
+  <data name="Settings_CacheClearTitle" xml:space="preserve"><value>Vider cache</value></data>
+  <data name="Settings_NotConnected" xml:space="preserve"><value>Non connecté à Active Directory.</value></data>
+  <data name="Settings_NoOUs" xml:space="preserve"><value>Aucune OU disponible.</value></data>
+  <data name="Settings_BrowseUserOU" xml:space="preserve"><value>Sélectionner l'OU de création utilisateurs</value></data>
+  <data name="Settings_BrowseGroupOU" xml:space="preserve"><value>Sélectionner l'OU de création groupes</value></data>
+  <data name="Settings_BrowseDisabledOU" xml:space="preserve"><value>Sélectionner l'OU de départ/désactivation</value></data>
+  <data name="Settings_BrowseIncludedOU" xml:space="preserve"><value>Ajouter une OU incluse</value></data>
+  <data name="Settings_BrowseExcludedOU" xml:space="preserve"><value>Ajouter une OU exclue</value></data>
+  <data name="Settings_ExportTitle" xml:space="preserve"><value>Exporter la configuration</value></data>
+  <data name="Settings_ExportSuccess" xml:space="preserve"><value>Configuration exportée :
+{0}</value></data>
+  <data name="Settings_ImportTitle" xml:space="preserve"><value>Importer une configuration</value></data>
+  <data name="Settings_ImportConfirm" xml:space="preserve"><value>Importer cette configuration ?
+
+Les paramètres actuels seront remplacés.</value></data>
+  <data name="Settings_ImportSuccess" xml:space="preserve"><value>Configuration importée avec succès !</value></data>
+  <data name="Common_ErrorFormat" xml:space="preserve"><value>Erreur : {0}</value></data>
+  <data name="Common_Info" xml:space="preserve"><value>Information</value></data>
+  <data name="Common_Select" xml:space="preserve"><value>Sélectionner</value></data>
+
+  <!-- ===== MESSAGES ===== -->
+  <data name="Msg_UserCreatedSuccess" xml:space="preserve"><value>Utilisateur créé avec succès !</value></data>
+  <data name="Msg_UserCreatedError" xml:space="preserve"><value>Erreur lors de la création de l'utilisateur</value></data>
+  <data name="Msg_GroupCreatedSuccess" xml:space="preserve"><value>Groupe créé avec succès !</value></data>
+  <data name="Msg_SaveSuccess" xml:space="preserve"><value>Modifications sauvegardées avec succès</value></data>
+  <data name="Msg_SaveError" xml:space="preserve"><value>Erreur lors de la sauvegarde</value></data>
+  <data name="Msg_PasswordResetSuccess" xml:space="preserve"><value>Mot de passe réinitialisé avec succès</value></data>
+  <data name="Msg_TemplateExported" xml:space="preserve"><value>Template exporté avec succès</value></data>
+  <data name="Msg_TemplateImported" xml:space="preserve"><value>Template importé avec succès</value></data>
+  <data name="Msg_TemplateDeleted" xml:space="preserve"><value>Template supprimé</value></data>
+  <data name="Msg_TemplateSaved" xml:space="preserve"><value>Template sauvegardé avec succès</value></data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Voulez-vous vraiment supprimer cet élément ?</value></data>
+  <data name="Msg_AccountDisabled" xml:space="preserve"><value>Compte désactivé avec succès</value></data>
+  <data name="Msg_AccountEnabled" xml:space="preserve"><value>Compte activé avec succès</value></data>
+  <data name="Msg_MemberAdded" xml:space="preserve"><value>Membre(s) ajouté(s) avec succès</value></data>
+  <data name="Msg_MemberRemoved" xml:space="preserve"><value>Membre retiré du groupe</value></data>
+  <data name="Msg_CsvExported" xml:space="preserve"><value>Export CSV réussi</value></data>
+  <data name="Msg_SettingsSaved" xml:space="preserve"><value>Paramètres sauvegardés</value></data>
+
+</root>

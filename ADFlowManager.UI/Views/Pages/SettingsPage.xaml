@@ -1,0 +1,1089 @@
+<Page
+    x:Class="ADFlowManager.UI.Views.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:ADFlowManager.UI.Views.Pages"
+    xmlns:ext="clr-namespace:ADFlowManager.UI.Extensions"
+    Title="{ext:Localized Nav_Settings}"
+    d:DesignHeight="900"
+    d:DesignWidth="1200"
+    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+    mc:Ignorable="d">
+
+    <Grid Margin="24,8,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ===== CONTENT: Sidebar + Panels ===== -->
+        <Grid Grid.Row="0" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- === SIDEBAR NAVIGATION === -->
+            <Border
+                Grid.Column="0"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="8">
+
+                <StackPanel>
+                    <!-- Général -->
+                    <Border Tag="0" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="0">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="0">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_General}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="0">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Active Directory -->
+                    <Border Tag="1" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="1">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="PeopleTeam24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="1">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_ActiveDirectory}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="1">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Cache -->
+                    <Border Tag="2" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="2">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Database24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="2">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_Cache}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="2">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Logs -->
+                    <Border Tag="3" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="3">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Document24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="3">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_Logs}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="3">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Historique -->
+                    <Border Tag="4" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="4">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="History24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="4">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_History}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="4">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Templates -->
+                    <Border Tag="5" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="5">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="DocumentCopy24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="5">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_Templates}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="5">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- À propos -->
+                    <Border Tag="6" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Info24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_About}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- === CONTENT AREA === -->
+            <Border
+                Grid.Column="2"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="32">
+
+                        <!-- ===== TAB 0 : GÉNÉRAL ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_General}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,24" />
+
+                            <!-- Thème -->
+                            <StackPanel Margin="0,0,0,24">
+                                <TextBlock Text="{ext:Localized Settings_Theme}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                                <ComboBox
+                                    SelectedIndex="{Binding ViewModel.ThemeIndex}"
+                                    Height="44"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46">
+                                    <ComboBoxItem Content="{ext:Localized Settings_ThemeDark}" />
+                                    <ComboBoxItem Content="{ext:Localized Settings_ThemeLight}" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Langue -->
+                            <StackPanel>
+                                <TextBlock Text="{ext:Localized Settings_Language}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                                <ComboBox
+                                    SelectedIndex="{Binding ViewModel.LanguageIndex}"
+                                    Height="44"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46">
+                                    <ComboBoxItem Content="Français" />
+                                    <ComboBoxItem Content="English" />
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ===== TAB 1 : ACTIVE DIRECTORY ===== -->
+                        <StackPanel MaxWidth="900" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="1">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_AD}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,24" />
+
+                            <!-- OU par défaut -->
+                            <TextBlock Text="{ext:Localized Settings_DefaultOU}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,16" />
+
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized Settings_Users}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox
+                                        Grid.Column="0"
+                                        Text="{Binding ViewModel.DefaultUserOU, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="OU=Users,DC=contoso,DC=local"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="44" />
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        ToolTip="{ext:Localized Settings_BrowseOUs}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.BrowseDefaultUserOUCommand}"
+                                        Height="44"
+                                        Width="44"
+                                        Margin="8,0,0,0">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="FolderOpen24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized Settings_Groups}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox
+                                        Grid.Column="0"
+                                        Text="{Binding ViewModel.DefaultGroupOU, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="OU=Groups,DC=contoso,DC=local"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="44" />
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        ToolTip="{ext:Localized Settings_BrowseOUs}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.BrowseDefaultGroupOUCommand}"
+                                        Height="44"
+                                        Width="44"
+                                        Margin="8,0,0,0">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="FolderOpen24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- OU de départ/désactivation -->
+                            <StackPanel Margin="0,0,0,24">
+                                <TextBlock Text="{ext:Localized Settings_DisabledOU}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <TextBlock Text="{ext:Localized Settings_DisabledOUDesc}" FontSize="11" Foreground="#71717A" Margin="0,0,0,4" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox
+                                        Grid.Column="0"
+                                        Text="{Binding ViewModel.DisabledUserOU, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="OU=Disabled,DC=contoso,DC=local"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="44" />
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        ToolTip="{ext:Localized Settings_BrowseOUs}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.BrowseDisabledUserOUCommand}"
+                                        Height="44"
+                                        Width="44"
+                                        Margin="8,0,0,0">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="FolderOpen24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- OUs incluses -->
+                            <StackPanel Margin="0,0,0,24">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="{ext:Localized Settings_IncludedOUs}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" VerticalAlignment="Center" />
+                                    <ui:Button
+                                        ToolTip="{ext:Localized Settings_AddOUFromAD}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.BrowseIncludedOUCommand}"
+                                        Height="28"
+                                        Width="28"
+                                        Margin="8,0,0,0"
+                                        Padding="0">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Add24" FontSize="14" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </StackPanel>
+                                <TextBlock Text="{ext:Localized Settings_IncludedOUsDesc}" FontSize="13" Foreground="#71717A" Margin="0,0,0,8" />
+                                <TextBox
+                                    Text="{Binding ViewModel.IncludedUserOUs, UpdateSourceTrigger=PropertyChanged}"
+                                    Height="120"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    VerticalScrollBarVisibility="Auto"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Padding="12" />
+                                <TextBlock Text="{ext:Localized Settings_OneOUPerLine}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <!-- OUs exclues -->
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="{ext:Localized Settings_ExcludedOUs}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" VerticalAlignment="Center" />
+                                    <ui:Button
+                                        ToolTip="{ext:Localized Settings_AddOUFromAD}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.BrowseExcludedOUCommand}"
+                                        Height="28"
+                                        Width="28"
+                                        Margin="8,0,0,0"
+                                        Padding="0">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Add24" FontSize="14" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </StackPanel>
+                                <TextBlock Text="{ext:Localized Settings_ExcludedOUsDesc}" FontSize="13" Foreground="#71717A" Margin="0,0,0,8" />
+                                <TextBox
+                                    Text="{Binding ViewModel.ExcludedUserOUs, UpdateSourceTrigger=PropertyChanged}"
+                                    Height="120"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    VerticalScrollBarVisibility="Auto"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Padding="12" />
+                                <TextBlock Text="{ext:Localized Settings_OneOUPerLineEx}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ===== TAB 2 : CACHE ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="2">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_CacheTitle}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                            <TextBlock
+                                Text="{ext:Localized Settings_CacheDesc}"
+                                FontSize="13"
+                                Foreground="#71717A"
+                                TextWrapping="Wrap"
+                                Margin="0,0,0,24" />
+
+                            <!-- Stats cache -->
+                            <Border Background="#2D2D30" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{ext:Localized Settings_LastRefresh}" FontSize="10" FontWeight="Bold" Foreground="#71717A" />
+                                        <TextBlock
+                                            Text="{Binding ViewModel.LastCacheRefresh}"
+                                            FontSize="15"
+                                            FontWeight="SemiBold"
+                                            Foreground="#F5F5F5"
+                                            Margin="0,6,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                                        <TextBlock Text="{ext:Localized Settings_CacheUsers}" FontSize="10" FontWeight="Bold" Foreground="#71717A" />
+                                        <TextBlock
+                                            FontSize="15"
+                                            FontWeight="SemiBold"
+                                            Foreground="#8B5CF6"
+                                            Margin="0,6,0,0">
+                                            <Run Text="{Binding ViewModel.CachedUsersCount, Mode=OneWay}" />
+                                            <Run Text="{ext:Localized Settings_InCache}" Foreground="#A1A1AA" />
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Margin="16,0,0,0">
+                                        <TextBlock Text="{ext:Localized Settings_CacheGroups}" FontSize="10" FontWeight="Bold" Foreground="#71717A" />
+                                        <TextBlock
+                                            FontSize="15"
+                                            FontWeight="SemiBold"
+                                            Foreground="#8B5CF6"
+                                            Margin="0,6,0,0">
+                                            <Run Text="{Binding ViewModel.CachedGroupsCount, Mode=OneWay}" />
+                                            <Run Text="{ext:Localized Settings_InCache}" Foreground="#A1A1AA" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Actions cache -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                                <ui:Button
+                                    Content="{ext:Localized Settings_ClearCache}"
+                                    Appearance="Secondary"
+                                    Command="{Binding ViewModel.ClearCacheCommand}"
+                                    Height="44"
+                                    Padding="20,0"
+                                    Margin="0,0,12,0">
+                                    <ui:Button.Icon>
+                                        <ui:SymbolIcon Symbol="Delete24" />
+                                    </ui:Button.Icon>
+                                </ui:Button>
+
+                                <ui:Button
+                                    Content="{Binding ViewModel.IsCacheRefreshing, Converter={StaticResource InverseBoolConverter}, ConverterParameter=Rafraîchir}"
+                                    Appearance="Primary"
+                                    Command="{Binding ViewModel.RefreshCacheCommand}"
+                                    Height="44"
+                                    Padding="20,0">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Content" Value="{ext:Localized Settings_RefreshNow}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ViewModel.IsCacheRefreshing}" Value="True">
+                                                    <Setter Property="Content" Value="{ext:Localized Settings_Refreshing}" />
+                                                    <Setter Property="IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                    <ui:Button.Icon>
+                                        <ui:SymbolIcon Symbol="ArrowSync24" />
+                                    </ui:Button.Icon>
+                                </ui:Button>
+                            </StackPanel>
+
+                            <!-- Séparateur -->
+                            <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
+
+                            <!-- TTL Rafraîchissement -->
+                            <TextBlock Text="{ext:Localized Settings_CacheTTL}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,12" />
+
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Slider
+                                    Value="{Binding ViewModel.CacheRefreshMinutes}"
+                                    Minimum="15"
+                                    Maximum="240"
+                                    TickFrequency="15"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center" />
+
+                                <TextBlock
+                                    Grid.Column="1"
+                                    FontSize="14"
+                                    Foreground="#8B5CF6"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center"
+                                    Margin="16,0,0,0">
+                                    <Run Text="{Binding ViewModel.CacheRefreshMinutes, Mode=OneWay}" />
+                                    <Run Text=" min" />
+                                </TextBlock>
+                            </Grid>
+
+                            <!-- Cache local -->
+                            <CheckBox
+                                IsChecked="{Binding ViewModel.CacheEnabled}"
+                                Content="{ext:Localized Settings_EnableCache}"
+                                Foreground="#F5F5F5"
+                                FontSize="14"
+                                Margin="0,0,0,12" />
+
+                            <TextBlock
+                                FontSize="11"
+                                Foreground="#52525B"
+                                Margin="0,0,0,0">
+                                <Run Text="Base de données : %LOCALAPPDATA%\ADFlowManager\Cache\adflow-cache.db" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- ===== TAB 3 : LOGS ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="3">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_LogsTitle}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,24" />
+
+                            <!-- Logs locaux -->
+                            <CheckBox
+                                IsChecked="True"
+                                IsEnabled="False"
+                                Content="{ext:Localized Settings_LocalLogs}"
+                                Foreground="#F5F5F5"
+                                FontSize="14"
+                                Margin="0,0,0,12" />
+
+                            <ui:Button
+                                Content="{ext:Localized Settings_OpenLogsFolder}"
+                                Appearance="Secondary"
+                                Command="{Binding ViewModel.OpenLogsCommand}"
+                                Height="44"
+                                Padding="16,0"
+                                HorizontalAlignment="Left"
+                                Margin="0,0,0,24">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Folder24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+
+                            <!-- Logs réseau -->
+                            <CheckBox
+                                IsChecked="{Binding ViewModel.NetworkLogsEnabled}"
+                                Content="{ext:Localized Settings_NetworkLogs}"
+                                Foreground="#F5F5F5"
+                                FontSize="14"
+                                Margin="0,0,0,12" />
+
+                            <StackPanel IsEnabled="{Binding ViewModel.NetworkLogsEnabled}">
+                                <TextBlock Text="{ext:Localized Settings_NetworkPath}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    Text="{Binding ViewModel.NetworkLogPath, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="\\server\share\ADFlowLogs"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="44" />
+                                <TextBlock Text="{ext:Localized Settings_NetworkLogsDesc}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ===== TAB 4 : HISTORIQUE ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="4">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_HistoryTitle}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                            <TextBlock Text="{ext:Localized Settings_HistoryDesc}" FontSize="13" Foreground="#71717A" Margin="0,0,0,24" />
+
+                            <!-- Activer audit -->
+                            <CheckBox
+                                IsChecked="{Binding ViewModel.AuditEnabled}"
+                                Content="{ext:Localized Settings_EnableAudit}"
+                                Foreground="#F5F5F5"
+                                FontSize="14"
+                                Margin="0,0,0,20" />
+
+                            <!-- Mode stockage -->
+                            <StackPanel IsEnabled="{Binding ViewModel.AuditEnabled}">
+                                <TextBlock Text="{ext:Localized Settings_StorageMode}" FontSize="13" Foreground="#A1A1AA" FontWeight="SemiBold" Margin="0,0,0,8" />
+
+                                <ComboBox
+                                    ItemsSource="{Binding ViewModel.AuditStorageModes}"
+                                    SelectedIndex="{Binding ViewModel.AuditStorageModeIndex}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    Height="44"
+                                    Margin="0,0,0,8" />
+
+                                <TextBlock FontSize="11" Foreground="#52525B" Margin="0,0,0,20">
+                                    <Run Text="{ext:Localized Settings_AuditLocalDesc}" />
+                                    <LineBreak />
+                                    <Run Text="{ext:Localized Settings_AuditNetworkDesc}" />
+                                </TextBlock>
+
+                                <!-- Chemin réseau (visible si mode Réseau) -->
+                                <StackPanel Margin="0,0,0,20">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ViewModel.AuditStorageModeIndex}" Value="1">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="{ext:Localized Settings_AuditNetworkPath}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        Text="{Binding ViewModel.AuditNetworkPath, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="\\server\share\ADFlowManager\audit-shared.db"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="44" />
+                                    <TextBlock Text="{ext:Localized Settings_AuditNetworkPathDesc}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <!-- Rétention -->
+                                <TextBlock Text="{ext:Localized Settings_RetentionDays}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox
+                                        Grid.Column="0"
+                                        Text="{Binding ViewModel.AuditRetentionDays, UpdateSourceTrigger=PropertyChanged}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="44" />
+                                    <TextBlock Grid.Column="1" Text="{ext:Localized Settings_RetentionUnlimited}" FontSize="12" Foreground="#52525B" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- Bouton ouvrir dossier -->
+                                <ui:Button
+                                    Content="{ext:Localized Settings_OpenAuditFolder}"
+                                    Appearance="Secondary"
+                                    Command="{Binding ViewModel.OpenAuditDbCommand}"
+                                    Height="44"
+                                    Padding="16,0"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,12,0,0">
+                                    <ui:Button.Icon>
+                                        <ui:SymbolIcon Symbol="Folder24" />
+                                    </ui:Button.Icon>
+                                </ui:Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ===== TAB 5 : TEMPLATES ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="5">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_TemplatesTitle}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                            <TextBlock Text="{ext:Localized Settings_TemplatesDesc}" FontSize="13" Foreground="#71717A" TextWrapping="Wrap" Margin="0,0,0,24" />
+
+                            <!-- Mode stockage -->
+                            <StackPanel Margin="0,0,0,20">
+                                <TextBlock Text="{ext:Localized Settings_StorageMode}" FontSize="13" Foreground="#A1A1AA" FontWeight="SemiBold" Margin="0,0,0,8" />
+                                <ComboBox
+                                    ItemsSource="{Binding ViewModel.TemplateStorageModes}"
+                                    SelectedIndex="{Binding ViewModel.TemplateStorageModeIndex}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    Height="44"
+                                    Margin="0,0,0,8" />
+                                <TextBlock FontSize="11" Foreground="#52525B" Margin="0,0,0,0">
+                                    <Run Text="{ext:Localized Settings_TemplateLocalDesc}" />
+                                    <LineBreak />
+                                    <Run Text="{ext:Localized Settings_TemplateNetworkDesc}" />
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- Chemin local (readonly) -->
+                            <StackPanel Margin="0,0,0,20">
+                                <TextBlock Text="{ext:Localized Settings_LocalFolder}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    Text="{Binding ViewModel.TemplateLocalPath, Mode=OneWay}"
+                                    IsReadOnly="True"
+                                    Background="#2D2D30"
+                                    Foreground="#71717A"
+                                    BorderBrush="#3F3F46"
+                                    Height="44" />
+                            </StackPanel>
+
+                            <!-- Chemin réseau (visible si mode Réseau) -->
+                            <StackPanel Margin="0,0,0,20">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.TemplateStorageModeIndex}" Value="1">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{ext:Localized Settings_NetworkFolder}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    Text="{Binding ViewModel.TemplateNetworkPath, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="\\server\share\ADFlowManager\Templates"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="44" />
+                                <TextBlock Text="{ext:Localized Settings_TemplateNetworkPathDesc}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <!-- Bouton ouvrir dossier -->
+                            <ui:Button
+                                Content="{ext:Localized Settings_OpenTemplatesFolder}"
+                                Appearance="Secondary"
+                                Command="{Binding ViewModel.OpenTemplatesFolderCommand}"
+                                Height="44"
+                                Padding="16,0"
+                                HorizontalAlignment="Left">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Folder24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                        </StackPanel>
+
+                        <!-- ===== TAB 6 : À PROPOS ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Center">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <!-- App icon + info -->
+                            <StackPanel HorizontalAlignment="Center" Margin="0,24,0,0">
+                                <Image
+                                    Source="pack://application:,,,/Assets/logo.png"
+                                    Width="100"
+                                    Height="100"
+                                    Margin="0,0,0,16"
+                                    HorizontalAlignment="Center"
+                                    RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                <TextBlock
+                                    Text="ADFlowManager"
+                                    FontSize="32"
+                                    FontWeight="Bold"
+                                    Foreground="#F5F5F5"
+                                    HorizontalAlignment="Center" />
+
+                                <TextBlock
+                                    FontSize="16"
+                                    Foreground="#A1A1AA"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,8,0,0">
+                                    <Run Text="Version " />
+                                    <Run Text="{Binding ViewModel.AppVersion, Mode=OneWay}" />
+                                </TextBlock>
+
+                                <TextBlock
+                                    Text="{ext:Localized Login_Subtitle}"
+                                    FontSize="14"
+                                    Foreground="#71717A"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <!-- Actions -->
+                            <Border
+                                Background="#2D2D30"
+                                CornerRadius="8"
+                                Padding="24"
+                                Margin="0,32,0,0">
+                                <StackPanel>
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_GitHub}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.OpenGitHubCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Height="44"
+                                        Margin="0,0,0,8">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Link24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_ExportConfig}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.ExportSettingsCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Height="44"
+                                        Margin="0,0,0,8">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="ArrowUpload24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_ImportConfig}"
+                                        Appearance="Secondary"
+                                        Command="{Binding ViewModel.ImportSettingsCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Height="44">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="ArrowDownload24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock
+                                TextAlignment="Center"
+                                FontSize="12"
+                                Foreground="#71717A"
+                                Margin="0,24,0,0">
+                                <Run Text="Développé par Alex Bumblebee" />
+                                <LineBreak />
+                                <Run Text="© 2026 - Licence GPLv3" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ===== FOOTER ===== -->
+        <Border
+            Grid.Row="1"
+            BorderBrush="#3F3F46"
+            BorderThickness="0,1,0,0"
+            Padding="0,10,0,0"
+            Margin="0,10,0,0">
+
+            <Grid>
+                <TextBlock
+                    Text="{ext:Localized Settings_FooterRestart}"
+                    FontSize="12"
+                    Foreground="#F59E0B"
+                    VerticalAlignment="Center" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <ui:Button
+                        Content="{ext:Localized Common_Cancel}"
+                        Appearance="Secondary"
+                        Command="{Binding ViewModel.CancelCommand}"
+                        Height="36"
+                        Padding="20,0"
+                        Margin="0,0,8,0" />
+
+                    <ui:Button
+                        Content="{ext:Localized Settings_Save}"
+                        Appearance="Primary"
+                        Command="{Binding ViewModel.SaveCommand}"
+                        Height="36"
+                        Padding="20,0">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="Save24" />
+                        </ui:Button.Icon>
+                    </ui:Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

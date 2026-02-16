@@ -1,0 +1,215 @@
+<Page
+    x:Class="ADFlowManager.UI.Views.Pages.TemplatesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:ADFlowManager.UI.Views.Pages"
+    xmlns:ext="clr-namespace:ADFlowManager.UI.Extensions"
+    Title="{ext:Localized Nav_Templates}"
+    d:DesignHeight="900"
+    d:DesignWidth="1200"
+    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+    mc:Ignorable="d">
+
+    <Grid Margin="24,8,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- === HEADER === -->
+        <Grid Grid.Row="0" Margin="8,16,8,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock
+                    Text="{ext:Localized Templates_Title}"
+                    FontSize="28"
+                    FontWeight="Bold"
+                    Foreground="#F5F5F5" />
+                <TextBlock
+                    Text="{ext:Localized Templates_Subtitle}"
+                    FontSize="13"
+                    Foreground="#71717A"
+                    Margin="0,4,0,0" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button
+                    Appearance="Secondary"
+                    Command="{Binding ViewModel.ImportTemplateCommand}"
+                    ToolTip="{ext:Localized Templates_ImportTooltip}"
+                    Height="44"
+                    Padding="16,0"
+                    Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="16" Margin="0,0,8,0" />
+                        <TextBlock Text="{ext:Localized Templates_Import}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ui:Button>
+
+                <ui:Button
+                    Appearance="Secondary"
+                    Command="{Binding ViewModel.RefreshCommand}"
+                    ToolTip="{ext:Localized Templates_RefreshTooltip}"
+                    Height="44"
+                    Width="44">
+                    <ui:Button.Icon>
+                        <ui:SymbolIcon Symbol="ArrowSync24" />
+                    </ui:Button.Icon>
+                </ui:Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- === CONTENT === -->
+        <Grid Grid.Row="1">
+
+            <!-- DataGrid Templates -->
+            <Border
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8">
+
+                <DataGrid
+                    ItemsSource="{Binding ViewModel.Templates}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    SelectionMode="Single"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    HeadersVisibility="Column"
+                    GridLinesVisibility="None"
+                    RowBackground="#1E1E1E"
+                    AlternatingRowBackground="#252525"
+                    Foreground="#F5F5F5"
+                    FontSize="13">
+
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#2D2D30" />
+                            <Setter Property="Foreground" Value="#A1A1AA" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="FontSize" Value="13" />
+                            <Setter Property="Padding" Value="12,10" />
+                            <Setter Property="BorderBrush" Value="#3F3F46" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="12,8" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Foreground" Value="#F5F5F5" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Header="{ext:Localized Templates_ColName}"
+                            Binding="{Binding Name}"
+                            Width="200"
+                            FontWeight="SemiBold" />
+
+                        <DataGridTextColumn
+                            Header="{ext:Localized Templates_ColDescription}"
+                            Binding="{Binding Description}"
+                            Width="*" />
+
+                        <DataGridTextColumn
+                            Header="{ext:Localized Templates_ColGroups}"
+                            Binding="{Binding Groups.Count}"
+                            Width="80" />
+
+                        <DataGridTextColumn
+                            Header="{ext:Localized Templates_ColCreatedBy}"
+                            Binding="{Binding CreatedBy}"
+                            Width="130" />
+
+                        <DataGridTextColumn
+                            Header="{ext:Localized Templates_ColCreatedAt}"
+                            Binding="{Binding CreatedAt, StringFormat='dd/MM/yyyy HH:mm'}"
+                            Width="130" />
+
+                        <DataGridTemplateColumn Header="{ext:Localized Templates_ColActions}" Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:Button
+                                            ToolTip="{ext:Localized Templates_Export}"
+                                            Appearance="Secondary"
+                                            Command="{Binding DataContext.ViewModel.ExportTemplateCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Height="30"
+                                            Width="30"
+                                            Padding="0"
+                                            Margin="0,0,6,0">
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="Share24" FontSize="14" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
+
+                                        <ui:Button
+                                            ToolTip="{ext:Localized Templates_Delete}"
+                                            Appearance="Secondary"
+                                            Command="{Binding DataContext.ViewModel.DeleteTemplateCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Height="30"
+                                            Width="30"
+                                            Padding="0">
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="Delete24" FontSize="14" Foreground="#EF4444" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- État vide -->
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{Binding ViewModel.HasNoTemplates, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ui:SymbolIcon
+                    Symbol="Document24"
+                    FontSize="64"
+                    Foreground="#3F3F46"
+                    Margin="0,0,0,16"
+                    HorizontalAlignment="Center" />
+                <TextBlock
+                    Text="{ext:Localized Templates_NoTemplates}"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Foreground="#A1A1AA"
+                    HorizontalAlignment="Center" />
+                <TextBlock
+                    Text="{ext:Localized Templates_NoTemplatesSub}"
+                    FontSize="13"
+                    Foreground="#71717A"
+                    HorizontalAlignment="Center"
+                    Margin="0,8,0,0" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

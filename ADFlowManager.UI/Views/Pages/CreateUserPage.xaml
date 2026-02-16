@@ -1,0 +1,1094 @@
+<Page
+    x:Class="ADFlowManager.UI.Views.Pages.CreateUserPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:ADFlowManager.UI.Views.Pages"
+    xmlns:ext="clr-namespace:ADFlowManager.UI.Extensions"
+    Title="{ext:Localized Nav_CreateUser}"
+    d:DesignHeight="900"
+    d:DesignWidth="1400"
+    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+    mc:Ignorable="d">
+
+    <Grid Margin="24,8,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- === ZONE 1 : HEADER TOOLBAR === Responsive, une seule ligne -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3.5*" MinWidth="220" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="3.5*" MinWidth="220" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="4*" MinWidth="260" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Mode Template : Radio + icône + label + ComboBox -->
+            <Border
+                Grid.Column="0"
+                Background="#2D2D30"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12,0"
+                Height="44"
+                Cursor="Hand">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush" Value="#3F3F46" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UseTemplateMode}" Value="True">
+                                <Setter Property="BorderBrush" Value="#8B5CF6" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <RadioButton
+                        Grid.Column="0"
+                        IsChecked="{Binding UseTemplateMode}"
+                        GroupName="CreationMode"
+                        VerticalAlignment="Center"
+                        Margin="0,0,6,0" />
+                    <ui:SymbolIcon Grid.Column="1" Symbol="Document24" Foreground="#8B5CF6" FontSize="16" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{ext:Localized CreateUser_Template}" FontSize="13" FontWeight="SemiBold" Foreground="#F5F5F5" VerticalAlignment="Center" />
+                    <ComboBox
+                        Grid.Column="4"
+                        ItemsSource="{Binding AvailableTemplates}"
+                        SelectedItem="{Binding SelectedTemplate}"
+                        DisplayMemberPath="Name"
+                        IsEnabled="{Binding UseTemplateMode}"
+                        Height="32"
+                        Background="#1E1E1E"
+                        Foreground="#F5F5F5"
+                        BorderBrush="#3F3F46"
+                        FontSize="12" />
+                </Grid>
+            </Border>
+
+            <!-- Mode Copie user : Radio + icône + label + SearchBox -->
+            <Border
+                Grid.Column="2"
+                Background="#2D2D30"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12,0"
+                Height="44"
+                Cursor="Hand">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush" Value="#3F3F46" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UseTemplateMode}" Value="False">
+                                <Setter Property="BorderBrush" Value="#8B5CF6" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <RadioButton
+                        Grid.Column="0"
+                        IsChecked="{Binding UseTemplateMode, Converter={StaticResource InverseBoolConverter}}"
+                        GroupName="CreationMode"
+                        VerticalAlignment="Center"
+                        Margin="0,0,6,0" />
+                    <ui:SymbolIcon Grid.Column="1" Symbol="PersonAdd24" Foreground="#8B5CF6" FontSize="16" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{ext:Localized CreateUser_Copy}" FontSize="13" FontWeight="SemiBold" Foreground="#F5F5F5" VerticalAlignment="Center" />
+
+                    <!-- AutoSuggest search box -->
+                    <Grid Grid.Column="4">
+                        <ui:TextBox
+                            x:Name="UserSearchBox"
+                            Text="{Binding UserSearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                            PlaceholderText="{ext:Localized CreateUser_SearchUser}"
+                            IsEnabled="{Binding UseTemplateMode, Converter={StaticResource InverseBoolConverter}}"
+                            Background="#1E1E1E"
+                            Foreground="#F5F5F5"
+                            BorderBrush="#3F3F46"
+                            Height="32"
+                            FontSize="12"
+                            PreviewKeyDown="UserSearchBox_PreviewKeyDown">
+                            <ui:TextBox.Icon>
+                                <ui:SymbolIcon Symbol="Search24" Foreground="#8B5CF6" />
+                            </ui:TextBox.Icon>
+                        </ui:TextBox>
+
+                        <!-- Dropdown suggestions -->
+                        <Popup
+                            x:Name="UserSearchPopup"
+                            IsOpen="{Binding IsUserSearchDropdownOpen}"
+                            PlacementTarget="{Binding ElementName=UserSearchBox}"
+                            Placement="Bottom"
+                            StaysOpen="False"
+                            AllowsTransparency="True">
+                            <Border
+                                Background="#2D2D30"
+                                BorderBrush="#3F3F46"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                MaxHeight="300"
+                                MinWidth="350"
+                                Margin="0,4,0,0">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl
+                                        x:Name="UserSuggestList"
+                                        ItemsSource="{Binding FilteredUsers}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border
+                                                    Padding="12,8"
+                                                    Cursor="Hand">
+                                                    <Border.InputBindings>
+                                                        <MouseBinding
+                                                            MouseAction="LeftClick"
+                                                            Command="{Binding DataContext.SelectUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                            CommandParameter="{Binding}" />
+                                                    </Border.InputBindings>
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="Transparent" />
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#3B2D5E" />
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- Avatar -->
+                                                        <Border
+                                                            Width="32"
+                                                            Height="32"
+                                                            Background="#3B2D5E"
+                                                            CornerRadius="16"
+                                                            Margin="0,0,10,0">
+                                                            <TextBlock
+                                                                FontSize="12"
+                                                                FontWeight="Bold"
+                                                                Foreground="#8B5CF6"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center">
+                                                                <TextBlock.Text>
+                                                                    <MultiBinding StringFormat="{}{0}{1}">
+                                                                        <Binding Path="FirstName[0]" FallbackValue="?" />
+                                                                        <Binding Path="LastName[0]" FallbackValue="?" />
+                                                                    </MultiBinding>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
+                                                        </Border>
+
+                                                        <!-- Info -->
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <TextBlock
+                                                                Text="{Binding DisplayName}"
+                                                                Foreground="#F5F5F5"
+                                                                FontSize="13"
+                                                                FontWeight="SemiBold" />
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                                <TextBlock
+                                                                    Text="{Binding UserName}"
+                                                                    Foreground="#A1A1AA"
+                                                                    FontSize="11" />
+                                                                <TextBlock
+                                                                    Text=" · "
+                                                                    Foreground="#52525B"
+                                                                    FontSize="11"
+                                                                    Visibility="{Binding Department, Converter={StaticResource StringToVisibilityConverter}}" />
+                                                                <TextBlock
+                                                                    Text="{Binding Department}"
+                                                                    Foreground="#71717A"
+                                                                    FontSize="11"
+                                                                    Visibility="{Binding Department, Converter={StaticResource StringToVisibilityConverter}}" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- OU selector -->
+            <Border
+                Grid.Column="4"
+                Background="#2D2D30"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12,0"
+                Height="44">
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Grid.Column="0" Symbol="FolderOpen24" Foreground="#8B5CF6" FontSize="16" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="OU" FontSize="13" FontWeight="SemiBold" Foreground="#F5F5F5" VerticalAlignment="Center" />
+                    <ComboBox
+                        Grid.Column="3"
+                        ItemsSource="{Binding AvailableOUs}"
+                        SelectedItem="{Binding SelectedOU}"
+                        DisplayMemberPath="Name"
+                        Height="32"
+                        Background="#1E1E1E"
+                        Foreground="#F5F5F5"
+                        BorderBrush="#3F3F46"
+                        FontSize="12" />
+                </Grid>
+            </Border>
+
+            <!-- Save template button -->
+            <ui:Button
+                Grid.Column="6"
+                Appearance="Secondary"
+                Command="{Binding SaveAsTemplateCommand}"
+                ToolTip="{ext:Localized CreateUser_SaveTemplate}"
+                Height="44"
+                Width="44">
+                <ui:Button.Icon>
+                    <ui:SymbolIcon Symbol="Save24" />
+                </ui:Button.Icon>
+            </ui:Button>
+        </Grid>
+
+        <!-- === ZONE 2 : MAIN CONTENT === Tabs + Preview -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- === LEFT: TabControl Form === -->
+            <Border
+                Grid.Column="0"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8"
+                ClipToBounds="True">
+
+                <TabControl
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="0">
+
+                    <TabControl.Resources>
+                        <!-- TabItem style dark -->
+                        <Style TargetType="TabItem">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="#A1A1AA" />
+                            <Setter Property="FontSize" Value="13" />
+                            <Setter Property="Padding" Value="16,10" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border
+                                            x:Name="TabBorder"
+                                            Background="Transparent"
+                                            Padding="{TemplateBinding Padding}"
+                                            BorderThickness="0,0,0,2"
+                                            BorderBrush="Transparent"
+                                            Cursor="Hand">
+                                            <ContentPresenter
+                                                x:Name="ContentSite"
+                                                ContentSource="Header"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#8B5CF6" />
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <!-- === TAB 1 : Identité === -->
+                    <TabItem Header="{ext:Localized CreateUser_TabIdentity}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="24,20,24,24">
+                                <TextBlock Text="{ext:Localized CreateUser_IdentityInfo}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,16" />
+
+                                <!-- Prénom + Nom sur la même ligne -->
+                                <Grid Margin="0,0,0,16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{ext:Localized CreateUser_FirstNameReq}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                        <ui:TextBox
+                                            Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"
+                                            PlaceholderText="Jean"
+                                            Background="#2D2D30"
+                                            Foreground="#F5F5F5"
+                                            BorderBrush="#3F3F46"
+                                            Height="40"
+                                            FontSize="14">
+                                            <ui:TextBox.Icon>
+                                                <ui:SymbolIcon Symbol="Person24" Foreground="#8B5CF6" />
+                                            </ui:TextBox.Icon>
+                                        </ui:TextBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{ext:Localized CreateUser_LastNameReq}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                        <ui:TextBox
+                                            Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"
+                                            PlaceholderText="Dupont"
+                                            Background="#2D2D30"
+                                            Foreground="#F5F5F5"
+                                            BorderBrush="#3F3F46"
+                                            Height="40"
+                                            FontSize="14">
+                                            <ui:TextBox.Icon>
+                                                <ui:SymbolIcon Symbol="Person24" Foreground="#8B5CF6" />
+                                            </ui:TextBox.Icon>
+                                        </ui:TextBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- DisplayName (auto-généré) -->
+                                <StackPanel Margin="0,0,0,16">
+                                    <TextBlock Text="{ext:Localized CreateUser_DisplayNameAuto}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="{ext:Localized CreateUser_AutoGenerated}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14"
+                                        IsReadOnly="True">
+                                        <ui:TextBox.Icon>
+                                            <ui:SymbolIcon Symbol="PersonTag24" Foreground="#71717A" />
+                                        </ui:TextBox.Icon>
+                                    </ui:TextBox>
+                                </StackPanel>
+
+                                <!-- SAM Account Name (auto-généré) -->
+                                <StackPanel Margin="0,0,0,16">
+                                    <TextBlock Text="{ext:Localized CreateUser_LoginAuto}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding SamAccountName, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="jean.dupont"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14">
+                                        <ui:TextBox.Icon>
+                                            <ui:SymbolIcon Symbol="Key24" Foreground="#71717A" />
+                                        </ui:TextBox.Icon>
+                                    </ui:TextBox>
+                                </StackPanel>
+
+                                <!-- UPN (auto-généré) -->
+                                <StackPanel Margin="0,0,0,0">
+                                    <TextBlock Text="{ext:Localized CreateUser_UpnAuto}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding UserPrincipalName, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="jean.dupont@contoso.local"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14"
+                                        IsReadOnly="True">
+                                        <ui:TextBox.Icon>
+                                            <ui:SymbolIcon Symbol="Globe24" Foreground="#71717A" />
+                                        </ui:TextBox.Icon>
+                                    </ui:TextBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- === TAB 2 : Contact === -->
+                    <TabItem Header="{ext:Localized CreateUser_TabContact}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="24,20,24,24">
+                                <TextBlock Text="{ext:Localized CreateUser_ContactInfo}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,16" />
+
+                                <!-- Email (auto-généré) -->
+                                <StackPanel Margin="0,0,0,16">
+                                    <TextBlock Text="{ext:Localized CreateUser_EmailAuto}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="jean.dupont@contoso.local"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14">
+                                        <ui:TextBox.Icon>
+                                            <ui:SymbolIcon Symbol="Mail24" Foreground="#8B5CF6" />
+                                        </ui:TextBox.Icon>
+                                    </ui:TextBox>
+                                </StackPanel>
+
+                                <!-- Téléphone fixe -->
+                                <StackPanel Margin="0,0,0,16">
+                                    <TextBlock Text="{ext:Localized CreateUser_OfficePhone}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="+33 1 23 45 67 89"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14">
+                                        <ui:TextBox.Icon>
+                                            <ui:SymbolIcon Symbol="Call24" Foreground="#8B5CF6" />
+                                        </ui:TextBox.Icon>
+                                    </ui:TextBox>
+                                </StackPanel>
+
+                                <!-- Téléphone mobile -->
+                                <StackPanel Margin="0,0,0,0">
+                                    <TextBlock Text="{ext:Localized CreateUser_MobilePhone}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding MobileNumber, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="+33 6 12 34 56 78"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14">
+                                        <ui:TextBox.Icon>
+                                            <ui:SymbolIcon Symbol="Phone24" Foreground="#8B5CF6" />
+                                        </ui:TextBox.Icon>
+                                    </ui:TextBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- === TAB 3 : Organisation === -->
+                    <TabItem Header="{ext:Localized CreateUser_TabOrganization}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="24,20,24,24">
+                                <TextBlock Text="{ext:Localized CreateUser_ProfessionalInfo}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,16" />
+
+                                <!-- Poste + Service -->
+                                <Grid Margin="0,0,0,16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{ext:Localized CreateUser_JobTitle}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                        <ui:TextBox
+                                            Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}"
+                                            PlaceholderText="Développeur"
+                                            Background="#2D2D30"
+                                            Foreground="#F5F5F5"
+                                            BorderBrush="#3F3F46"
+                                            Height="40"
+                                            FontSize="14">
+                                            <ui:TextBox.Icon>
+                                                <ui:SymbolIcon Symbol="Briefcase24" Foreground="#8B5CF6" />
+                                            </ui:TextBox.Icon>
+                                        </ui:TextBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{ext:Localized CreateUser_Department}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                        <ui:TextBox
+                                            Text="{Binding Department, UpdateSourceTrigger=PropertyChanged}"
+                                            PlaceholderText="Informatique"
+                                            Background="#2D2D30"
+                                            Foreground="#F5F5F5"
+                                            BorderBrush="#3F3F46"
+                                            Height="40"
+                                            FontSize="14">
+                                            <ui:TextBox.Icon>
+                                                <ui:SymbolIcon Symbol="Building24" Foreground="#8B5CF6" />
+                                            </ui:TextBox.Icon>
+                                        </ui:TextBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Société + Bureau -->
+                                <Grid Margin="0,0,0,16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{ext:Localized CreateUser_Company}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                        <ui:TextBox
+                                            Text="{Binding Company, UpdateSourceTrigger=PropertyChanged}"
+                                            PlaceholderText="Contoso Ltd"
+                                            Background="#2D2D30"
+                                            Foreground="#F5F5F5"
+                                            BorderBrush="#3F3F46"
+                                            Height="40"
+                                            FontSize="14">
+                                            <ui:TextBox.Icon>
+                                                <ui:SymbolIcon Symbol="BuildingMultiple24" Foreground="#8B5CF6" />
+                                            </ui:TextBox.Icon>
+                                        </ui:TextBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{ext:Localized CreateUser_Office}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                        <ui:TextBox
+                                            Text="{Binding Office, UpdateSourceTrigger=PropertyChanged}"
+                                            PlaceholderText="B204"
+                                            Background="#2D2D30"
+                                            Foreground="#F5F5F5"
+                                            BorderBrush="#3F3F46"
+                                            Height="40"
+                                            FontSize="14">
+                                            <ui:TextBox.Icon>
+                                                <ui:SymbolIcon Symbol="Location24" Foreground="#8B5CF6" />
+                                            </ui:TextBox.Icon>
+                                        </ui:TextBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Description -->
+                                <StackPanel Margin="0,0,0,0">
+                                    <TextBlock Text="{ext:Localized Users_Description}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:TextBox
+                                        Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="Description du compte..."
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        MinHeight="80"
+                                        FontSize="14"
+                                        AcceptsReturn="True"
+                                        TextWrapping="Wrap"
+                                        VerticalContentAlignment="Top" />
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- === TAB 4 : Groupes === -->
+                    <TabItem Header="{ext:Localized CreateUser_TabGroups}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Search + Count -->
+                            <Grid Grid.Row="0" Margin="24,16,24,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ui:TextBox
+                                    Grid.Column="0"
+                                    Text="{Binding GroupSearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="{ext:Localized CreateUser_GroupSearch}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="38"
+                                    FontSize="13"
+                                    Margin="0,0,12,0">
+                                    <ui:TextBox.Icon>
+                                        <ui:SymbolIcon Symbol="Search24" Foreground="#8B5CF6" />
+                                    </ui:TextBox.Icon>
+                                </ui:TextBox>
+
+                                <Border
+                                    Grid.Column="1"
+                                    Background="#3B2D5E"
+                                    CornerRadius="12"
+                                    Padding="12,6"
+                                    VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="Checkmark24" Foreground="#8B5CF6" FontSize="14" Margin="0,0,6,0" />
+                                        <TextBlock Foreground="#8B5CF6" FontSize="13" FontWeight="SemiBold">
+                                            <Run Text="{Binding SelectedGroupsCount, Mode=OneWay}" />
+                                            <Run Text="{ext:Localized CreateUser_SelectedGroups}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Groups list with checkboxes -->
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="700" Margin="24,12,24,12">
+                                <ItemsControl ItemsSource="{Binding FilteredAvailableGroups}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                Background="#2D2D30"
+                                                CornerRadius="6"
+                                                Padding="12,10"
+                                                Margin="0,0,0,6"
+                                                Cursor="Hand">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <CheckBox
+                                                        Grid.Column="0"
+                                                        IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,0,12,0" />
+
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock
+                                                            Text="{Binding GroupName}"
+                                                            Foreground="#F5F5F5"
+                                                            FontSize="13"
+                                                            FontWeight="SemiBold" />
+                                                        <TextBlock
+                                                            Text="{Binding Description}"
+                                                            Foreground="#71717A"
+                                                            FontSize="11"
+                                                            TextTrimming="CharacterEllipsis"
+                                                            Margin="0,2,0,0" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- === TAB 5 : Options === -->
+                    <TabItem Header="{ext:Localized CreateUser_TabOptions}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="24,20,24,24">
+                                <TextBlock Text="{ext:Localized CreateUser_Password}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,16" />
+
+                                <!-- Mot de passe -->
+                                <StackPanel Margin="0,0,0,16">
+                                    <Grid Margin="0,0,0,6">
+                                        <TextBlock Text="{ext:Localized CreateUser_PasswordReq}" FontSize="12" Foreground="#A1A1AA" VerticalAlignment="Center" />
+                                        <ui:Button
+                                            Content="{ext:Localized CreateUser_Generate}"
+                                            Appearance="Secondary"
+                                            Command="{Binding GeneratePasswordCommand}"
+                                            Height="28"
+                                            Padding="12,0"
+                                            FontSize="11"
+                                            HorizontalAlignment="Right">
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="Key24" FontSize="12" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
+                                    </Grid>
+                                    <ui:PasswordBox
+                                        Password="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="Minimum 8 caractères"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14">
+                                        <ui:PasswordBox.Icon>
+                                            <ui:SymbolIcon Symbol="LockClosed24" Foreground="#8B5CF6" />
+                                        </ui:PasswordBox.Icon>
+                                    </ui:PasswordBox>
+
+                                    <!-- Indicateur de force -->
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <ProgressBar
+                                            Grid.Column="0"
+                                            Value="{Binding PasswordStrength}"
+                                            Maximum="100"
+                                            Height="6"
+                                            Background="#3F3F46"
+                                            BorderThickness="0" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="{Binding PasswordStrengthText}"
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Confirmation mot de passe -->
+                                <StackPanel Margin="0,0,0,24">
+                                    <TextBlock Text="{ext:Localized CreateUser_ConfirmReq}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <ui:PasswordBox
+                                        Password="{Binding PasswordConfirm, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="Retapez le mot de passe"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="14">
+                                        <ui:PasswordBox.Icon>
+                                            <ui:SymbolIcon Symbol="LockClosed24" Foreground="#8B5CF6" />
+                                        </ui:PasswordBox.Icon>
+                                    </ui:PasswordBox>
+                                </StackPanel>
+
+                                <!-- Séparateur -->
+                                <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
+
+                                <TextBlock Text="{ext:Localized CreateUser_AccountOptions}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,16" />
+
+                                <!-- Changement au prochain logon -->
+                                <Border Background="#2D2D30" CornerRadius="6" Padding="16,12" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{ext:Localized CreateUser_ChangePasswordNextLogon}" Foreground="#F5F5F5" FontSize="13" />
+                                            <TextBlock Text="{ext:Localized CreateUser_ChangePasswordNextLogonDesc}" Foreground="#71717A" FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <CheckBox
+                                            Grid.Column="1"
+                                            IsChecked="{Binding MustChangePasswordNextLogon}"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Mot de passe n'expire jamais -->
+                                <Border Background="#2D2D30" CornerRadius="6" Padding="16,12" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{ext:Localized CreateUser_PasswordNeverExpires}" Foreground="#F5F5F5" FontSize="13" />
+                                            <TextBlock Text="{ext:Localized CreateUser_PasswordNeverExpiresDesc}" Foreground="#71717A" FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <CheckBox
+                                            Grid.Column="1"
+                                            IsChecked="{Binding PasswordNeverExpires}"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Compte désactivé -->
+                                <Border Background="#2D2D30" CornerRadius="6" Padding="16,12" Margin="0,0,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{ext:Localized CreateUser_CreateDisabled}" Foreground="#F5F5F5" FontSize="13" />
+                                            <TextBlock Text="{ext:Localized CreateUser_CreateDisabledDesc}" Foreground="#71717A" FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <CheckBox
+                                            Grid.Column="1"
+                                            IsChecked="{Binding AccountDisabled}"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Border>
+
+            <!-- === RIGHT: Preview Panel === -->
+            <Border
+                Grid.Column="2"
+                Background="#1E1E1E"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="8">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Preview content (scrollable) -->
+                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24,20,24,16">
+                            <!-- Section title -->
+                            <TextBlock
+                                Text="{ext:Localized CreateUser_Preview}"
+                                FontSize="11"
+                                FontWeight="Bold"
+                                Foreground="#71717A"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,20" />
+
+                            <!-- Avatar cercle avec initiales -->
+                            <Border
+                                Width="80" Height="80"
+                                CornerRadius="40"
+                                Background="#3B2D5E"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,16">
+                                <TextBlock
+                                    Text="{Binding Initials}"
+                                    Foreground="#8B5CF6"
+                                    FontSize="28"
+                                    FontWeight="Bold"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+
+                            <!-- Display Name -->
+                            <TextBlock
+                                Text="{Binding DisplayName, TargetNullValue='Nom Prénom'}"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="#F5F5F5"
+                                HorizontalAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
+
+                            <!-- SAM Account Name -->
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="#A1A1AA"
+                                HorizontalAlignment="Center"
+                                Margin="0,4,0,0"
+                                TextTrimming="CharacterEllipsis">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{Binding SamAccountName}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SamAccountName}" Value="">
+                                                <Setter Property="Text" Value="login.utilisateur" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <!-- Séparateur -->
+                            <Border Height="1" Background="#3F3F46" Margin="0,20,0,16" />
+
+                            <!-- Champs preview -->
+                            <TextBlock Text="{ext:Localized CreateUser_Details}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,12" />
+
+                            <!-- Email -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized Users_Email}" FontSize="11" Foreground="#71717A" />
+                                <TextBlock
+                                    FontSize="13" Foreground="#F5F5F5" Margin="0,2,0,0"
+                                    TextTrimming="CharacterEllipsis">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Email}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Email}" Value="">
+                                                    <Setter Property="Text" Value="—" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- UPN -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="UPN" FontSize="11" Foreground="#71717A" />
+                                <TextBlock
+                                    FontSize="13" Foreground="#F5F5F5" Margin="0,2,0,0"
+                                    TextTrimming="CharacterEllipsis">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding UserPrincipalName}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding UserPrincipalName}" Value="">
+                                                    <Setter Property="Text" Value="—" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- OU -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreateUser_OULabel}" FontSize="11" Foreground="#71717A" />
+                                <TextBlock
+                                    Text="{Binding SelectedOU.Name, FallbackValue='—'}"
+                                    FontSize="13" Foreground="#F5F5F5" Margin="0,2,0,0" />
+                            </StackPanel>
+
+                            <!-- Template -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreateUser_Template}" FontSize="11" Foreground="#71717A" />
+                                <TextBlock
+                                    Text="{Binding SelectedTemplate.Name, FallbackValue='Aucun'}"
+                                    FontSize="13" Foreground="#F5F5F5" Margin="0,2,0,0" />
+                            </StackPanel>
+
+                            <!-- Groupes -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreateUser_TabGroups}" FontSize="11" Foreground="#71717A" />
+                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                    <ui:SymbolIcon Symbol="PeopleTeam16" Foreground="#8B5CF6" FontSize="14" Margin="0,0,6,0" />
+                                    <TextBlock FontSize="13" Foreground="#F5F5F5">
+                                        <Run Text="{Binding SelectedGroupsCount, Mode=OneWay}" />
+                                        <Run Text="{ext:Localized CreateUser_SelectedGroups}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Séparateur -->
+                            <Border Height="1" Background="#3F3F46" Margin="0,8,0,16" />
+
+                            <!-- Validation status -->
+                            <TextBlock Text="{ext:Localized CreateUser_Validation}" FontSize="11" FontWeight="Bold" Foreground="#71717A" Margin="0,0,0,12" />
+
+                            <!-- Prénom/Nom -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <ui:SymbolIcon FontSize="14" Margin="0,0,8,0">
+                                    <ui:SymbolIcon.Style>
+                                        <Style TargetType="ui:SymbolIcon">
+                                            <Setter Property="Symbol" Value="DismissCircle24" />
+                                            <Setter Property="Foreground" Value="#EF4444" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding FirstName, Converter={x:Static local:NotEmptyConverter.Instance}}" Value="True" />
+                                                        <Condition Binding="{Binding LastName, Converter={x:Static local:NotEmptyConverter.Instance}}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Symbol" Value="CheckmarkCircle24" />
+                                                    <Setter Property="Foreground" Value="#10B981" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:SymbolIcon.Style>
+                                </ui:SymbolIcon>
+                                <TextBlock Text="{ext:Localized CreateUser_ValidationName}" FontSize="12" Foreground="#A1A1AA" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Login généré -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <ui:SymbolIcon FontSize="14" Margin="0,0,8,0">
+                                    <ui:SymbolIcon.Style>
+                                        <Style TargetType="ui:SymbolIcon">
+                                            <Setter Property="Symbol" Value="DismissCircle24" />
+                                            <Setter Property="Foreground" Value="#EF4444" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SamAccountName, Converter={x:Static local:NotEmptyConverter.Instance}}" Value="True">
+                                                    <Setter Property="Symbol" Value="CheckmarkCircle24" />
+                                                    <Setter Property="Foreground" Value="#10B981" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:SymbolIcon.Style>
+                                </ui:SymbolIcon>
+                                <TextBlock Text="{ext:Localized CreateUser_ValidationLogin}" FontSize="12" Foreground="#A1A1AA" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Mot de passe valide -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <ui:SymbolIcon FontSize="14" Margin="0,0,8,0">
+                                    <ui:SymbolIcon.Style>
+                                        <Style TargetType="ui:SymbolIcon">
+                                            <Setter Property="Symbol" Value="DismissCircle24" />
+                                            <Setter Property="Foreground" Value="#EF4444" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsFormValid}" Value="True">
+                                                    <Setter Property="Symbol" Value="CheckmarkCircle24" />
+                                                    <Setter Property="Foreground" Value="#10B981" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:SymbolIcon.Style>
+                                </ui:SymbolIcon>
+                                <TextBlock Text="{ext:Localized CreateUser_ValidationPassword}" FontSize="12" Foreground="#A1A1AA" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Action buttons (fixed at bottom) -->
+                    <Border
+                        Grid.Row="1"
+                        BorderBrush="#3F3F46"
+                        BorderThickness="0,1,0,0"
+                        Padding="24,16">
+                        <StackPanel>
+                            <ui:Button
+                                Content="{ext:Localized CreateUser_CreateButton}"
+                                Appearance="Primary"
+                                Command="{Binding CreateUserCommand}"
+                                HorizontalAlignment="Stretch"
+                                Height="44"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Margin="0,0,0,8">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="PersonAdd24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+
+                            <ui:Button
+                                Content="{ext:Localized Common_Cancel}"
+                                Appearance="Secondary"
+                                Command="{Binding CancelCommand}"
+                                HorizontalAlignment="Stretch"
+                                Height="40"
+                                FontSize="13" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

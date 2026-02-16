@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Velopack properties DEV -->
+    <PackageId>ADFlowManager-DEV</PackageId>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Authors>Alex Bumblebee</Authors>
+    <Company>Alex Bumblebee</Company>
+    <Product>ADFlowManager</Product>
+    <Description>Gestion moderne d'Active Directory</Description>
+    <Copyright>Copyright © 2025 - GPLv3</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
+    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0 " />
+    <PackageReference Include="Velopack" Version="0.0.942" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ADFlowManager.Core\ADFlowManager.Core.csproj" />
+    <ProjectReference Include="..\ADFlowManager.Infrastructure\ADFlowManager.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\logo.png" />
+  </ItemGroup>
+
+</Project>

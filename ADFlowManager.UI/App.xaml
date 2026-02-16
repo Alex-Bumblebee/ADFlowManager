@@ -1,0 +1,28 @@
+﻿<Application
+  x:Class="ADFlowManager.UI.App"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:converters="clr-namespace:ADFlowManager.UI.Converters"
+  DispatcherUnhandledException="OnDispatcherUnhandledException"
+  Exit="OnExit"
+  Startup="OnStartup"
+>
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ui:ThemesDictionary Theme="Dark" />
+        <ui:ControlsDictionary />
+      </ResourceDictionary.MergedDictionaries>
+      <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+      <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+      <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+      <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+      <converters:InitialsConverter x:Key="InitialsConverter" />
+      <converters:BoolToStatusColorConverter x:Key="BoolToStatusColorConverter" />
+      <converters:BoolToStatusTextConverter x:Key="BoolToStatusTextConverter" />
+      <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+      <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>
