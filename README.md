@@ -48,7 +48,7 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 5. Start managing your Active Directory!
 ```
 
-[![Download Beta](https://img.shields.io/badge/Download-v0.1.0--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.1.0-beta)
+[![Download Beta](https://img.shields.io/badge/Download-v0.1.4--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.1.4-beta)
 
 ---
 
