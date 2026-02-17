@@ -336,7 +336,7 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 5. Commencez à gérer votre Active Directory !
 ```
 
-[![Télécharger la Bêta](https://img.shields.io/badge/T%C3%A9l%C3%A9charger-v0.1.0--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.1.0-beta)
+[![Télécharger la Bêta](https://img.shields.io/badge/T%C3%A9l%C3%A9charger-v0.1.4--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.1.4-beta)
 
 ---
 
