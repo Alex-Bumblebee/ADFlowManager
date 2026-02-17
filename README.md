@@ -125,18 +125,23 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 
 ### Screenshots
 
-> Screenshots will be added for the stable release. Below are the planned captures.
+<div align="center">
 
-| Screen | Description |
-|---|---|
-| **Dashboard** | Real-time statistics and recent activity |
-| **Users** | User list with search, filters, and bulk actions |
-| **User Details** | 5-tab detail view (General, Contact, Organization, Groups, History) |
-| **Create User** | Full creation form with template support |
-| **Groups** | Group browser with member management |
-| **Templates** | CRUD interface for local and network templates |
-| **Audit History** | Filterable audit log with CSV export |
-| **Settings** | 7-tab configuration panel |
+**Connection**
+
+<img src="docs/screenshots/connection.png" alt="Connection Window" width="600">
+
+**Groups Management**
+
+<img src="docs/screenshots/groups.png" alt="Groups Management" width="600">
+
+**Settings Panel**
+
+<img src="docs/screenshots/settings.png" alt="Settings Panel" width="600">
+
+</div>
+
+> More screenshots will be added for the stable release.
 
 To contribute screenshots: save PNGs (1920×1080) in `docs/screenshots/` and open a PR.
 
@@ -408,18 +413,23 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 
 ### Captures d'Écran
 
-> Les captures d'écran seront ajoutées pour la version stable. Voici les écrans prévus.
+<div align="center">
 
-| Écran | Description |
-|---|---|
-| **Tableau de bord** | Statistiques en temps réel et activité récente |
-| **Utilisateurs** | Liste avec recherche, filtres et actions en masse |
-| **Détails Utilisateur** | Vue détaillée à 5 onglets (Général, Contact, Organisation, Groupes, Historique) |
-| **Création Utilisateur** | Formulaire complet avec support des templates |
-| **Groupes** | Navigateur de groupes avec gestion des membres |
-| **Templates** | Interface CRUD pour templates locaux et réseau |
-| **Historique Audit** | Journal d'audit filtrable avec export CSV |
-| **Paramètres** | Panneau de configuration à 7 onglets |
+**Connexion**
+
+<img src="docs/screenshots/connection.png" alt="Fenêtre de Connexion" width="600">
+
+**Gestion des Groupes**
+
+<img src="docs/screenshots/groups.png" alt="Gestion des Groupes" width="600">
+
+**Panneau de Paramètres**
+
+<img src="docs/screenshots/settings.png" alt="Panneau de Paramètres" width="600">
+
+</div>
+
+> D'autres captures d'écran seront ajoutées pour la version stable.
 
 Pour contribuer des captures : enregistrez des PNG (1920×1080) dans `docs/screenshots/` et ouvrez une PR.
 
