@@ -129,7 +129,7 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 
 **Connection**
 
-<img src="docs/screenshots/connection.png" alt="Connection Window" width="600">
+<img src="docs/screenshots/connection.png" alt="Connection Window" width="300">
 
 **Groups Management**
 
@@ -417,7 +417,7 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 
 **Connexion**
 
-<img src="docs/screenshots/connection.png" alt="Fenêtre de Connexion" width="600">
+<img src="docs/screenshots/connection.png" alt="Fenêtre de Connexion" width="300">
 
 **Gestion des Groupes**
 
