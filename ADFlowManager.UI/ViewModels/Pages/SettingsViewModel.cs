@@ -52,6 +52,9 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _disabledUserOU = "";
 
+    [ObservableProperty]
+    private bool _loadGroupsOnStartup = true;
+
     /// <summary>
     /// Liste des OUs disponibles dans le domaine AD (chargées à la demande).
     /// </summary>
@@ -157,6 +160,7 @@ public partial class SettingsViewModel : ObservableObject
             DefaultUserOU = s.ActiveDirectory.DefaultUserOU;
             DefaultGroupOU = s.ActiveDirectory.DefaultGroupOU;
             DisabledUserOU = s.ActiveDirectory.DisabledUserOU;
+            LoadGroupsOnStartup = s.ActiveDirectory.LoadGroupsOnStartup;
             IncludedUserOUs = string.Join(Environment.NewLine, s.ActiveDirectory.IncludedUserOUs);
             ExcludedUserOUs = string.Join(Environment.NewLine, s.ActiveDirectory.ExcludedUserOUs);
 
@@ -201,6 +205,7 @@ public partial class SettingsViewModel : ObservableObject
                 DefaultUserOU = DefaultUserOU?.Trim() ?? "",
                 DefaultGroupOU = DefaultGroupOU?.Trim() ?? "",
                 DisabledUserOU = DisabledUserOU?.Trim() ?? "",
+                LoadGroupsOnStartup = LoadGroupsOnStartup,
                 IncludedUserOUs = ParseMultilineToList(IncludedUserOUs),
                 ExcludedUserOUs = ParseMultilineToList(ExcludedUserOUs)
             },

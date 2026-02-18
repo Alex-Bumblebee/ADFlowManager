@@ -301,6 +301,8 @@ Vérifiez la complexité et la longueur minimale.</value></data>
   <data name="Settings_ExcludedOUs" xml:space="preserve"><value>OUs utilisateurs exclues</value></data>
   <data name="Settings_ExcludedOUsDesc" xml:space="preserve"><value>Les utilisateurs dans ces OUs ne seront pas affichés</value></data>
   <data name="Settings_OneOUPerLineEx" xml:space="preserve"><value>Une OU par ligne (ex: OU=ServiceAccounts,DC=contoso,DC=local)</value></data>
+  <data name="Settings_LoadGroupsOnStartup" xml:space="preserve"><value>Charger les groupes au démarrage</value></data>
+  <data name="Settings_LoadGroupsOnStartupDesc" xml:space="preserve"><value>Décocher améliore les performances sur les grands domaines ou AD 2012 R2. Les groupes restent accessibles via le double-clic.</value></data>
   <data name="Settings_CacheTitle" xml:space="preserve"><value>Cache SQLite</value></data>
   <data name="Settings_CacheDesc" xml:space="preserve"><value>Le cache accélère le chargement des utilisateurs et groupes. Les données sont rafraîchies automatiquement selon le TTL configuré.</value></data>
   <data name="Settings_LastRefresh" xml:space="preserve"><value>DERNIER RAFRAÎCHISSEMENT</value></data>

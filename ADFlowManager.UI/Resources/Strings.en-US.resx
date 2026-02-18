@@ -301,6 +301,8 @@ Check complexity and minimum length requirements.</value></data>
   <data name="Settings_ExcludedOUs" xml:space="preserve"><value>Excluded User OUs</value></data>
   <data name="Settings_ExcludedOUsDesc" xml:space="preserve"><value>Users in these OUs will not be displayed</value></data>
   <data name="Settings_OneOUPerLineEx" xml:space="preserve"><value>One OU per line (e.g.: OU=ServiceAccounts,DC=contoso,DC=local)</value></data>
+  <data name="Settings_LoadGroupsOnStartup" xml:space="preserve"><value>Load groups on startup</value></data>
+  <data name="Settings_LoadGroupsOnStartupDesc" xml:space="preserve"><value>Uncheck to improve performance on large domains or AD 2012 R2. Groups remain accessible via double-click.</value></data>
   <data name="Settings_CacheTitle" xml:space="preserve"><value>SQLite Cache</value></data>
   <data name="Settings_CacheDesc" xml:space="preserve"><value>The cache speeds up loading of users and groups. Data is automatically refreshed according to the configured TTL.</value></data>
   <data name="Settings_LastRefresh" xml:space="preserve"><value>LAST REFRESH</value></data>

@@ -967,27 +967,30 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 _logger.LogWarning(ex, "Impossible de charger les propriétés étendues de {UserName}", user.UserName);
             }
 
-            // Charger les groupes de l'utilisateur
-            try
+            // Charger les groupes uniquement si le setting est activé
+            if (_settingsService.CurrentSettings.ActiveDirectory.LoadGroupsOnStartup)
             {
-                using var memberOf = userPrin.GetGroups();
-                foreach (var grp in memberOf)
+                try
                 {
-                    if (grp is GroupPrincipal gp)
+                    using var memberOf = userPrin.GetGroups();
+                    foreach (var grp in memberOf)
                     {
-                        user.Groups.Add(new Group
+                        if (grp is GroupPrincipal gp)
                         {
-                            GroupName = gp.SamAccountName ?? string.Empty,
-                            Description = gp.Description ?? string.Empty,
-                            DistinguishedName = gp.DistinguishedName ?? string.Empty
-                        });
+                            user.Groups.Add(new Group
+                            {
+                                GroupName = gp.SamAccountName ?? string.Empty,
+                                Description = gp.Description ?? string.Empty,
+                                DistinguishedName = gp.DistinguishedName ?? string.Empty
+                            });
+                        }
+                        grp.Dispose();
                     }
-                    grp.Dispose();
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Impossible de charger les groupes de {UserName}", user.UserName);
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Impossible de charger les groupes de {UserName}", user.UserName);
+                }
             }
 
             return user;

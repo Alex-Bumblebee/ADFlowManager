@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.6-beta] - 2026-02-19
+
+### Added
+
+- **Configurable group loading** (perf): New setting in Active Directory tab - "Load groups on startup". Uncheck to skip `GetGroups()` during initial user load, significantly improving performance on large domains or AD 2012 R2. Groups remain fully accessible via double-click (live load).
+
+---
+
 ## [0.1.5-beta] - 2026-02-18
 
 ### Improvements/Fixed

@@ -52,6 +52,13 @@ public class ActiveDirectorySettings
     /// Si réactivé, il sera remis dans DefaultUserOU (si renseigné).
     /// </summary>
     public string DisabledUserOU { get; set; } = "";
+
+    /// <summary>
+    /// Charger les groupes de chaque utilisateur au démarrage (GetGroups).
+    /// Désactiver améliore les performances sur les grands domaines ou AD 2012 R2.
+    /// Les groupes restent accessibles via le double-clic (chargement live).
+    /// </summary>
+    public bool LoadGroupsOnStartup { get; set; } = true;
 }
 
 public class CacheSettings

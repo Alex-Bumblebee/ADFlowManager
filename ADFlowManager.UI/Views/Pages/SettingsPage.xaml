@@ -516,7 +516,7 @@
                             </StackPanel>
 
                             <!-- OUs exclues -->
-                            <StackPanel>
+                            <StackPanel Margin="0,0,0,24">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <TextBlock Text="{ext:Localized Settings_ExcludedOUs}" FontSize="16" FontWeight="SemiBold" Foreground="#F5F5F5" VerticalAlignment="Center" />
                                     <ui:Button
@@ -544,6 +544,20 @@
                                     BorderBrush="#3F3F46"
                                     Padding="12" />
                                 <TextBlock Text="{ext:Localized Settings_OneOUPerLineEx}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <!-- Chargement des groupes -->
+                            <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
+                            <StackPanel>
+                                <CheckBox
+                                    IsChecked="{Binding ViewModel.LoadGroupsOnStartup}"
+                                    Foreground="#F5F5F5"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Margin="0,0,0,6">
+                                    <TextBlock Text="{ext:Localized Settings_LoadGroupsOnStartup}" Foreground="#F5F5F5" FontSize="14" FontWeight="SemiBold" />
+                                </CheckBox>
+                                <TextBlock Text="{ext:Localized Settings_LoadGroupsOnStartupDesc}" FontSize="12" Foreground="#71717A" TextWrapping="Wrap" Margin="24,0,0,0" />
                             </StackPanel>
                         </StackPanel>
 
