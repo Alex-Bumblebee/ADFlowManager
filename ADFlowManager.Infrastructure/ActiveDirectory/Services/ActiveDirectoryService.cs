@@ -15,6 +15,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
     private readonly ILogger<ActiveDirectoryService> _logger;
     private readonly ICacheService _cacheService;
     private readonly IAuditService _auditService;
+    private readonly ISettingsService _settingsService;
     private PrincipalContext? _context;
     private string? _connectedDomain;
     private string? _connectedUser;
@@ -24,11 +25,12 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
     /// <summary>
     /// Constructeur avec injection du logger et du service de cache.
     /// </summary>
-    public ActiveDirectoryService(ILogger<ActiveDirectoryService> logger, ICacheService cacheService, IAuditService auditService)
+    public ActiveDirectoryService(ILogger<ActiveDirectoryService> logger, ICacheService cacheService, IAuditService auditService, ISettingsService settingsService)
     {
         _logger = logger;
         _cacheService = cacheService;
         _auditService = auditService;
+        _settingsService = settingsService;
     }
 
     /// <summary>
@@ -138,7 +140,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             if (cachedUsers != null)
             {
                 _logger.LogInformation("⚡ Users chargés depuis cache : {Count}", cachedUsers.Count);
-                return cachedUsers;
+                return ApplyOUFilter(cachedUsers);
             }
         }
 
@@ -157,91 +159,72 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             }
 
             var users = new List<User>();
+            var includedOUs = _settingsService.CurrentSettings.ActiveDirectory.IncludedUserOUs
+                .Where(o => !string.IsNullOrWhiteSpace(o)).ToList();
 
             await Task.Run(() =>
             {
-                // Créer un principal de recherche
-                var userPrincipal = new UserPrincipal(_context!)
+                if (includedOUs.Count > 0 && string.IsNullOrWhiteSpace(searchFilter))
                 {
-                    // Appliquer le filtre si fourni
-                    Name = string.IsNullOrWhiteSpace(searchFilter) ? "*" : $"*{searchFilter}*"
-                };
+                    // Scan ciblé : un DirectorySearcher par OU incluse
+                    _logger.LogInformation("🔍 Scan ciblé sur {Count} OU(s) incluse(s)", includedOUs.Count);
+                    var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                using var searcher = new PrincipalSearcher(userPrincipal);
-                var results = searcher.FindAll();
-
-                foreach (Principal principal in results)
-                {
-                    if (principal is UserPrincipal userPrin)
+                    foreach (var ouDn in includedOUs)
                     {
                         try
                         {
-                            var user = new User
-                            {
-                                UserName = userPrin.SamAccountName ?? string.Empty,
-                                DisplayName = userPrin.DisplayName ?? string.Empty,
-                                Email = userPrin.EmailAddress ?? string.Empty,
-                                FirstName = userPrin.GivenName ?? string.Empty,
-                                LastName = userPrin.Surname ?? string.Empty,
-                                DistinguishedName = userPrin.DistinguishedName ?? string.Empty,
-                                IsEnabled = userPrin.Enabled ?? false,
-                                Description = userPrin.Description ?? string.Empty,
-                                UserPrincipalName = userPrin.UserPrincipalName ?? string.Empty
-                            };
+                            using var ouContext = new PrincipalContext(ContextType.Domain, _context!.Name, ouDn,
+                                _adminUser, _adminPassword);
+                            var userPrincipal = new UserPrincipal(ouContext) { Name = "*" };
+                            using var searcher = new PrincipalSearcher(userPrincipal);
+                            var results = searcher.FindAll();
 
-                            // Charger les propriétés étendues via DirectoryEntry
-                            try
+                            foreach (Principal principal in results)
                             {
-                                if (userPrin.GetUnderlyingObject() is DirectoryEntry de)
+                                if (principal is UserPrincipal userPrin)
                                 {
-                                    user.JobTitle = de.Properties["title"]?.Value?.ToString() ?? string.Empty;
-                                    user.Department = de.Properties["department"]?.Value?.ToString() ?? string.Empty;
-                                    user.Company = de.Properties["company"]?.Value?.ToString() ?? string.Empty;
-                                    user.Office = de.Properties["physicalDeliveryOfficeName"]?.Value?.ToString() ?? string.Empty;
-                                    user.Phone = de.Properties["telephoneNumber"]?.Value?.ToString() ?? string.Empty;
-                                    user.Mobile = de.Properties["mobile"]?.Value?.ToString() ?? string.Empty;
+                                    var dn = userPrin.DistinguishedName ?? string.Empty;
+                                    if (!seen.Add(dn)) continue;
+                                    var user = MapUserPrincipal(userPrin);
+                                    if (user != null) users.Add(user);
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Impossible de charger les propriétés étendues de {UserName}", user.UserName);
-                            }
-
-                            // Charger les groupes de l'utilisateur
-                            try
-                            {
-                                using var memberOf = userPrin.GetGroups();
-                                foreach (var grp in memberOf)
-                                {
-                                    if (grp is GroupPrincipal gp)
-                                    {
-                                        user.Groups.Add(new Group
-                                        {
-                                            GroupName = gp.SamAccountName ?? string.Empty,
-                                            Description = gp.Description ?? string.Empty,
-                                            DistinguishedName = gp.DistinguishedName ?? string.Empty
-                                        });
-                                    }
-                                    grp.Dispose();
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Impossible de charger les groupes de {UserName}", user.UserName);
-                            }
-
-                            users.Add(user);
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogWarning(ex, "Erreur lors de la lecture de l'utilisateur {UserName}",
-                                userPrin.SamAccountName ?? "Unknown");
+                            _logger.LogWarning(ex, "Erreur scan OU ciblée : {OU}", ouDn);
+                        }
+                    }
+                }
+                else
+                {
+                    // Scan global (comportement original)
+                    var userPrincipal = new UserPrincipal(_context!)
+                    {
+                        Name = string.IsNullOrWhiteSpace(searchFilter) ? "*" : $"*{searchFilter}*"
+                    };
+
+                    using var searcher = new PrincipalSearcher(userPrincipal);
+                    var results = searcher.FindAll();
+
+                    foreach (Principal principal in results)
+                    {
+                        if (principal is UserPrincipal userPrin)
+                        {
+                            var user = MapUserPrincipal(userPrin);
+                            if (user != null) users.Add(user);
                         }
                     }
                 }
             });
 
-            _logger.LogInformation("✅ {Count} utilisateur(s) récupéré(s)", users.Count);
+            _logger.LogInformation("✅ {Count} utilisateur(s) récupéré(s) depuis AD", users.Count);
+
+            // Appliquer le filtrage OU si configuré
+            users = ApplyOUFilter(users);
+
+            _logger.LogInformation("✅ {Count} utilisateur(s) après filtrage OU", users.Count);
 
             // Mettre en cache si requête sans filtre
             if (string.IsNullOrWhiteSpace(searchFilter))
@@ -943,6 +926,106 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             _logger.LogError(ex, "❌ Erreur création groupe {Group}", groupName);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Mappe un UserPrincipal vers un objet User (propriétés de base + étendues + groupes).
+    /// Retourne null en cas d'erreur fatale sur cet utilisateur.
+    /// </summary>
+    private User? MapUserPrincipal(UserPrincipal userPrin)
+    {
+        try
+        {
+            var user = new User
+            {
+                UserName = userPrin.SamAccountName ?? string.Empty,
+                DisplayName = userPrin.DisplayName ?? string.Empty,
+                Email = userPrin.EmailAddress ?? string.Empty,
+                FirstName = userPrin.GivenName ?? string.Empty,
+                LastName = userPrin.Surname ?? string.Empty,
+                DistinguishedName = userPrin.DistinguishedName ?? string.Empty,
+                IsEnabled = userPrin.Enabled ?? false,
+                Description = userPrin.Description ?? string.Empty,
+                UserPrincipalName = userPrin.UserPrincipalName ?? string.Empty
+            };
+
+            // Charger les propriétés étendues via DirectoryEntry
+            try
+            {
+                if (userPrin.GetUnderlyingObject() is DirectoryEntry de)
+                {
+                    user.JobTitle = de.Properties["title"]?.Value?.ToString() ?? string.Empty;
+                    user.Department = de.Properties["department"]?.Value?.ToString() ?? string.Empty;
+                    user.Company = de.Properties["company"]?.Value?.ToString() ?? string.Empty;
+                    user.Office = de.Properties["physicalDeliveryOfficeName"]?.Value?.ToString() ?? string.Empty;
+                    user.Phone = de.Properties["telephoneNumber"]?.Value?.ToString() ?? string.Empty;
+                    user.Mobile = de.Properties["mobile"]?.Value?.ToString() ?? string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Impossible de charger les propriétés étendues de {UserName}", user.UserName);
+            }
+
+            // Charger les groupes de l'utilisateur
+            try
+            {
+                using var memberOf = userPrin.GetGroups();
+                foreach (var grp in memberOf)
+                {
+                    if (grp is GroupPrincipal gp)
+                    {
+                        user.Groups.Add(new Group
+                        {
+                            GroupName = gp.SamAccountName ?? string.Empty,
+                            Description = gp.Description ?? string.Empty,
+                            DistinguishedName = gp.DistinguishedName ?? string.Empty
+                        });
+                    }
+                    grp.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Impossible de charger les groupes de {UserName}", user.UserName);
+            }
+
+            return user;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Erreur lors de la lecture de l'utilisateur {UserName}", userPrin.SamAccountName ?? "Unknown");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Applique le filtrage IncludedUserOUs / ExcludedUserOUs depuis les settings.
+    /// Un user est inclus si son DN contient une des OUs incluses (ou si la liste est vide).
+    /// Un user est exclu si son DN contient une des OUs exclues.
+    /// </summary>
+    private List<User> ApplyOUFilter(List<User> users)
+    {
+        var settings = _settingsService.CurrentSettings.ActiveDirectory;
+        var included = settings.IncludedUserOUs.Where(o => !string.IsNullOrWhiteSpace(o)).ToList();
+        var excluded = settings.ExcludedUserOUs.Where(o => !string.IsNullOrWhiteSpace(o)).ToList();
+
+        if (included.Count == 0 && excluded.Count == 0)
+            return users;
+
+        return users.Where(u =>
+        {
+            var dn = u.DistinguishedName;
+            if (string.IsNullOrWhiteSpace(dn)) return true;
+
+            if (excluded.Count > 0 && excluded.Any(ou => dn.Contains(ou, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            if (included.Count > 0 && !included.Any(ou => dn.Contains(ou, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            return true;
+        }).ToList();
     }
 
     /// <summary>

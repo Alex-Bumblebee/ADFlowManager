@@ -15,6 +15,27 @@ public class OrganizationalUnit
 {
     public string Name { get; set; } = "";
     public string Path { get; set; } = "";
+
+    public string DisplayName
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Path))
+                return Name;
+
+            var ouParts = Path
+                .Split(',')
+                .Where(p => p.TrimStart().StartsWith("OU=", StringComparison.OrdinalIgnoreCase))
+                .Select(p => p.Trim().Substring(3))
+                .ToList();
+
+            if (ouParts.Count == 0)
+                return Name;
+
+            ouParts.Reverse();
+            return string.Join(" → ", ouParts);
+        }
+    }
 }
 
 /// <summary>

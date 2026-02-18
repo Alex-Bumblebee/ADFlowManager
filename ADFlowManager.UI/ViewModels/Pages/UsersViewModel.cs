@@ -41,6 +41,7 @@ public partial class UsersViewModel : ObservableObject
     private readonly IActiveDirectoryService _adService;
     private readonly ICacheService _cacheService;
     private readonly ILogger<UsersViewModel> _logger;
+    private readonly ILocalizationService _localization;
 
     private List<UserViewModel> _allUsers = [];
 
@@ -59,6 +60,9 @@ public partial class UsersViewModel : ObservableObject
     private bool _isLoading;
 
     [ObservableProperty]
+    private string _loadingText = "";
+
+    [ObservableProperty]
     private int _selectedCount;
 
     [ObservableProperty]
@@ -73,11 +77,13 @@ public partial class UsersViewModel : ObservableObject
     public UsersViewModel(
         IActiveDirectoryService adService,
         ICacheService cacheService,
-        ILogger<UsersViewModel> logger)
+        ILogger<UsersViewModel> logger,
+        ILocalizationService localization)
     {
         _adService = adService;
         _cacheService = cacheService;
         _logger = logger;
+        _localization = localization;
 
         _ = LoadUsersAsync();
     }
@@ -87,14 +93,42 @@ public partial class UsersViewModel : ObservableObject
         try
         {
             IsLoading = true;
+            LoadingText = "";
+            _allUsers = [];
+            Users = [];
 
             var users = await _adService.GetUsersAsync();
-            _allUsers = users.Select(u =>
+            var loaded = 0;
+            const int batchSize = 25;
+
+            var batch = new List<UserViewModel>(batchSize);
+
+            foreach (var u in users)
             {
                 var vm = new UserViewModel(u);
                 vm.SelectionChanged += () => UpdateSelectedCount();
-                return vm;
-            }).ToList();
+                batch.Add(vm);
+                loaded++;
+
+                if (batch.Count >= batchSize)
+                {
+                    var toAdd = batch.ToList();
+                    batch.Clear();
+                    _allUsers.AddRange(toAdd);
+                    foreach (var item in toAdd)
+                        Users.Add(item);
+                    LoadingText = string.Format(_localization.GetString("Users_LoadingProgress"), loaded);
+                    await Task.Yield();
+                }
+            }
+
+            if (batch.Count > 0)
+            {
+                _allUsers.AddRange(batch);
+                foreach (var item in batch)
+                    Users.Add(item);
+                LoadingText = string.Format(_localization.GetString("Users_LoadingProgress"), loaded);
+            }
 
             ApplyFilter();
 
@@ -107,6 +141,7 @@ public partial class UsersViewModel : ObservableObject
         finally
         {
             IsLoading = false;
+            LoadingText = "";
         }
     }
 
@@ -174,11 +209,12 @@ public partial class UsersViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task RefreshAsync()
+    public async Task RefreshAsync()
     {
         _logger.LogInformation("Rafraîchissement de la liste utilisateurs");
         SelectedUser = null;
         SearchText = "";
+        await _cacheService.ClearCacheAsync();
         await LoadUsersAsync();
     }
 

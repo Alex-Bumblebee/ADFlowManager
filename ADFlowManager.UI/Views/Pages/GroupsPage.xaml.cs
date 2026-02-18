@@ -172,10 +172,11 @@ public partial class GroupsPage : INavigableView<GroupsViewModel>
             {
                 listBox.Items.Add(new System.Windows.Controls.ListBoxItem
                 {
-                    Content = $"{ou.Name}  —  {ou.Path}",
+                    Content = ou.DisplayName,
                     Tag = ou.Path,
                     Foreground = System.Windows.Media.Brushes.White,
-                    Padding = new System.Windows.Thickness(8, 6, 8, 6)
+                    Padding = new System.Windows.Thickness(8, 6, 8, 6),
+                    ToolTip = ou.Path
                 });
             }
         }

@@ -261,7 +261,7 @@
                         Grid.Column="3"
                         ItemsSource="{Binding AvailableOUs}"
                         SelectedItem="{Binding SelectedOU}"
-                        DisplayMemberPath="Name"
+                        DisplayMemberPath="DisplayName"
                         Height="32"
                         Background="#1E1E1E"
                         Foreground="#F5F5F5"

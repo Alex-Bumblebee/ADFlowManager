@@ -22,6 +22,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ICacheService _cacheService;
     private readonly IActiveDirectoryService _adService;
     private readonly ILocalizationService _localization;
+    private readonly UsersViewModel _usersViewModel;
 
     // === Navigation ===
     [ObservableProperty]
@@ -118,13 +119,15 @@ public partial class SettingsViewModel : ObservableObject
         ISettingsService settingsService,
         ICacheService cacheService,
         IActiveDirectoryService adService,
-        ILocalizationService localization)
+        ILocalizationService localization,
+        UsersViewModel usersViewModel)
     {
         _logger = logger;
         _settingsService = settingsService;
         _cacheService = cacheService;
         _adService = adService;
         _localization = localization;
+        _usersViewModel = usersViewModel;
 
         AppVersion = GetAssemblyVersion();
         LoadSettingsFromService();
@@ -272,8 +275,15 @@ public partial class SettingsViewModel : ObservableObject
     {
         try
         {
+            var prevIncluded = _settingsService.CurrentSettings.ActiveDirectory.IncludedUserOUs;
+            var prevExcluded = _settingsService.CurrentSettings.ActiveDirectory.ExcludedUserOUs;
+
             var settings = BuildSettingsFromViewModel();
             await _settingsService.SaveSettingsAsync(settings);
+
+            var ouFilterChanged =
+                !prevIncluded.SequenceEqual(settings.ActiveDirectory.IncludedUserOUs) ||
+                !prevExcluded.SequenceEqual(settings.ActiveDirectory.ExcludedUserOUs);
 
             MessageBox.Show(
                 _localization.GetString("Settings_SaveSuccess"),
@@ -282,6 +292,12 @@ public partial class SettingsViewModel : ObservableObject
                 MessageBoxImage.Information);
 
             _logger.LogInformation("Settings sauvegardés");
+
+            if (ouFilterChanged)
+            {
+                _logger.LogInformation("Filtres OU modifiés — invalidation cache et rechargement utilisateurs");
+                await _usersViewModel.RefreshAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -494,10 +510,11 @@ public partial class SettingsViewModel : ObservableObject
             {
                 var item = new System.Windows.Controls.ListBoxItem
                 {
-                    Content = $"{ou.Name}  —  {ou.Path}",
+                    Content = ou.DisplayName,
                     Tag = ou.Path,
                     Foreground = System.Windows.Media.Brushes.White,
-                    Padding = new Thickness(8, 6, 8, 6)
+                    Padding = new Thickness(8, 6, 8, 6),
+                    ToolTip = ou.Path
                 };
                 listBox.Items.Add(item);
             }

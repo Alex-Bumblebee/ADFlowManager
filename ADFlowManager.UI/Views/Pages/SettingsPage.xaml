@@ -665,8 +665,9 @@
                                 <Slider
                                     Value="{Binding ViewModel.CacheRefreshMinutes}"
                                     Minimum="15"
-                                    Maximum="240"
-                                    TickFrequency="15"
+                                    Maximum="1440"
+                                    Ticks="15,30,60,120,240,480,720,1440"
+                                    TickPlacement="BottomRight"
                                     IsSnapToTickEnabled="True"
                                     VerticalAlignment="Center" />
 

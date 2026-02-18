@@ -20,6 +20,7 @@
         <converters:BoolToStatusTextConverter x:Key="BoolToStatusTextConverter" />
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Page.Resources>
 
     <!-- FIX 1 : Pas de scroll général, tout tient en 1920x1080 -->
@@ -723,17 +724,8 @@
             Grid.Row="0"
             Grid.RowSpan="2"
             Background="#CC0F0F0F"
-            Panel.ZIndex="999">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
+            Panel.ZIndex="999"
+            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
             <StackPanel
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
@@ -749,6 +741,12 @@
                     FontWeight="SemiBold"
                     Foreground="#F5F5F5"
                     HorizontalAlignment="Center"/>
+                <TextBlock
+                    Text="{Binding LoadingText}"
+                    FontSize="13"
+                    Foreground="#A0A0A0"
+                    HorizontalAlignment="Center"
+                    Margin="0,6,0,0"/>
             </StackPanel>
         </Border>
     </Grid>

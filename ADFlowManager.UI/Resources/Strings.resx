@@ -386,6 +386,8 @@ Vérifiez la complexité et la longueur minimale.</value></data>
   <data name="Common_Success" xml:space="preserve"><value>Succès</value></data>
   <data name="Common_Warning" xml:space="preserve"><value>Attention</value></data>
   <data name="Common_Loading" xml:space="preserve"><value>Chargement...</value></data>
+  <data name="Users_LoadingProgress" xml:space="preserve"><value>{0} utilisateurs chargés</value></data>
+  <data name="Users_LoadingInit" xml:space="preserve"><value>Chargement en cours...</value></data>
   <data name="Common_Search" xml:space="preserve"><value>Rechercher</value></data>
   <data name="Common_Enabled" xml:space="preserve"><value>Actif</value></data>
   <data name="Common_Disabled" xml:space="preserve"><value>Désactivé</value></data>

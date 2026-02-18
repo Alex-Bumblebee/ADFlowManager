@@ -151,4 +151,29 @@ public class OrganizationalUnitInfo
 {
     public string Name { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Affichage lisible : "Parent OU → OU Name" extrait du DN.
+    /// </summary>
+    public string DisplayName
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Path))
+                return Name;
+
+            var ouParts = Path
+                .Split(',')
+                .Where(p => p.TrimStart().StartsWith("OU=", StringComparison.OrdinalIgnoreCase))
+                .Select(p => p.Trim().Substring(3))
+                .ToList();
+
+            if (ouParts.Count == 0)
+                return Name;
+
+            ouParts.Reverse();
+
+            return string.Join(" → ", ouParts);
+        }
+    }
 }
