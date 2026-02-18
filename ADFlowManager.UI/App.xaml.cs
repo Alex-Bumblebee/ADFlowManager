@@ -336,10 +336,29 @@ namespace ADFlowManager.UI
                 _logger.Warning(ex, "Impossible de charger la langue depuis settings.json");
             }
 
-            // Appliquer la couleur d'accent violet (#8B5CF6) pour le thème Dark
-            ApplicationAccentColorManager.Apply(
-                Color.FromRgb(0x8B, 0x5C, 0xF6),
-                ApplicationTheme.Dark);
+            // Appliquer le thème depuis les settings (Dark par défaut, ignore le thème Windows)
+            try
+            {
+                var themeIndex = 0; // 0=Dark par défaut
+                var settingsPathTheme = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "ADFlowManager", "settings.json");
+                if (File.Exists(settingsPathTheme))
+                {
+                    var json = File.ReadAllText(settingsPathTheme);
+                    var settings = JsonSerializer.Deserialize<AppSettings>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    themeIndex = settings?.General?.ThemeIndex ?? 0;
+                }
+
+                var appTheme = themeIndex == 1 ? ApplicationTheme.Light : ApplicationTheme.Dark;
+                ApplicationAccentColorManager.Apply(Color.FromRgb(0x8B, 0x5C, 0xF6), appTheme);
+                _logger.Information("Thème appliqué : {Theme}", appTheme);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning(ex, "Impossible de charger le thème depuis settings.json, Dark appliqué par défaut");
+                ApplicationAccentColorManager.Apply(Color.FromRgb(0x8B, 0x5C, 0xF6), ApplicationTheme.Dark);
+            }
 
             // 1. Afficher LoginWindow en modal AVANT d'ouvrir MainWindow
             LoginWindow loginWindow;

@@ -7,6 +7,7 @@ using ADFlowManager.Core.Interfaces.Services;
 using ADFlowManager.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using Wpf.Ui.Appearance;
 
 namespace ADFlowManager.UI.ViewModels.Pages;
 
@@ -292,6 +293,11 @@ public partial class SettingsViewModel : ObservableObject
                 MessageBoxImage.Information);
 
             _logger.LogInformation("Settings sauvegardés");
+
+            // Appliquer le thème immédiatement sans redémarrage
+            var appTheme = ThemeIndex == 1 ? ApplicationTheme.Light : ApplicationTheme.Dark;
+            ApplicationThemeManager.Apply(appTheme);
+            _logger.LogInformation("Thème appliqué : {Theme}", appTheme);
 
             if (ouFilterChanged)
             {

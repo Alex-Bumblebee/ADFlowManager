@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.5-beta] - 2026-02-18
 
-### Improvements
+### Improvements/Fixed
 
+- **Theme not respecting settings** (issue #3): Application now applies the theme from Settings on startup instead of following the Windows system theme. Defaults to Dark if no preference is saved
 - **Included/Excluded OUs filter** (issue #1): OU filters in Settings now correctly apply to the user list. When Included OUs are configured, AD is scanned only on those specific OUs (targeted `PrincipalContext` per OU) instead of the full domain - significantly faster on large directories. Excluded OUs are filtered by DN on both AD results and cache reads. Cache is automatically invalidated and users reloaded when these filters change on save.
 - **OU visibility** (issue #4): Organizational Units are now displayed as `Parent OU → OU Name` (breadcrumb path) in all OU pickers (Settings, Create User, Groups). The full DN is shown as a tooltip.
 - **Cache TTL extended to 24h** (issue #2): Cache lifetime slider now goes up to 1440 min (24h) with snap-to-tick marks at 15, 30, 60, 120, 240, 480, 720 and 1440 min.
