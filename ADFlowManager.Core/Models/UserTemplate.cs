@@ -44,6 +44,11 @@ public class UserTemplate
     public string? Office { get; set; }
     public string? UserDescription { get; set; }
 
+    /// <summary>
+    /// OU de destination (Path LDAP). Si renseigné, sera pré-sélectionné à l'application du template.
+    /// </summary>
+    public string? DefaultOU { get; set; }
+
     // ===== GROUPES =====
 
     /// <summary>

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.7-beta] - 2026-02-19
+
+### Added
+
+- **Template - Save as template button**: The floppy disk icon is now a visible labeled button "Sauvegarder en template" / "Save as template" for better discoverability.
+- **Template - OU saved**: The selected Organizational Unit is now saved in the template and automatically pre-selected when the template is applied.
+- **Create User - Group filter toggle**: Added a "Voir sélectionnés" / "View selected" toggle button in the Groups tab. When active, only selected groups are displayed to quickly review the selection.
+
+---
+
 ## [0.1.6-beta] - 2026-02-19
 
 ### Added

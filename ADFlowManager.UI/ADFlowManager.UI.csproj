@@ -10,9 +10,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PackageId>ADFlowManager</PackageId>
-    <Version>0.1.5-beta</Version>
-    <AssemblyVersion>0.1.5.0</AssemblyVersion>
-    <FileVersion>0.1.5.0</FileVersion>
+    <Version>0.1.6-beta</Version>
+    <AssemblyVersion>0.1.6.0</AssemblyVersion>
+    <FileVersion>0.1.6.0</FileVersion>
     <Authors>Alex Bumblebee</Authors>
     <Company>Alex Bumblebee</Company>
     <Product>ADFlowManager</Product>
@@ -50,6 +50,7 @@
   </ItemGroup>
 
 </Project>
+
 
 
 

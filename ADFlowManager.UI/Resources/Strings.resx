@@ -147,7 +147,7 @@
   <data name="CreateUser_Template" xml:space="preserve"><value>Template</value></data>
   <data name="CreateUser_Copy" xml:space="preserve"><value>Copier</value></data>
   <data name="CreateUser_SearchUser" xml:space="preserve"><value>Rechercher un utilisateur...</value></data>
-  <data name="CreateUser_SaveTemplate" xml:space="preserve"><value>Sauvegarder template</value></data>
+  <data name="CreateUser_SaveTemplate" xml:space="preserve"><value>Sauvegarder en template</value></data>
   <data name="CreateUser_TabIdentity" xml:space="preserve"><value>Identité</value></data>
   <data name="CreateUser_TabContact" xml:space="preserve"><value>Contact</value></data>
   <data name="CreateUser_TabOrganization" xml:space="preserve"><value>Organisation</value></data>
@@ -176,6 +176,7 @@
   <data name="CreateUser_Preview" xml:space="preserve"><value>APERÇU</value></data>
   <data name="CreateUser_GroupSearch" xml:space="preserve"><value>Rechercher un groupe...</value></data>
   <data name="CreateUser_SelectedGroups" xml:space="preserve"><value>sélectionné(s)</value></data>
+  <data name="CreateUser_ShowSelectedGroups" xml:space="preserve"><value>Voir sélectionnés</value></data>
   <data name="CreateUser_PasswordReq" xml:space="preserve"><value>Mot de passe *</value></data>
   <data name="CreateUser_Generate" xml:space="preserve"><value>Générer</value></data>
   <data name="CreateUser_ConfirmReq" xml:space="preserve"><value>Confirmation *</value></data>

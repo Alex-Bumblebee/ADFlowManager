@@ -180,6 +180,9 @@ public partial class CreateUserViewModel : ObservableObject
     [ObservableProperty]
     private int _selectedGroupsCount;
 
+    [ObservableProperty]
+    private bool _showSelectedOnly;
+
     // === UI State ===
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateUserCommand))]
@@ -392,9 +395,18 @@ public partial class CreateUserViewModel : ObservableObject
                 group.IsSelected = true;
         }
 
+        // OU
+        if (!string.IsNullOrWhiteSpace(template.DefaultOU))
+        {
+            var matchingOU = AvailableOUs.FirstOrDefault(ou =>
+                ou.Path.Equals(template.DefaultOU, StringComparison.OrdinalIgnoreCase));
+            if (matchingOU != null)
+                SelectedOU = matchingOU;
+        }
+
         UpdateSelectedGroupsCount();
 
-        _logger.LogInformation("Template appliqu\u00e9 : {Groups} groupes pr\u00e9-s\u00e9lectionn\u00e9s", template.Groups.Count);
+        _logger.LogInformation("Template appliqué : {Groups} groupes pré-sélectionnés, OU: {OU}", template.Groups.Count, template.DefaultOU ?? "(aucune)");
     }
 
     // === Copie utilisateur via Dialog ===
@@ -496,25 +508,40 @@ public partial class CreateUserViewModel : ObservableObject
         UserSearchQuery = sourceUser.DisplayName;
     }
 
-    // === Groupes search ===
-    partial void OnGroupSearchQueryChanged(string value)
+    // === Groupes filter ===
+    partial void OnGroupSearchQueryChanged(string value) => RefreshGroupFilter();
+
+    partial void OnShowSelectedOnlyChanged(bool value) => RefreshGroupFilter();
+
+    [RelayCommand]
+    private void ToggleShowSelectedGroups()
     {
-        if (string.IsNullOrWhiteSpace(value))
+        ShowSelectedOnly = !ShowSelectedOnly;
+    }
+
+    private void RefreshGroupFilter()
+    {
+        IEnumerable<GroupSelectionViewModel> filtered = AvailableGroups;
+
+        if (ShowSelectedOnly)
         {
-            FilteredAvailableGroups = new ObservableCollection<GroupSelectionViewModel>(AvailableGroups);
-            return;
+            filtered = filtered.Where(g => g.IsSelected);
+        }
+        else if (!string.IsNullOrWhiteSpace(GroupSearchQuery))
+        {
+            var search = GroupSearchQuery.Trim().ToLowerInvariant();
+            filtered = filtered.Where(g =>
+                g.GroupName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                g.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
-        var search = value.Trim().ToLowerInvariant();
-        var filtered = AvailableGroups.Where(g =>
-            g.GroupName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-            g.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
         FilteredAvailableGroups = new ObservableCollection<GroupSelectionViewModel>(filtered);
     }
 
     private void UpdateSelectedGroupsCount()
     {
         SelectedGroupsCount = AvailableGroups.Count(g => g.IsSelected);
+        if (ShowSelectedOnly) RefreshGroupFilter();
         ValidateForm();
     }
 
@@ -775,6 +802,7 @@ public partial class CreateUserViewModel : ObservableObject
                 Company = Company,
                 Office = Office,
                 UserDescription = Description,
+                DefaultOU = SelectedOU?.Path,
                 Groups = AvailableGroups.Where(g => g.IsSelected).Select(g => g.GroupName).ToList(),
                 MustChangePasswordAtLogon = MustChangePasswordNextLogon,
                 IsEnabled = !AccountDisabled

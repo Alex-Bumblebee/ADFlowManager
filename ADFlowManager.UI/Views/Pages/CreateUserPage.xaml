@@ -274,10 +274,10 @@
             <ui:Button
                 Grid.Column="6"
                 Appearance="Secondary"
+                Content="{ext:Localized CreateUser_SaveTemplate}"
                 Command="{Binding SaveAsTemplateCommand}"
-                ToolTip="{ext:Localized CreateUser_SaveTemplate}"
                 Height="44"
-                Width="44">
+                Padding="16,0">
                 <ui:Button.Icon>
                     <ui:SymbolIcon Symbol="Save24" />
                 </ui:Button.Icon>
@@ -623,10 +623,11 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <!-- Search + Count -->
+                            <!-- Search + Count + Toggle -->
                             <Grid Grid.Row="0" Margin="24,16,24,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
@@ -650,7 +651,8 @@
                                     Background="#3B2D5E"
                                     CornerRadius="12"
                                     Padding="12,6"
-                                    VerticalAlignment="Center">
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,8,0">
                                     <StackPanel Orientation="Horizontal">
                                         <ui:SymbolIcon Symbol="Checkmark24" Foreground="#8B5CF6" FontSize="14" Margin="0,0,6,0" />
                                         <TextBlock Foreground="#8B5CF6" FontSize="13" FontWeight="SemiBold">
@@ -659,6 +661,28 @@
                                         </TextBlock>
                                     </StackPanel>
                                 </Border>
+
+                                <ui:Button
+                                    Grid.Column="2"
+                                    Content="{ext:Localized CreateUser_ShowSelectedGroups}"
+                                    Command="{Binding ToggleShowSelectedGroupsCommand}"
+                                    Height="38"
+                                    Padding="12,0"
+                                    FontSize="12">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Appearance" Value="Secondary" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ShowSelectedOnly}" Value="True">
+                                                    <Setter Property="Appearance" Value="Primary" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                    <ui:Button.Icon>
+                                        <ui:SymbolIcon Symbol="Filter24" />
+                                    </ui:Button.Icon>
+                                </ui:Button>
                             </Grid>
 
                             <!-- Groups list with checkboxes -->
