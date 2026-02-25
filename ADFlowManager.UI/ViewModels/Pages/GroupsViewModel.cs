@@ -151,11 +151,11 @@ public partial class GroupsViewModel : ObservableObject
 
             ApplyFilter();
 
-            _logger.LogInformation("Groupes chargés : {Count}", _allGroups.Count);
+            _logger.LogInformation("Groups loaded: {Count}", _allGroups.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur lors du chargement des groupes");
+            _logger.LogError(ex, "Error while loading groups.");
         }
         finally
         {
@@ -180,11 +180,11 @@ public partial class GroupsViewModel : ObservableObject
         {
             var members = await _adService.GetGroupMembersAsync(groupVm.GroupName);
             groupVm.SetMembers(members);
-            _logger.LogInformation("Membres chargés pour {Group} : {Count}", groupVm.GroupName, members.Count);
+            _logger.LogInformation("Group members loaded for {Group}: {Count}", groupVm.GroupName, members.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Erreur chargement membres de {Group}", groupVm.GroupName);
+            _logger.LogWarning(ex, "Error while loading members for group {Group}", groupVm.GroupName);
         }
     }
 
@@ -229,7 +229,7 @@ public partial class GroupsViewModel : ObservableObject
     /// </summary>
     public async Task AddMembersToGroupsAsync(List<string> groupNames, List<User> usersToAdd)
     {
-        _logger.LogInformation("Ajout de {UserCount} utilisateur(s) à {GroupCount} groupe(s)",
+        _logger.LogInformation("Adding {UserCount} user(s) to {GroupCount} group(s)",
             usersToAdd.Count, groupNames.Count);
 
         foreach (var groupName in groupNames)
@@ -239,11 +239,11 @@ public partial class GroupsViewModel : ObservableObject
                 try
                 {
                     await _adService.AddUserToGroupAsync(user.UserName, groupName);
-                    _logger.LogInformation("✅ {User} ajouté à {Group}", user.UserName, groupName);
+                    _logger.LogInformation("User added to group: {User}/{Group}", user.UserName, groupName);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "❌ Erreur ajout {User} à {Group}", user.UserName, groupName);
+                    _logger.LogWarning(ex, "Failed to add user to group: {User}/{Group}", user.UserName, groupName);
                 }
             }
 
@@ -278,7 +278,7 @@ public partial class GroupsViewModel : ObservableObject
     [RelayCommand]
     private async Task RefreshAsync()
     {
-        _logger.LogInformation("Rafraîchissement de la liste groupes");
+        _logger.LogInformation("Refreshing groups list.");
         SelectedGroup = null;
         SearchText = "";
         await LoadGroupsAsync();
@@ -289,7 +289,7 @@ public partial class GroupsViewModel : ObservableObject
     {
         if (SelectedGroup is null) return;
         System.Windows.Clipboard.SetText(SelectedGroup.GroupName);
-        _logger.LogInformation("Copié : {GroupName}", SelectedGroup.GroupName);
+        _logger.LogDebug("Group name copied to clipboard.");
     }
 
     [RelayCommand]
@@ -297,7 +297,7 @@ public partial class GroupsViewModel : ObservableObject
     {
         if (SelectedGroup is null) return;
         System.Windows.Clipboard.SetText(SelectedGroup.DistinguishedName);
-        _logger.LogInformation("Copié : DN de {GroupName}", SelectedGroup.GroupName);
+        _logger.LogDebug("Group DN copied to clipboard.");
     }
 
     /// <summary>
@@ -308,7 +308,7 @@ public partial class GroupsViewModel : ObservableObject
         try
         {
             await _adService.RemoveUserFromGroupAsync(user.UserName, groupName);
-            _logger.LogInformation("✅ {User} retiré de {Group}", user.UserName, groupName);
+            _logger.LogInformation("User removed from group: {User}/{Group}", user.UserName, groupName);
 
             // Refresh
             var groupVm = _allGroups.FirstOrDefault(g => g.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
@@ -322,7 +322,7 @@ public partial class GroupsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur retrait {User} de {Group}", user.UserName, groupName);
+            _logger.LogError(ex, "Failed to remove user from group: {User}/{Group}", user.UserName, groupName);
         }
     }
 
@@ -378,7 +378,7 @@ public partial class GroupsViewModel : ObservableObject
                 isSecurityGroup,
                 scope);
 
-            _logger.LogInformation("✅ Groupe créé : {Group}", group.GroupName);
+            _logger.LogInformation("Group created: {Group}", group.GroupName);
 
             // Ajouter à la liste locale
             var gvm = new GroupViewModel(group);
@@ -398,7 +398,7 @@ public partial class GroupsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur création groupe {Group}", NewGroupName);
+            _logger.LogError(ex, "Error while creating group {Group}", NewGroupName);
             MessageBox.Show(
                 string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message),
                 _localization.GetString("Common_Error"),
@@ -419,7 +419,7 @@ public partial class GroupsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur chargement OUs");
+            _logger.LogError(ex, "Error while loading OUs.");
             return [];
         }
     }

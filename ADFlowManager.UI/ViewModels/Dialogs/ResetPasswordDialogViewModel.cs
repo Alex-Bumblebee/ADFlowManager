@@ -1,4 +1,7 @@
-using System.Security.Cryptography;
+using System.Windows;
+using System.Windows.Threading;
+using ADFlowManager.Core.Interfaces.Services;
+using ADFlowManager.UI.Security;
 using Microsoft.Extensions.Logging;
 
 namespace ADFlowManager.UI.ViewModels.Dialogs;
@@ -11,7 +14,11 @@ namespace ADFlowManager.UI.ViewModels.Dialogs;
 public partial class ResetPasswordDialogViewModel : ObservableObject
 {
     private readonly ILogger<ResetPasswordDialogViewModel> _logger;
+    private readonly ISettingsService _settingsService;
+    private readonly ILocalizationService _localization;
     private string _userSam;
+    private DispatcherTimer? _clipboardClearTimer;
+    private int _clipboardCountdown;
 
     [ObservableProperty]
     private string _userDisplayName = "";
@@ -35,29 +42,16 @@ public partial class ResetPasswordDialogViewModel : ObservableObject
     private string _generatedPasswordDisplay = "";
 
     /// <summary>
-    /// Dictionnaire de mots internationaux simples à retenir et prononcer.
+    /// Message d'état du presse-papiers (compte à rebours auto-clear).
     /// </summary>
-    private static readonly string[] SimpleWords =
-    [
-        "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot",
-        "Galaxy", "Hunter", "Indigo", "Jungle", "Krypto", "Lotus",
-        "Mango", "Naruto", "Omega", "Phoenix", "Quartz", "Rocket",
-        "Shadow", "Titan", "Ultra", "Vortex", "Winter", "Xenon",
-        "Zephyr", "Blaze", "Crystal", "Dragon", "Falcon", "Glacier",
-        "Horizon", "Jaguar", "Knight", "Legend", "Meteor", "Nebula",
-        "Oracle", "Panther", "Raptor", "Sierra", "Thunder", "Viking",
-        "Wizard", "Zenith", "Storm", "Coral", "Silver", "Amber",
-        "Cobalt", "Prism", "Summit", "Velvet", "Cyber", "Plasma",
-        "Quantum", "Spark", "Mystic", "Solar", "Turbo", "Pixel",
-        "Matrix", "Sonic", "Atlas", "Raven", "Comet", "Lancer",
-        "Sphinx", "Astral", "Carbon", "Nitro", "Pulse", "Chrome"
-    ];
+    [ObservableProperty]
+    private string _clipboardStatus = "";
 
-    private static readonly char[] SpecialChars = ['@', '#', '!', '$', '%', '&', '*'];
-
-    public ResetPasswordDialogViewModel(ILogger<ResetPasswordDialogViewModel> logger)
+    public ResetPasswordDialogViewModel(ILogger<ResetPasswordDialogViewModel> logger, ISettingsService settingsService, ILocalizationService localization)
     {
         _logger = logger;
+        _settingsService = settingsService;
+        _localization = localization;
         _userSam = "";
     }
 
@@ -68,6 +62,11 @@ public partial class ResetPasswordDialogViewModel : ObservableObject
     {
         _userSam = userSam;
         UserDisplayName = userDisplayName;
+        NewPassword = string.Empty;
+        ConfirmPassword = string.Empty;
+        GeneratedPasswordDisplay = string.Empty;
+        ClipboardStatus = string.Empty;
+        StopClipboardTimer();
     }
 
     partial void OnNewPasswordChanged(string value) => ValidatePasswords();
@@ -75,9 +74,10 @@ public partial class ResetPasswordDialogViewModel : ObservableObject
 
     private void ValidatePasswords()
     {
+        var policy = _settingsService.CurrentSettings.UserCreation.PasswordPolicy;
         CanReset = !string.IsNullOrWhiteSpace(NewPassword) &&
-                   NewPassword.Length >= 8 &&
-                   NewPassword == ConfirmPassword;
+                   NewPassword == ConfirmPassword &&
+                   PasswordPolicyHelper.IsCompliant(NewPassword, policy, out _);
     }
 
     /// <summary>
@@ -86,38 +86,14 @@ public partial class ResetPasswordDialogViewModel : ObservableObject
     [RelayCommand]
     private void GenerateClassic()
     {
-        const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-        const string lower = "abcdefghjkmnpqrstuvwxyz";
-        const string digits = "23456789";
-        const string special = "@#!$%&*";
-        const int length = 12;
-
-        var password = new char[length];
-
-        // Garantir au moins un de chaque type
-        password[0] = upper[RandomNumberGenerator.GetInt32(upper.Length)];
-        password[1] = lower[RandomNumberGenerator.GetInt32(lower.Length)];
-        password[2] = digits[RandomNumberGenerator.GetInt32(digits.Length)];
-        password[3] = special[RandomNumberGenerator.GetInt32(special.Length)];
-
-        // Remplir le reste
-        var allChars = upper + lower + digits + special;
-        for (int i = 4; i < length; i++)
-            password[i] = allChars[RandomNumberGenerator.GetInt32(allChars.Length)];
-
-        // Mélanger
-        for (int i = password.Length - 1; i > 0; i--)
-        {
-            int j = RandomNumberGenerator.GetInt32(i + 1);
-            (password[i], password[j]) = (password[j], password[i]);
-        }
-
-        var generated = new string(password);
+        var policy = _settingsService.CurrentSettings.UserCreation.PasswordPolicy;
+        var generated = PasswordPolicyHelper.GeneratePassword(policy);
         NewPassword = generated;
         ConfirmPassword = generated;
         GeneratedPasswordDisplay = generated;
+        CopyToClipboardWithAutoClear(generated);
 
-        _logger.LogInformation("Mot de passe classique généré pour {User}", _userSam);
+        _logger.LogInformation("Generated reset password for user: {User}", _userSam);
     }
 
     /// <summary>
@@ -127,17 +103,72 @@ public partial class ResetPasswordDialogViewModel : ObservableObject
     [RelayCommand]
     private void GenerateSimple()
     {
-        var word = SimpleWords[RandomNumberGenerator.GetInt32(SimpleWords.Length)];
-        var number = RandomNumberGenerator.GetInt32(100, 999).ToString();
-        var special = SpecialChars[RandomNumberGenerator.GetInt32(SpecialChars.Length)];
-
-        var generated = $"{word}{number}{special}";
+        var policy = _settingsService.CurrentSettings.UserCreation.PasswordPolicy;
+        var generated = policy == PasswordPolicyHelper.Easy
+            ? PasswordPolicyHelper.GeneratePassword(PasswordPolicyHelper.Easy)
+            : PasswordPolicyHelper.GeneratePassword(policy);
 
         NewPassword = generated;
         ConfirmPassword = generated;
         GeneratedPasswordDisplay = generated;
+        CopyToClipboardWithAutoClear(generated);
 
-        _logger.LogInformation("Mot de passe simple généré pour {User}", _userSam);
+        _logger.LogInformation("Generated readable reset password for user: {User}", _userSam);
     }
 
+    /// <summary>
+    /// Copie le mot de passe dans le presse-papiers et lance un timer de 60s pour l'effacer.
+    /// </summary>
+    public void CopyToClipboardWithAutoClear(string text)
+    {
+        try
+        {
+            Clipboard.SetText(text);
+            _clipboardCountdown = 60;
+            ClipboardStatus = string.Format(_localization.GetString("ResetPassword_ClipboardCountdown"), _clipboardCountdown);
+
+            StopClipboardTimer();
+            _clipboardClearTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _clipboardClearTimer.Tick += OnClipboardTimerTick;
+            _clipboardClearTimer.Start();
+
+            _logger.LogDebug("Password copied to clipboard with 60s auto-clear.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to copy password to clipboard.");
+        }
+    }
+
+    private void OnClipboardTimerTick(object? sender, EventArgs e)
+    {
+        _clipboardCountdown--;
+
+        if (_clipboardCountdown <= 0)
+        {
+            try
+            {
+                Clipboard.Clear();
+            }
+            catch { /* Clipboard may be locked by another app */ }
+
+            ClipboardStatus = _localization.GetString("ResetPassword_ClipboardCleared");
+            StopClipboardTimer();
+            _logger.LogDebug("Clipboard auto-cleared after timeout.");
+        }
+        else
+        {
+            ClipboardStatus = string.Format(_localization.GetString("ResetPassword_ClipboardCountdown"), _clipboardCountdown);
+        }
+    }
+
+    private void StopClipboardTimer()
+    {
+        if (_clipboardClearTimer != null)
+        {
+            _clipboardClearTimer.Stop();
+            _clipboardClearTimer.Tick -= OnClipboardTimerTick;
+            _clipboardClearTimer = null;
+        }
+    }
 }

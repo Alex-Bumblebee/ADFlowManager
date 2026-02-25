@@ -98,7 +98,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
 
         CompareGroups();
 
-        _logger.LogInformation("Comparaison : {User1} vs {User2}", user1.UserName, user2.UserName);
+        _logger.LogInformation("Comparing users: {User1} vs {User2}", user1.UserName, user2.UserName);
     }
 
     private string GetInitials(User user)
@@ -129,7 +129,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
 
         UpdateCounts();
 
-        _logger.LogInformation("Resultat : {U1} unique, {Common} communs, {U2} unique",
+        _logger.LogInformation("Comparison result: {U1} unique, {Common} common, {U2} unique",
             User1UniqueCount, CommonGroupsCount, User2UniqueCount);
     }
 
@@ -150,7 +150,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
         _pendingAdds.Add((_user2.UserName, group.GroupName));
         UpdateCounts();
         OnPropertyChanged(nameof(HasChanges));
-        _logger.LogInformation("Groupe {Group} planifié : {User1} -> {User2}", group.GroupName, _user1.UserName, _user2.UserName);
+        _logger.LogInformation("Group {Group} queued: {User1} -> {User2}", group.GroupName, _user1.UserName, _user2.UserName);
     }
 
     [RelayCommand]
@@ -161,7 +161,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
         _pendingAdds.Add((_user1.UserName, group.GroupName));
         UpdateCounts();
         OnPropertyChanged(nameof(HasChanges));
-        _logger.LogInformation("Groupe {Group} planifié : {User2} -> {User1}", group.GroupName, _user2.UserName, _user1.UserName);
+        _logger.LogInformation("Group {Group} queued: {User2} -> {User1}", group.GroupName, _user2.UserName, _user1.UserName);
     }
 
     // === Actions batch ===
@@ -177,7 +177,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
         }
         UpdateCounts();
         OnPropertyChanged(nameof(HasChanges));
-        _logger.LogInformation("Tous les groupes planifiés : {User1} -> {User2}", _user1.UserName, _user2.UserName);
+        _logger.LogInformation("All groups queued: {User1} -> {User2}", _user1.UserName, _user2.UserName);
     }
 
     [RelayCommand]
@@ -191,7 +191,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
         }
         UpdateCounts();
         OnPropertyChanged(nameof(HasChanges));
-        _logger.LogInformation("Tous les groupes planifiés : {User2} -> {User1}", _user2.UserName, _user1.UserName);
+        _logger.LogInformation("All groups queued: {User2} -> {User1}", _user2.UserName, _user1.UserName);
     }
 
     [RelayCommand]
@@ -211,7 +211,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
         }
         UpdateCounts();
         OnPropertyChanged(nameof(HasChanges));
-        _logger.LogInformation("Egalisation planifiée : {User1} <-> {User2}",
+        _logger.LogInformation("Bidirectional sync queued: {User1} <-> {User2}",
             _user1.UserName, _user2.UserName);
     }
 
@@ -236,12 +236,12 @@ public partial class CompareUsersDialogViewModel : ObservableObject
                 {
                     await _adService.AddUserToGroupAsync(sam, groupName);
                     successCount++;
-                    _logger.LogInformation("✅ Groupe {Group} ajouté à {User}", groupName, sam);
+                    _logger.LogInformation("Group {Group} added to {User}", groupName, sam);
                 }
                 catch (Exception ex)
                 {
                     errorCount++;
-                    _logger.LogWarning(ex, "❌ Erreur ajout {Group} à {User}", groupName, sam);
+                    _logger.LogWarning(ex, "Failed to add group {Group} to {User}", groupName, sam);
                 }
             }
 
@@ -254,12 +254,12 @@ public partial class CompareUsersDialogViewModel : ObservableObject
                 ? $"{successCount} groupe(s) appliqué(s) avec succès"
                 : $"{successCount} succès, {errorCount} erreur(s)";
 
-            _logger.LogInformation("Résultat application : {Success} succès, {Errors} erreurs", successCount, errorCount);
+            _logger.LogInformation("Apply result: {Success} success, {Errors} errors", successCount, errorCount);
         }
         catch (Exception ex)
         {
             StatusMessage = $"Erreur : {ex.Message}";
-            _logger.LogError(ex, "Erreur application des modifications");
+            _logger.LogError(ex, "Error while applying queued changes.");
         }
         finally
         {

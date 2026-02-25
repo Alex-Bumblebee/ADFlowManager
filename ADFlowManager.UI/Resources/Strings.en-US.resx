@@ -169,6 +169,9 @@
   <data name="CreateUser_Office" xml:space="preserve"><value>Office</value></data>
   <data name="CreateUser_TabGroups" xml:space="preserve"><value>Groups</value></data>
   <data name="CreateUser_TabOptions" xml:space="preserve"><value>Options</value></data>
+  <data name="CreateUser_TabTemplateOptions" xml:space="preserve"><value>Template</value></data>
+  <data name="CreateUser_TemplateOptionsInfo" xml:space="preserve"><value>TEMPLATE OPTIONS</value></data>
+  <data name="CreateUser_TemplateOptionsHint" xml:space="preserve"><value>These options will be saved in the template and automatically applied when creating a user from this template.</value></data>
   <data name="CreateUser_Password" xml:space="preserve"><value>Password</value></data>
   <data name="CreateUser_ConfirmPassword" xml:space="preserve"><value>Confirm Password</value></data>
   <data name="CreateUser_CreateButton" xml:space="preserve"><value>Create User</value></data>
@@ -180,6 +183,8 @@
   <data name="CreateUser_PasswordReq" xml:space="preserve"><value>Password *</value></data>
   <data name="CreateUser_Generate" xml:space="preserve"><value>Generate</value></data>
   <data name="CreateUser_ConfirmReq" xml:space="preserve"><value>Confirmation *</value></data>
+  <data name="CreateUser_Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="CreateUser_ResetConfirm" xml:space="preserve"><value>Are you sure you want to reset all fields? Unsaved data will be lost.</value></data>
   <data name="CreateUser_AccountOptions" xml:space="preserve"><value>ACCOUNT OPTIONS</value></data>
   <data name="CreateUser_ChangePasswordNextLogon" xml:space="preserve"><value>Change password at next logon</value></data>
   <data name="CreateUser_ChangePasswordNextLogonDesc" xml:space="preserve"><value>User will need to set a new password</value></data>
@@ -187,6 +192,10 @@
   <data name="CreateUser_PasswordNeverExpiresDesc" xml:space="preserve"><value>Not recommended for standard user accounts</value></data>
   <data name="CreateUser_CreateDisabled" xml:space="preserve"><value>Create account disabled</value></data>
   <data name="CreateUser_CreateDisabledDesc" xml:space="preserve"><value>Account will be created but access blocked</value></data>
+  <data name="CreateUser_ExpirationDate" xml:space="preserve"><value>Exact Expiration Date</value></data>
+  <data name="CreateUser_ExpirationDateDesc" xml:space="preserve"><value>The account will expire on this date</value></data>
+  <data name="CreateUser_ExpirationDays" xml:space="preserve"><value>Expires in (days)</value></data>
+  <data name="CreateUser_ExpirationDaysDesc" xml:space="preserve"><value>Useful for templates (e.g., contractors)</value></data>
   <data name="CreateUser_Details" xml:space="preserve"><value>DETAILS</value></data>
   <data name="CreateUser_OULabel" xml:space="preserve"><value>Organizational Unit</value></data>
   <data name="CreateUser_Validation" xml:space="preserve"><value>VALIDATION</value></data>
@@ -304,6 +313,16 @@ Check complexity and minimum length requirements.</value></data>
   <data name="Settings_OneOUPerLineEx" xml:space="preserve"><value>One OU per line (e.g.: OU=ServiceAccounts,DC=contoso,DC=local)</value></data>
   <data name="Settings_LoadGroupsOnStartup" xml:space="preserve"><value>Load groups on startup</value></data>
   <data name="Settings_LoadGroupsOnStartupDesc" xml:space="preserve"><value>Uncheck to improve performance on large domains or AD 2012 R2. Groups remain accessible via double-click.</value></data>
+  <data name="Settings_UserCreation" xml:space="preserve"><value>User Creation</value></data>
+  <data name="Settings_UserCreationTitle" xml:space="preserve"><value>User Creation</value></data>
+  <data name="Settings_UserCreationDesc" xml:space="preserve"><value>Configure automatic formats for login, display name, and duplicate handling when creating a user.</value></data>
+  <data name="Settings_LoginFormat" xml:space="preserve"><value>Login Format (UPN/sAMAccountName)</value></data>
+  <data name="Settings_DisplayNameFormat" xml:space="preserve"><value>Display Name Format</value></data>
+  <data name="Settings_DuplicateHandling" xml:space="preserve"><value>Duplicate Handling (login)</value></data>
+  <data name="Settings_DuplicateAppendNumber" xml:space="preserve"><value>Append a number (e.g. firstname.lastname1)</value></data>
+  <data name="Settings_DuplicateDoNothing" xml:space="preserve"><value>Do nothing (risk of AD error)</value></data>
+  <data name="Settings_EmailDomain" xml:space="preserve"><value>Custom Email Domain (optional)</value></data>
+  <data name="Settings_EmailDomainDesc" xml:space="preserve"><value>If set (e.g. example.com), will be used for email and UPN instead of the default AD domain.</value></data>
   <data name="Settings_CacheTitle" xml:space="preserve"><value>SQLite Cache</value></data>
   <data name="Settings_CacheDesc" xml:space="preserve"><value>The cache speeds up loading of users and groups. Data is automatically refreshed according to the configured TTL.</value></data>
   <data name="Settings_LastRefresh" xml:space="preserve"><value>LAST REFRESH</value></data>
@@ -325,6 +344,8 @@ Check complexity and minimum length requirements.</value></data>
   <data name="Settings_HistoryDesc" xml:space="preserve"><value>Configure audit log storage to track all AD actions.</value></data>
   <data name="Settings_EnableAudit" xml:space="preserve"><value>Enable action history</value></data>
   <data name="Settings_StorageMode" xml:space="preserve"><value>Storage Mode</value></data>
+  <data name="Settings_StorageLocal" xml:space="preserve"><value>Local</value></data>
+  <data name="Settings_StorageNetwork" xml:space="preserve"><value>Shared Network</value></data>
   <data name="Settings_AuditLocalDesc" xml:space="preserve"><value>Local: each workstation has its own database.</value></data>
   <data name="Settings_AuditNetworkDesc" xml:space="preserve"><value>Shared network: all users share the same database (centralized audit).</value></data>
   <data name="Settings_AuditNetworkPath" xml:space="preserve"><value>Network Database Path</value></data>
@@ -449,5 +470,15 @@ Current settings will be replaced.</value></data>
   <data name="Msg_MemberRemoved" xml:space="preserve"><value>Member removed from group</value></data>
   <data name="Msg_CsvExported" xml:space="preserve"><value>CSV export successful</value></data>
   <data name="Msg_SettingsSaved" xml:space="preserve"><value>Settings saved</value></data>
+
+  <!-- ===== SECURITY ===== -->
+  <data name="ResetPassword_ClipboardCountdown" xml:space="preserve"><value>Clipboard will be cleared in {0}s</value></data>
+  <data name="ResetPassword_ClipboardCleared" xml:space="preserve"><value>Clipboard cleared automatically</value></data>
+  <data name="CreateUser_ClipboardWarning" xml:space="preserve"><value>⚠️ Password copied — clipboard will be cleared automatically in {0}s</value></data>
+  <data name="CreateUser_ClipboardCleared" xml:space="preserve"><value>Clipboard cleared automatically</value></data>
+  <data name="Login_ErrorGeneric" xml:space="preserve"><value>Login failed. Check your credentials or contact your administrator.</value></data>
+  <data name="CreateUser_TemplateSaveError" xml:space="preserve"><value>Unable to save the template. Check the logs for details.</value></data>
+  <data name="CreateUser_ErrorInvalidName" xml:space="preserve"><value>First name or last name contains unauthorized characters</value></data>
+  <data name="Settings_InvalidPath" xml:space="preserve"><value>The path "{0}" contains forbidden sequences (.., ~). Please use an absolute path.</value></data>
 
 </root>

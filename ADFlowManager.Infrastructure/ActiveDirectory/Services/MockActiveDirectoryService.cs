@@ -178,18 +178,10 @@ public class MockActiveDirectoryService : IActiveDirectoryService
     }
 
     /// <summary>
-    /// Stocke les credentials admin (mock - ne fait rien).
-    /// </summary>
-    public void StoreCredentials(string domain, string username, string password)
-    {
-        _logger.LogInformation("⚠️ MOCK StoreCredentials : {Domain}/{Username}", domain, username);
-    }
-
-    /// <summary>
     /// Crée un utilisateur fictif (mock).
     /// </summary>
     public async Task<User> CreateUserAsync(User user, string ouPath, string password,
-        bool mustChangePassword = true, bool passwordNeverExpires = false, bool accountDisabled = false)
+        bool mustChangePassword = true, bool passwordNeverExpires = false, bool accountDisabled = false, DateTime? accountExpirationDate = null)
     {
         await Task.Delay(500);
 

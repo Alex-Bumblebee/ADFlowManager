@@ -55,6 +55,27 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _loadGroupsOnStartup = true;
 
+    // === Création Utilisateur ===
+    [ObservableProperty]
+    private string _loginFormat = "Prenom.Nom";
+
+    [ObservableProperty]
+    private string _displayNameFormat = "Prenom Nom";
+
+    [ObservableProperty]
+    private string _duplicateHandling = "AppendNumber";
+
+    [ObservableProperty]
+    private string _emailDomain = "";
+
+    [ObservableProperty]
+    private string _passwordPolicy = "Standard";
+
+    public List<string> LoginFormats { get; } = ["Prenom.Nom", "P.Nom", "Nom.P", "Nom"];
+    public List<string> DisplayNameFormats { get; } = ["Prenom Nom", "Nom Prenom"];
+    public List<string> DuplicateHandlingOptions { get; } = ["AppendNumber", "DoNothing"];
+    public List<string> PasswordPolicies { get; } = ["Easy", "Standard", "Strong"];
+
     /// <summary>
     /// Liste des OUs disponibles dans le domaine AD (chargées à la demande).
     /// </summary>
@@ -100,7 +121,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private int _auditRetentionDays = 0;
 
-    public List<string> AuditStorageModes { get; } = ["Local", "Réseau partagé"];
+    public List<string> AuditStorageModes { get; }
 
     // === Templates ===
     [ObservableProperty]
@@ -112,7 +133,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _templateLocalPath = "";
 
-    public List<string> TemplateStorageModes { get; } = ["Local", "Réseau partagé"];
+    public List<string> TemplateStorageModes { get; }
 
     // === À propos ===
     [ObservableProperty]
@@ -132,6 +153,9 @@ public partial class SettingsViewModel : ObservableObject
         _adService = adService;
         _localization = localization;
         _usersViewModel = usersViewModel;
+
+        AuditStorageModes = [_localization.GetString("Settings_StorageLocal"), _localization.GetString("Settings_StorageNetwork")];
+        TemplateStorageModes = [_localization.GetString("Settings_StorageLocal"), _localization.GetString("Settings_StorageNetwork")];
 
         AppVersion = GetAssemblyVersion();
         LoadSettingsFromService();
@@ -164,6 +188,15 @@ public partial class SettingsViewModel : ObservableObject
             IncludedUserOUs = string.Join(Environment.NewLine, s.ActiveDirectory.IncludedUserOUs);
             ExcludedUserOUs = string.Join(Environment.NewLine, s.ActiveDirectory.ExcludedUserOUs);
 
+            // Création Utilisateur
+            LoginFormat = s.UserCreation.LoginFormat;
+            DisplayNameFormat = s.UserCreation.DisplayNameFormat;
+            DuplicateHandling = s.UserCreation.DuplicateHandling;
+            EmailDomain = s.UserCreation.EmailDomain;
+            PasswordPolicy = string.IsNullOrWhiteSpace(s.UserCreation.PasswordPolicy)
+                ? "Standard"
+                : s.UserCreation.PasswordPolicy;
+
             // Cache
             CacheEnabled = s.Cache.IsEnabled;
             CacheRefreshMinutes = s.Cache.TtlMinutes;
@@ -183,11 +216,11 @@ public partial class SettingsViewModel : ObservableObject
             TemplateNetworkPath = s.Templates.NetworkFolderPath;
             TemplateLocalPath = s.Templates.LocalFolderPath;
 
-            _logger.LogInformation("Settings chargés dans ViewModel");
+            _logger.LogInformation("Settings loaded into view model.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur chargement settings dans ViewModel");
+            _logger.LogError(ex, "Error while loading settings into view model.");
         }
     }
 
@@ -208,6 +241,14 @@ public partial class SettingsViewModel : ObservableObject
                 LoadGroupsOnStartup = LoadGroupsOnStartup,
                 IncludedUserOUs = ParseMultilineToList(IncludedUserOUs),
                 ExcludedUserOUs = ParseMultilineToList(ExcludedUserOUs)
+            },
+            UserCreation = new UserCreationSettings
+            {
+                LoginFormat = LoginFormat,
+                DisplayNameFormat = DisplayNameFormat,
+                DuplicateHandling = DuplicateHandling,
+                EmailDomain = EmailDomain?.Trim() ?? "",
+                PasswordPolicy = PasswordPolicy
             },
             Cache = new CacheSettings
             {
@@ -270,7 +311,7 @@ public partial class SettingsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur lecture stats cache");
+            _logger.LogError(ex, "Error while reading cache stats.");
         }
     }
 
@@ -281,6 +322,28 @@ public partial class SettingsViewModel : ObservableObject
     {
         try
         {
+            // Validation des chemins réseau (path traversal)
+            var pathsToValidate = new Dictionary<string, string>();
+            if (NetworkLogsEnabled && !string.IsNullOrWhiteSpace(NetworkLogPath))
+                pathsToValidate[_localization.GetString("Settings_NetworkLogs")] = NetworkLogPath;
+            if (AuditStorageModeIndex == 1 && !string.IsNullOrWhiteSpace(AuditNetworkPath))
+                pathsToValidate[_localization.GetString("Settings_AuditNetworkPath")] = AuditNetworkPath;
+            if (TemplateStorageModeIndex == 1 && !string.IsNullOrWhiteSpace(TemplateNetworkPath))
+                pathsToValidate[_localization.GetString("Settings_NetworkFolder")] = TemplateNetworkPath;
+
+            foreach (var (label, path) in pathsToValidate)
+            {
+                if (path.Contains("..") || path.Contains("~"))
+                {
+                    MessageBox.Show(
+                        string.Format(_localization.GetString("Settings_InvalidPath"), label),
+                        _localization.GetString("Common_Error"),
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
             var prevIncluded = _settingsService.CurrentSettings.ActiveDirectory.IncludedUserOUs;
             var prevExcluded = _settingsService.CurrentSettings.ActiveDirectory.ExcludedUserOUs;
 
@@ -297,22 +360,22 @@ public partial class SettingsViewModel : ObservableObject
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            _logger.LogInformation("Settings sauvegardés");
+            _logger.LogInformation("Settings saved.");
 
             // Appliquer le thème immédiatement sans redémarrage
             var appTheme = ThemeIndex == 1 ? ApplicationTheme.Light : ApplicationTheme.Dark;
             ApplicationThemeManager.Apply(appTheme);
-            _logger.LogInformation("Thème appliqué : {Theme}", appTheme);
+            _logger.LogInformation("Theme applied: {Theme}", appTheme);
 
             if (ouFilterChanged)
             {
-                _logger.LogInformation("Filtres OU modifiés — invalidation cache et rechargement utilisateurs");
+                _logger.LogInformation("OU filters changed. Invalidating cache and reloading users.");
                 await _usersViewModel.RefreshAsync();
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur sauvegarde settings");
+            _logger.LogError(ex, "Error while saving settings.");
             MessageBox.Show(string.Format(_localization.GetString("Settings_SaveError"), ex.Message), _localization.GetString("Common_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -321,7 +384,7 @@ public partial class SettingsViewModel : ObservableObject
     private void Cancel()
     {
         LoadSettingsFromService();
-        _logger.LogInformation("Modifications annulées, settings rechargés");
+        _logger.LogInformation("Changes canceled. Settings reloaded.");
     }
 
     [RelayCommand]
@@ -343,11 +406,11 @@ public partial class SettingsViewModel : ObservableObject
             CachedUsersCount = 0;
             CachedGroupsCount = 0;
 
-            _logger.LogInformation("Cache vidé");
+            _logger.LogInformation("Cache cleared.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur vidage cache");
+            _logger.LogError(ex, "Error while clearing cache.");
             MessageBox.Show(string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message), _localization.GetString("Common_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -368,12 +431,12 @@ public partial class SettingsViewModel : ObservableObject
 
             await LoadCacheStatsAsync();
 
-            _logger.LogInformation("Cache rafraîchi : {Users} users, {Groups} groups",
+            _logger.LogInformation("Cache refreshed: {Users} users, {Groups} groups",
                 CachedUsersCount, CachedGroupsCount);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur rafraîchissement cache");
+            _logger.LogError(ex, "Error while refreshing cache.");
             MessageBox.Show(string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message), _localization.GetString("Common_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
@@ -400,11 +463,11 @@ public partial class SettingsViewModel : ObservableObject
             AvailableOUs = new ObservableCollection<OrganizationalUnitInfo>(
                 ous.OrderBy(o => o.Path));
 
-            _logger.LogInformation("OUs chargées pour sélection : {Count}", ous.Count);
+            _logger.LogInformation("OUs loaded for selection: {Count}", ous.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur chargement OUs");
+            _logger.LogError(ex, "Error while loading OUs.");
             MessageBox.Show(string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message), _localization.GetString("Common_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -592,7 +655,7 @@ public partial class SettingsViewModel : ObservableObject
             Directory.CreateDirectory(logsPath);
 
         Process.Start("explorer.exe", logsPath);
-        _logger.LogInformation("Ouverture dossier logs");
+        _logger.LogInformation("Opening logs folder.");
     }
 
     [RelayCommand]
@@ -622,7 +685,7 @@ public partial class SettingsViewModel : ObservableObject
             Directory.CreateDirectory(path);
 
         Process.Start("explorer.exe", path);
-        _logger.LogInformation("Ouverture dossier templates : {Path}", path);
+        _logger.LogInformation("Opening templates folder.");
     }
 
     [RelayCommand]
@@ -661,11 +724,11 @@ public partial class SettingsViewModel : ObservableObject
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            _logger.LogInformation("Config exportée : {Path}", dialog.FileName);
+            _logger.LogInformation("Configuration exported.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur export config");
+            _logger.LogError(ex, "Error while exporting configuration.");
             MessageBox.Show(string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message), _localization.GetString("Common_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -701,11 +764,11 @@ public partial class SettingsViewModel : ObservableObject
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            _logger.LogInformation("Config importée : {Path}", dialog.FileName);
+            _logger.LogInformation("Configuration imported.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur import config");
+            _logger.LogError(ex, "Error while importing configuration.");
             MessageBox.Show(string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message), _localization.GetString("Common_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }

@@ -101,7 +101,7 @@ public partial class UserDetailsWindow
             catch (Exception ex)
             {
                 var logger = App.Services.GetRequiredService<ILogger<UserDetailsWindow>>();
-                logger.LogError(ex, "❌ Erreur reset mot de passe pour {User}", ViewModel.UserName);
+                logger.LogError(ex, "Error while resetting password for {User}", ViewModel.UserName);
 
                 var localization = App.Services.GetRequiredService<ILocalizationService>();
                 System.Windows.MessageBox.Show(

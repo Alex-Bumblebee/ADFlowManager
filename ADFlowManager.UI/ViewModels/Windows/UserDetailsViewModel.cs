@@ -199,7 +199,7 @@ public partial class UserDetailsViewModel : ObservableObject
 
         _ = LoadAvailableGroupsAsync();
 
-        _logger.LogInformation("Chargement détails utilisateur : {DisplayName} ({UserName}), EditMode={EditMode}, Tab={Tab}",
+        _logger.LogInformation("Loading user details: {DisplayName} ({UserName}), EditMode={EditMode}, Tab={Tab}",
             user.DisplayName, user.UserName, startInEditMode, initialTabIndex);
     }
 
@@ -220,7 +220,7 @@ public partial class UserDetailsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Erreur chargement historique audit pour {User}", UserName);
+            _logger.LogWarning(ex, "Error while loading audit history for {User}", UserName);
         }
     }
 
@@ -261,11 +261,11 @@ public partial class UserDetailsViewModel : ObservableObject
         {
             var groups = await _adService.GetGroupsAsync();
             _allAvailableGroups = groups;
-            _logger.LogInformation("Groupes disponibles chargés : {Count}", groups.Count);
+            _logger.LogInformation("Available groups loaded: {Count}", groups.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Impossible de charger les groupes disponibles");
+            _logger.LogWarning(ex, "Unable to load available groups.");
         }
     }
 
@@ -295,7 +295,7 @@ public partial class UserDetailsViewModel : ObservableObject
 
         try
         {
-            _logger.LogInformation("Sauvegarde utilisateur dans AD : {UserName}", UserName);
+            _logger.LogInformation("Saving user to AD: {UserName}", UserName);
 
             var changes = new List<string>();
 
@@ -345,7 +345,7 @@ public partial class UserDetailsViewModel : ObservableObject
             if (propsChanged)
             {
                 await _adService.UpdateUserAsync(_originalUser);
-                _logger.LogInformation("Propriétés utilisateur mises à jour dans AD");
+                _logger.LogInformation("User properties updated in AD.");
             }
 
             // 4. Synchroniser les groupes (ajouts)
@@ -362,7 +362,7 @@ public partial class UserDetailsViewModel : ObservableObject
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Erreur ajout groupe {Group} pour {User}", groupName, UserName);
+                    _logger.LogWarning(ex, "Error while adding group {Group} for {User}", groupName, UserName);
                 }
             }
 
@@ -376,7 +376,7 @@ public partial class UserDetailsViewModel : ObservableObject
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Erreur retrait groupe {Group} pour {User}", groupName, UserName);
+                    _logger.LogWarning(ex, "Error while removing group {Group} for {User}", groupName, UserName);
                 }
             }
 
@@ -394,7 +394,7 @@ public partial class UserDetailsViewModel : ObservableObject
                 Changes = changes
             };
 
-            _logger.LogInformation("✅ Utilisateur {UserName} sauvegardé dans AD + cache", UserName);
+            _logger.LogInformation("User {UserName} saved in AD and cache.", UserName);
         }
         catch (Exception ex)
         {
@@ -404,7 +404,7 @@ public partial class UserDetailsViewModel : ObservableObject
                 Success = false,
                 ErrorMessage = ex.Message
             };
-            _logger.LogError(ex, "❌ Erreur sauvegarde {UserName}", UserName);
+            _logger.LogError(ex, "Error while saving user {UserName}", UserName);
         }
         finally
         {
@@ -438,11 +438,11 @@ public partial class UserDetailsViewModel : ObservableObject
             _originalGroupNames.Add(SelectedAvailableGroup.GroupName);
             await _cacheService.ClearCacheAsync();
 
-            _logger.LogInformation("✅ Groupe ajouté : {Group} à {User}", SelectedAvailableGroup.GroupName, UserName);
+            _logger.LogInformation("Group added: {Group} to {User}", SelectedAvailableGroup.GroupName, UserName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur ajout groupe {Group} à {User}", SelectedAvailableGroup.GroupName, UserName);
+            _logger.LogError(ex, "Error while adding group {Group} to {User}", SelectedAvailableGroup.GroupName, UserName);
         }
         finally
         {
@@ -458,17 +458,17 @@ public partial class UserDetailsViewModel : ObservableObject
         try
         {
             var newState = !IsEnabled;
-            var action = newState ? "Activation" : "Désactivation";
-            _logger.LogInformation("{Action} du compte {UserName}", action, UserName);
+            var action = newState ? "Enable" : "Disable";
+            _logger.LogInformation("Updating account state for {UserName}: {Action}", UserName, action);
 
             await _adService.SetUserEnabledAsync(UserName, newState);
             IsEnabled = newState;
 
-            _logger.LogInformation("✅ Compte {UserName} : {Action}", UserName, action);
+            _logger.LogInformation("Account updated for {UserName}: {Action}", UserName, action);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur activation/désactivation {UserName}", UserName);
+            _logger.LogError(ex, "Error while toggling account state for {UserName}", UserName);
         }
     }
 
@@ -483,11 +483,11 @@ public partial class UserDetailsViewModel : ObservableObject
             UserGroups.Remove(group);
             _originalGroupNames.RemoveAll(g => g.Equals(group.GroupName, StringComparison.OrdinalIgnoreCase));
             GroupCount = UserGroups.Count;
-            _logger.LogInformation("✅ Groupe retiré : {GroupName} de {UserName}", group.GroupName, UserName);
+            _logger.LogInformation("Group removed: {GroupName} from {UserName}", group.GroupName, UserName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur retrait groupe {GroupName} de {UserName}", group.GroupName, UserName);
+            _logger.LogError(ex, "Error while removing group {GroupName} from {UserName}", group.GroupName, UserName);
         }
     }
 }

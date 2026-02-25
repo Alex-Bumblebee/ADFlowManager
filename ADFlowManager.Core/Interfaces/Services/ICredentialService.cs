@@ -10,4 +10,8 @@ public interface ICredentialService
     (string? domain, string? username, string? password) LoadCredentials();
     void DeleteCredentials();
     bool HasSavedCredentials();
+
+    void SaveSessionCredentials(string domain, string username, string password);
+    (string? domain, string? username, string? password) LoadSessionCredentials();
+    void DeleteSessionCredentials();
 }

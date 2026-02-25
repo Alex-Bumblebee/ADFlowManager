@@ -84,6 +84,10 @@ namespace ADFlowManager.UI
                 shared: true);
 
             // === Sink 3 : Fichier Réseau (OPTIONNEL) ===
+            // NOTE SECURITE:
+            // La sécurisation du partage réseau (ACL NTFS/SMB, segmentation, contrôle d'accès)
+            // relève de l'administrateur de l'infrastructure. L'application n'applique pas
+            // de droits systèmes automatiquement.
             if (!string.IsNullOrWhiteSpace(settings.NetworkLogPath))
             {
                 try
@@ -92,20 +96,42 @@ namespace ADFlowManager.UI
                     var networkLogDir = Environment.ExpandEnvironmentVariables(
                         settings.NetworkLogPath.Replace("{username}", Environment.UserName).Trim());
 
-                    // Tenter de créer le dossier réseau (test d'accessibilité)
-                    Directory.CreateDirectory(networkLogDir);
+                    // Security: normaliser via Path.GetFullPath pour résoudre les séquences ".."
+                    // cachées après expansion des variables d'environnement, puis valider le résultat.
+                    string normalizedLogDir;
+                    try
+                    {
+                        normalizedLogDir = Path.GetFullPath(networkLogDir);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("[WARNING] Logs réseau désactivés : chemin réseau invalide.");
+                        normalizedLogDir = string.Empty;
+                    }
 
-                    // Fichier distinct par machine/utilisateur pour éviter les collisions
-                    var networkLogFile = Path.Combine(
-                        networkLogDir,
-                        $"adflow-{Environment.MachineName}-{Environment.UserName}-.log");
-                    logConfig.WriteTo.File(
-                        path: networkLogFile,
-                        rollingInterval: RollingInterval.Day,
-                        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] [{MachineName}] {Message:lj}{NewLine}{Exception}",
-                        retainedFileCountLimit: settings.NetworkRetentionDays,
-                        shared: true);
+                    if (string.IsNullOrEmpty(normalizedLogDir)
+                        || !Path.IsPathRooted(normalizedLogDir)
+                        || normalizedLogDir.Contains("..")
+                        || normalizedLogDir.Contains("~"))
+                    {
+                        Console.WriteLine("[WARNING] Logs réseau désactivés : chemin réseau suspect (traversal).");
+                    }
+                    else
+                    {
+                        // Tenter de créer le dossier réseau (test d'accessibilité)
+                        Directory.CreateDirectory(normalizedLogDir);
 
+                        // Fichier distinct par machine/utilisateur pour éviter les collisions
+                        var networkLogFile = Path.Combine(
+                            normalizedLogDir,
+                            $"adflow-{Environment.MachineName}-{Environment.UserName}-.log");
+                        logConfig.WriteTo.File(
+                            path: networkLogFile,
+                            rollingInterval: RollingInterval.Day,
+                            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] [{MachineName}] {Message:lj}{NewLine}{Exception}",
+                            retainedFileCountLimit: settings.NetworkRetentionDays,
+                            shared: true);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -282,13 +308,17 @@ namespace ADFlowManager.UI
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "ADFlowManager",
                 "logs");
-            _logger.Information("✅ Logs locaux activés : {LocalLogPath}", localLogPath);
+            _logger.Information("Logs locaux activés.");
+            _logger.Debug("Chemin des logs locaux: {LocalLogPath}", localLogPath);
 
             var runtimeLogging = LoadLoggingSettings();
             if (!string.IsNullOrWhiteSpace(runtimeLogging.NetworkLogPath))
-                _logger.Information("📋 Logs réseau activés : {NetworkLogPath}", runtimeLogging.NetworkLogPath);
+            {
+                _logger.Information("Logs réseau activés.");
+                _logger.Debug("Chemin des logs réseau configuré.");
+            }
             else
-                _logger.Information("📋 Logs réseau : Désactivés");
+                _logger.Information("Logs réseau désactivés.");
 
             // Appliquer la langue sauvegardée dans les settings (ou détecter l'OS)
             try
@@ -370,7 +400,7 @@ namespace ADFlowManager.UI
             {
                 _logger.Fatal(ex, "Erreur critique : impossible de créer LoginWindow");
                 MessageBox.Show(
-                    $"Erreur au démarrage :\n\n{ex.Message}\n\n{ex.InnerException?.Message}",
+                    "Erreur critique au démarrage.\nConsultez les logs pour plus de détails.",
                     "ADFlowManager - Erreur fatale",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -403,7 +433,7 @@ namespace ADFlowManager.UI
         {
             try
             {
-                _logger.Information("🔍 Vérification mises à jour...");
+                _logger.Information("Vérification des mises à jour.");
                 
                 // Log version actuelle
                 var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
@@ -422,13 +452,13 @@ namespace ADFlowManager.UI
                 if (newVersion != null)
                 {
                     var newVer = newVersion.TargetFullRelease.Version;
-                    _logger.Information("📦 Nouvelle version disponible : {Version}", newVer);
+                    _logger.Information("Nouvelle version disponible: {Version}", newVer);
 
                     // Download update en arrière-plan
                     _logger.Information("Téléchargement de la mise à jour...");
                     await mgr.DownloadUpdatesAsync(newVersion);
 
-                    _logger.Information("✅ Mise à jour téléchargée");
+                    _logger.Information("Mise à jour téléchargée.");
 
                     var result = MessageBox.Show(
                         $"Nouvelle version {newVer} téléchargée.\n\n" +
@@ -440,22 +470,22 @@ namespace ADFlowManager.UI
 
                     if (result == MessageBoxResult.Yes)
                     {
-                        _logger.Information("🔄 Redémarrage pour mise à jour...");
+                        _logger.Information("Redémarrage pour appliquer la mise à jour.");
                         mgr.ApplyUpdatesAndRestart(newVersion);
                     }
                     else
                     {
-                        _logger.Information("⏳ Mise à jour reportée au prochain démarrage");
+                        _logger.Information("Mise à jour reportée au prochain démarrage.");
                     }
                 }
                 else
                 {
-                    _logger.Information("✅ Application à jour (aucune nouvelle version détectée)");
+                    _logger.Information("Application à jour (aucune nouvelle version détectée).");
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "⚠️ Échec vérification mises à jour - Détails: {Message}", ex.Message);
+                _logger.Error(ex, "Échec de la vérification des mises à jour.");
                 if (ex.InnerException != null)
                 {
                     _logger.Error("Exception interne: {InnerMessage}", ex.InnerException.Message);
@@ -471,6 +501,18 @@ namespace ADFlowManager.UI
         {
             _logger.Information("Arrêt de l'application...");
 
+            // Nettoyage sécurisé des credentials de session
+            try
+            {
+                var credentialService = _host.Services.GetService<ICredentialService>();
+                credentialService?.DeleteSessionCredentials();
+                _logger.Information("Session credentials nettoyés à la fermeture.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning(ex, "Impossible de nettoyer les session credentials à la fermeture.");
+            }
+
             await _host.StopAsync();
             _host.Dispose();
 
@@ -485,8 +527,16 @@ namespace ADFlowManager.UI
         {
             _logger.Fatal(e.Exception, "Exception non gérée dans l'application");
 
+            // Nettoyage best-effort des credentials de session même en cas de crash
+            try
+            {
+                var credentialService = _host?.Services?.GetService<ICredentialService>();
+                credentialService?.DeleteSessionCredentials();
+            }
+            catch { /* best effort — ne pas masquer l'exception originale */ }
+
             MessageBox.Show(
-                $"Erreur non gérée :\n\n{e.Exception.Message}\n\n{e.Exception.InnerException?.Message}",
+                "Une erreur inattendue s'est produite.\nConsultez les logs pour plus de détails.",
                 "ADFlowManager - Erreur",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
