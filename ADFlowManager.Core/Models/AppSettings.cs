@@ -9,6 +9,7 @@ namespace ADFlowManager.Core.Models;
 public class AppSettings
 {
     public ActiveDirectorySettings ActiveDirectory { get; set; } = new();
+    public UserCreationSettings UserCreation { get; set; } = new();
     public CacheSettings Cache { get; set; } = new();
     public LogSettings Logs { get; set; } = new();
     public AuditSettings Audit { get; set; } = new();
@@ -19,6 +20,39 @@ public class AppSettings
     /// Version config (pour migrations futures)
     /// </summary>
     public int ConfigVersion { get; set; } = 1;
+}
+
+public class UserCreationSettings
+{
+    /// <summary>
+    /// Format du login (sAMAccountName / UPN).
+    /// Valeurs possibles: "Prenom.Nom", "P.Nom", "Nom.P", "Nom"
+    /// </summary>
+    public string LoginFormat { get; set; } = "Prenom.Nom";
+
+    /// <summary>
+    /// Format du nom d'affichage (DisplayName).
+    /// Valeurs possibles: "Prenom Nom", "Nom Prenom"
+    /// </summary>
+    public string DisplayNameFormat { get; set; } = "Prenom Nom";
+
+    /// <summary>
+    /// Gestion des doublons lors de la génération automatique du login.
+    /// Valeurs possibles: "AppendNumber" (ajoute 1, 2...), "DoNothing" (laisse tel quel, risque d'erreur AD)
+    /// </summary>
+    public string DuplicateHandling { get; set; } = "AppendNumber";
+
+    /// <summary>
+    /// Domaine personnalisé pour l'email et l'UPN (ex: "exemple.fr").
+    /// Si vide, utilise le domaine AD par défaut.
+    /// </summary>
+    public string EmailDomain { get; set; } = "";
+
+    /// <summary>
+    /// Politique de mot de passe appliquée côté UI.
+    /// Valeurs possibles: "Easy", "Standard", "Strong"
+    /// </summary>
+    public string PasswordPolicy { get; set; } = "Standard";
 }
 
 public class ActiveDirectorySettings

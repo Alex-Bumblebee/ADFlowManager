@@ -59,11 +59,6 @@ public interface IActiveDirectoryService
     string? ConnectedUser { get; }
 
     /// <summary>
-    /// Stocke les credentials admin pour les opérations ultérieures (création user dans OU spécifique).
-    /// </summary>
-    void StoreCredentials(string domain, string username, string password);
-
-    /// <summary>
     /// Crée un nouvel utilisateur dans Active Directory.
     /// </summary>
     /// <param name="user">Modèle utilisateur avec toutes les propriétés</param>
@@ -72,9 +67,10 @@ public interface IActiveDirectoryService
     /// <param name="mustChangePassword">Forcer changement au prochain logon</param>
     /// <param name="passwordNeverExpires">Le mot de passe n'expire jamais</param>
     /// <param name="accountDisabled">Créer le compte désactivé</param>
+    /// <param name="accountExpirationDate">Date d'expiration du compte (null = n'expire jamais)</param>
     /// <returns>L'utilisateur créé</returns>
     Task<User> CreateUserAsync(User user, string ouPath, string password,
-        bool mustChangePassword = true, bool passwordNeverExpires = false, bool accountDisabled = false);
+        bool mustChangePassword = true, bool passwordNeverExpires = false, bool accountDisabled = false, DateTime? accountExpirationDate = null);
 
     /// <summary>
     /// Ajoute un utilisateur à un groupe AD.

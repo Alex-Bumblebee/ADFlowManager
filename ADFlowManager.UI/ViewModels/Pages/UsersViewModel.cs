@@ -132,11 +132,11 @@ public partial class UsersViewModel : ObservableObject
 
             ApplyFilter();
 
-            _logger.LogInformation("Utilisateurs chargés : {Count}", _allUsers.Count);
+            _logger.LogInformation("Users loaded: {Count}", _allUsers.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur lors du chargement des utilisateurs");
+            _logger.LogError(ex, "Error while loading users.");
         }
         finally
         {
@@ -211,7 +211,7 @@ public partial class UsersViewModel : ObservableObject
     [RelayCommand]
     public async Task RefreshAsync()
     {
-        _logger.LogInformation("Rafraîchissement de la liste utilisateurs");
+        _logger.LogInformation("Refreshing users list.");
         SelectedUser = null;
         SearchText = "";
         await _cacheService.ClearCacheAsync();
@@ -223,7 +223,7 @@ public partial class UsersViewModel : ObservableObject
     {
         if (SelectedUser is null) return;
         System.Windows.Clipboard.SetText(SelectedUser.User.UserName);
-        _logger.LogInformation("Copié : {UserName}", SelectedUser.User.UserName);
+        _logger.LogDebug("User name copied to clipboard.");
     }
 
     [RelayCommand]
@@ -231,7 +231,7 @@ public partial class UsersViewModel : ObservableObject
     {
         if (SelectedUser is null) return;
         System.Windows.Clipboard.SetText(SelectedUser.User.Email);
-        _logger.LogInformation("Copié : {Email}", SelectedUser.User.Email);
+        _logger.LogDebug("User email copied to clipboard.");
     }
 
     [RelayCommand]
@@ -239,7 +239,7 @@ public partial class UsersViewModel : ObservableObject
     {
         if (SelectedUser is null) return;
         System.Windows.Clipboard.SetText(SelectedUser.User.DistinguishedName);
-        _logger.LogInformation("Copié : DN de {UserName}", SelectedUser.User.UserName);
+        _logger.LogDebug("User DN copied to clipboard.");
     }
 
     /// <summary>
@@ -252,14 +252,14 @@ public partial class UsersViewModel : ObservableObject
             await _adService.SetUserEnabledAsync(user.UserName, false);
             user.IsEnabled = false;
             await _cacheService.ClearCacheAsync();
-            _logger.LogInformation("\u2705 Compte désactivé : {UserName}", user.UserName);
+            _logger.LogInformation("User account disabled: {UserName}", user.UserName);
 
             // Refresh UI
             OnPropertyChanged(nameof(SelectedUser));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "\u274c Erreur désactivation {UserName}", user.UserName);
+            _logger.LogError(ex, "Error while disabling user {UserName}", user.UserName);
         }
     }
 
@@ -271,7 +271,7 @@ public partial class UsersViewModel : ObservableObject
         var checkedUsers = GetCheckedUsers();
         if (checkedUsers.Count == 0) return;
 
-        _logger.LogInformation("Désactivation en masse de {Count} utilisateurs", checkedUsers.Count);
+        _logger.LogInformation("Bulk disable requested for {Count} users", checkedUsers.Count);
 
         foreach (var user in checkedUsers)
         {

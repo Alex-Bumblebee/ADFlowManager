@@ -73,7 +73,7 @@ public partial class DashboardViewModel : ObservableObject
         CurrentUser = _adService.ConnectedUser ?? Environment.UserName;
         ConnectedUser = $"{CurrentUser}@{CurrentDomain}";
 
-        _logger.LogInformation("Dashboard chargé : version {Version}, user {User}@{Domain}",
+        _logger.LogInformation("Dashboard loaded: version {Version}, user {User}@{Domain}",
             AppVersion, CurrentUser, CurrentDomain);
 
         _ = LoadDashboardDataAsync();
@@ -105,12 +105,12 @@ public partial class DashboardViewModel : ObservableObject
 
             HasNoActions = RecentActivities.Count == 0;
 
-            _logger.LogInformation("Dashboard chargé : {Users} utilisateurs, {Groups} groupes, {Actions} actions aujourd'hui",
+            _logger.LogInformation("Dashboard loaded: {Users} users, {Groups} groups, {Actions} actions today",
                 TotalUsers, TotalGroups, ActionsToday);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur lors du chargement du dashboard");
+            _logger.LogError(ex, "Error while loading dashboard.");
         }
         finally
         {
@@ -131,7 +131,7 @@ public partial class DashboardViewModel : ObservableObject
     [RelayCommand]
     private async Task RefreshAsync()
     {
-        _logger.LogInformation("Actualisation du dashboard");
+        _logger.LogInformation("Refreshing dashboard.");
         await LoadDashboardDataAsync();
     }
 
@@ -146,7 +146,7 @@ public partial class DashboardViewModel : ObservableObject
 
         if (result == System.Windows.MessageBoxResult.Yes)
         {
-            _logger.LogInformation("Déconnexion demandée par l'utilisateur");
+            _logger.LogInformation("User requested disconnect.");
             System.Windows.Application.Current.Shutdown();
         }
     }

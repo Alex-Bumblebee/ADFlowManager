@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Threading;
 using ADFlowManager.Core.Interfaces.Services;
 using ADFlowManager.Core.Models;
+using ADFlowManager.UI.Security;
 using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 
@@ -66,6 +68,8 @@ public partial class CreateUserViewModel : ObservableObject
     private readonly ILogger<CreateUserViewModel> _logger;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _localization;
+    private DispatcherTimer? _clipboardClearTimer;
+    private int _clipboardCountdown;
 
     // === Identité ===
     [ObservableProperty]
@@ -125,6 +129,12 @@ public partial class CreateUserViewModel : ObservableObject
     [ObservableProperty]
     private bool _accountDisabled;
 
+    [ObservableProperty]
+    private int? _expirationDays;
+
+    [ObservableProperty]
+    private DateTime? _expirationDate;
+
     // === Password Strength ===
     [ObservableProperty]
     private int _passwordStrength;
@@ -134,6 +144,12 @@ public partial class CreateUserViewModel : ObservableObject
 
     [ObservableProperty]
     private string _passwordStrengthColor = "#71717A";
+
+    /// <summary>
+    /// Message de sécurité presse-papiers (compte à rebours auto-clear 60s).
+    /// </summary>
+    [ObservableProperty]
+    private string _clipboardStatus = "";
 
     // === Mode de création (Template ou Copie user) ===
     [ObservableProperty]
@@ -242,12 +258,12 @@ public partial class CreateUserViewModel : ObservableObject
                 {
                     AvailableOUs = new ObservableCollection<OrganizationalUnit>(
                         realOUs.Select(ou => new OrganizationalUnit { Name = ou.Name, Path = ou.Path }));
-                    _logger.LogInformation("{Count} OUs chargées depuis AD", AvailableOUs.Count);
+                    _logger.LogInformation("Loaded {Count} OUs from AD.", AvailableOUs.Count);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Impossible de charger les OUs depuis AD, utilisation des valeurs par défaut");
+                _logger.LogWarning(ex, "Unable to load OUs from AD, using fallback values.");
             }
 
             ApplyPreferredDefaultOu();
@@ -272,11 +288,11 @@ public partial class CreateUserViewModel : ObservableObject
             var users = await _adService.GetUsersAsync();
             _allUsers = users.ToList();
 
-            _logger.LogInformation("Formulaire création utilisateur initialisé : {GroupCount} groupes, {UserCount} utilisateurs disponibles", groups.Count, users.Count);
+            _logger.LogInformation("User creation workflow completed.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur lors de l'initialisation du formulaire");
+            _logger.LogError(ex, "Error while initializing user creation form.");
         }
     }
 
@@ -300,21 +316,88 @@ public partial class CreateUserViewModel : ObservableObject
             return;
         }
 
-        DisplayName = $"{FirstName} {LastName}";
+        var fName = FirstName.Trim();
+        var lName = LastName.Trim();
+        
+        var settings = _settingsService.CurrentSettings.UserCreation;
 
-        var sam = $"{FirstName.ToLower()}.{LastName.ToLower()}"
-            .Replace(" ", "")
-            .Replace("é", "e").Replace("è", "e").Replace("ê", "e")
-            .Replace("à", "a").Replace("â", "a")
-            .Replace("ô", "o").Replace("ù", "u").Replace("ç", "c");
-        SamAccountName = sam.Length > 20 ? sam[..20] : sam;
+        // Génération DisplayName selon format
+        DisplayName = settings.DisplayNameFormat switch
+        {
+            "Nom Prenom" => $"{lName} {fName}",
+            _ => $"{fName} {lName}" // "Prenom Nom" par défaut
+        };
 
-        UserPrincipalName = $"{SamAccountName}@{_adService.ConnectedDomain ?? "contoso.local"}";
-        Email = $"{SamAccountName}@{_adService.ConnectedDomain ?? "contoso.local"}";
+        // Nettoyage pour le login
+        var cleanFirstName = RemoveDiacritics(fName.ToLower());
+        var cleanLastName = RemoveDiacritics(lName.ToLower());
 
-        Initials = $"{FirstName[0]}{LastName[0]}".ToUpper();
+        // Génération Login (SamAccountName) selon format
+        var baseSam = settings.LoginFormat switch
+        {
+            "P.Nom" => $"{cleanFirstName[0]}.{cleanLastName}",
+            "Nom.P" => $"{cleanLastName}.{cleanFirstName[0]}",
+            "Nom" => cleanLastName,
+            _ => $"{cleanFirstName}.{cleanLastName}" // "Prenom.Nom" par défaut
+        };
+
+        baseSam = baseSam.Replace(" ", "");
+
+        // Gestion des doublons
+        var finalSam = baseSam;
+        if (settings.DuplicateHandling == "AppendNumber" && _allUsers.Count > 0)
+        {
+            int counter = 1;
+            while (_allUsers.Any(u => string.Equals(u.UserName, finalSam, StringComparison.OrdinalIgnoreCase)))
+            {
+                finalSam = $"{baseSam}{counter}";
+                counter++;
+            }
+        }
+
+        SamAccountName = finalSam.Length > 20 ? finalSam[..20] : finalSam;
+
+        // Récupérer le domaine depuis les paramètres (EmailDomain), sinon le domaine AD par défaut
+        var customDomain = _settingsService.CurrentSettings.UserCreation.EmailDomain;
+        var targetDomain = string.IsNullOrWhiteSpace(customDomain) 
+            ? (_adService.ConnectedDomain ?? "contoso.local") 
+            : customDomain.Trim();
+
+        // Enlever le @ si l'utilisateur l'a tapé par erreur dans les paramètres
+        if (targetDomain.StartsWith("@"))
+        {
+            targetDomain = targetDomain[1..];
+        }
+
+        UserPrincipalName = $"{SamAccountName}@{targetDomain}";
+        Email = $"{SamAccountName}@{targetDomain}";
+
+        Initials = $"{fName[0]}{lName[0]}".ToUpper();
 
         ValidateForm();
+    }
+
+    private string RemoveDiacritics(string text)
+    {
+        return text
+            .Replace("é", "e").Replace("è", "e").Replace("ê", "e").Replace("ë", "e")
+            .Replace("à", "a").Replace("â", "a").Replace("ä", "a")
+            .Replace("ô", "o").Replace("ö", "o")
+            .Replace("ù", "u").Replace("û", "u").Replace("ü", "u")
+            .Replace("î", "i").Replace("ï", "i")
+            .Replace("ç", "c");
+    }
+
+    partial void OnExpirationDaysChanged(int? value)
+    {
+        if (value.HasValue)
+        {
+            ExpirationDate = DateTime.Now.AddDays(value.Value).Date;
+        }
+        else
+        {
+            ExpirationDate = null;
+        }
     }
 
     // === Mode sélection (Template ou Copie user) ===
@@ -344,7 +427,7 @@ public partial class CreateUserViewModel : ObservableObject
             AvailableTemplates.Clear();
 
             // Option "Aucun template" en premier
-            AvailableTemplates.Add(new UserTemplate { Id = "", Name = "Aucun template", Description = "Partir de z\u00e9ro" });
+            AvailableTemplates.Add(new UserTemplate { Id = "", Name = "Aucun template", Description = "Partir de zéro" });
 
             foreach (var template in templates)
             {
@@ -353,11 +436,11 @@ public partial class CreateUserViewModel : ObservableObject
 
             SelectedTemplate = AvailableTemplates[0];
 
-            _logger.LogInformation("{Count} templates charg\u00e9s", templates.Count);
+            _logger.LogInformation("Loaded {Count} templates.", templates.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur chargement templates");
+            _logger.LogError(ex, "Error while loading templates.");
         }
     }
 
@@ -370,23 +453,16 @@ public partial class CreateUserViewModel : ObservableObject
 
     private void ApplyTemplate(UserTemplate template)
     {
-        _logger.LogInformation("Application template : {Name}", template.Name);
+        _logger.LogInformation("Applying template: {Name}", template.Name);
 
-        // Propri\u00e9t\u00e9s organisation
+        // Propriétés organisation
         JobTitle = template.JobTitle ?? "";
         Department = template.Department ?? "";
         Company = template.Company ?? "";
         Office = template.Office ?? "";
-        Description = template.UserDescription ?? "";
 
-        // Options
-        MustChangePasswordNextLogon = template.MustChangePasswordAtLogon;
-        AccountDisabled = !template.IsEnabled;
-
-        // Groupes
-        foreach (var g in AvailableGroups)
-            g.IsSelected = false;
-
+        // Expiration : calcule la date à partir d'aujourd'hui + X jours
+        ExpirationDays = template.ExpirationDays;
         foreach (var groupName in template.Groups)
         {
             var group = AvailableGroups.FirstOrDefault(g =>
@@ -406,7 +482,7 @@ public partial class CreateUserViewModel : ObservableObject
 
         UpdateSelectedGroupsCount();
 
-        _logger.LogInformation("Template appliqué : {Groups} groupes pré-sélectionnés, OU: {OU}", template.Groups.Count, template.DefaultOU ?? "(aucune)");
+        _logger.LogInformation("Template applied: {Groups} groups pre-selected.", template.Groups.Count);
     }
 
     // === Copie utilisateur via Dialog ===
@@ -453,7 +529,7 @@ public partial class CreateUserViewModel : ObservableObject
     /// </summary>
     private void ApplyCopiedUserData(User sourceUser)
     {
-        _logger.LogInformation("Copie des droits depuis : {DisplayName} ({UserName})", sourceUser.DisplayName, sourceUser.UserName);
+        _logger.LogInformation("Copying rights from source user: {UserName}", sourceUser.UserName);
 
         // Copier les champs organisationnels
         JobTitle = sourceUser.JobTitle;
@@ -476,7 +552,7 @@ public partial class CreateUserViewModel : ObservableObject
                 if (matchingOU != null)
                 {
                     SelectedOU = matchingOU;
-                    _logger.LogInformation("OU copiée depuis source : {OU}", matchingOU.Name);
+                    _logger.LogDebug("OU copied from source user.");
                 }
                 else
                 {
@@ -484,7 +560,7 @@ public partial class CreateUserViewModel : ObservableObject
                     var newOU = new OrganizationalUnit { Name = ouPath, Path = ouPath };
                     AvailableOUs.Add(newOU);
                     SelectedOU = newOU;
-                    _logger.LogInformation("OU ajoutée depuis source : {OU}", ouPath);
+                    _logger.LogDebug("OU added from source user DN.");
                 }
             }
         }
@@ -550,40 +626,64 @@ public partial class CreateUserViewModel : ObservableObject
     [RelayCommand]
     private void GeneratePassword()
     {
-        Password = GenerateSecurePassword(14);
+        var policy = _settingsService.CurrentSettings.UserCreation.PasswordPolicy;
+        Password = PasswordPolicyHelper.GeneratePassword(policy);
         PasswordConfirm = Password;
-        _logger.LogInformation("\U0001f511 Mot de passe g\u00e9n\u00e9r\u00e9 automatiquement");
+        CopyToClipboardWithAutoClear(Password);
+        _logger.LogInformation("Generated password for user creation form.");
     }
 
-    private static string GenerateSecurePassword(int length)
+    /// <summary>
+    /// Copie le mot de passe dans le presse-papiers et lance un timer de 60s pour l'effacer.
+    /// </summary>
+    private void CopyToClipboardWithAutoClear(string text)
     {
-        const string lowercase = "abcdefghijklmnopqrstuvwxyz";
-        const string uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const string digits = "0123456789";
-        const string special = "!@#$%&*()-_=+[]{}|;:,.<>?";
-        var all = lowercase + uppercase + digits + special;
+        try
+        {
+            Clipboard.SetText(text);
+            _clipboardCountdown = 60;
+            ClipboardStatus = string.Format(_localization.GetString("CreateUser_ClipboardWarning"), _clipboardCountdown);
 
-        using var rng = RandomNumberGenerator.Create();
-        var password = new char[length];
+            StopClipboardTimer();
+            _clipboardClearTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _clipboardClearTimer.Tick += OnClipboardTimerTick;
+            _clipboardClearTimer.Start();
 
-        // Garantir au moins 1 de chaque type
-        password[0] = lowercase[GetRandomInt(rng, lowercase.Length)];
-        password[1] = uppercase[GetRandomInt(rng, uppercase.Length)];
-        password[2] = digits[GetRandomInt(rng, digits.Length)];
-        password[3] = special[GetRandomInt(rng, special.Length)];
-
-        for (int i = 4; i < length; i++)
-            password[i] = all[GetRandomInt(rng, all.Length)];
-
-        // M\u00e9langer
-        return new string(password.OrderBy(_ => GetRandomInt(rng, 1000)).ToArray());
+            _logger.LogDebug("Generated password copied to clipboard with 60s auto-clear.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to copy generated password to clipboard.");
+        }
     }
 
-    private static int GetRandomInt(RandomNumberGenerator rng, int max)
+    private void OnClipboardTimerTick(object? sender, EventArgs e)
     {
-        var bytes = new byte[4];
-        rng.GetBytes(bytes);
-        return Math.Abs(BitConverter.ToInt32(bytes, 0)) % max;
+        _clipboardCountdown--;
+
+        if (_clipboardCountdown <= 0)
+        {
+            try { Clipboard.Clear(); }
+            catch { /* Presse-papiers verrouillé par une autre application */ }
+
+            ClipboardStatus = _localization.GetString("CreateUser_ClipboardCleared");
+            StopClipboardTimer();
+            _logger.LogDebug("Clipboard auto-cleared after timeout (user creation form).");
+        }
+        else
+        {
+            ClipboardStatus = string.Format(_localization.GetString("CreateUser_ClipboardWarning"), _clipboardCountdown);
+        }
+    }
+
+    private void StopClipboardTimer()
+    {
+        if (_clipboardClearTimer != null)
+        {
+            _clipboardClearTimer.Stop();
+            _clipboardClearTimer.Tick -= OnClipboardTimerTick;
+            _clipboardClearTimer = null;
+        }
     }
 
     private void CalculatePasswordStrength(string pwd)
@@ -625,24 +725,65 @@ public partial class CreateUserViewModel : ObservableObject
     }
 
     // === Validation ===
+
+    /// <summary>
+    /// Caractères interdits dans sAMAccountName selon la documentation AD.
+    /// </summary>
+    private static readonly char[] InvalidSamChars = ['"', '/', '\\', '[', ']', ':', ';', '|', '=', ',', '+', '*', '?', '<', '>'];
+
+    /// <summary>
+    /// Caractères LDAP dangereux interdits dans les champs nom/prénom (injection LDAP).
+    /// </summary>
+    private static readonly char[] LdapInjectionChars = ['\0', '*', '(', ')', '\\', '/'];
+
+    private static bool ContainsInvalidSamChars(string value) =>
+        value.IndexOfAny(InvalidSamChars) >= 0;
+
+    private static bool IsValidEmailFormat(string email) =>
+        !string.IsNullOrWhiteSpace(email) &&
+        email.Contains('@') &&
+        email.IndexOf('@') > 0 &&
+        email.IndexOf('@') < email.Length - 1 &&
+        email.LastIndexOf('.') > email.IndexOf('@');
+
     private void ValidateForm()
     {
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(FirstName))
-            errors.Add("Pr\u00e9nom requis");
+            errors.Add("Prénom requis");
+        else if (FirstName.Trim().Length > 64)
+            errors.Add("Prénom trop long (max 64)");
+        else if (FirstName.IndexOfAny(LdapInjectionChars) >= 0)
+            errors.Add(_localization.GetString("CreateUser_ErrorInvalidName"));
+
         if (string.IsNullOrWhiteSpace(LastName))
             errors.Add("Nom requis");
+        else if (LastName.Trim().Length > 64)
+            errors.Add("Nom trop long (max 64)");
+        else if (LastName.IndexOfAny(LdapInjectionChars) >= 0)
+            errors.Add(_localization.GetString("CreateUser_ErrorInvalidName"));
+
         if (string.IsNullOrWhiteSpace(SamAccountName))
             errors.Add("Login SAM requis");
         else if (SamAccountName.Length > 20)
-            errors.Add("Login SAM max 20 caract\u00e8res");
+            errors.Add("Login SAM max 20 caractères");
+        else if (ContainsInvalidSamChars(SamAccountName))
+            errors.Add("Login SAM contient des caractères invalides");
+
+        if (!string.IsNullOrWhiteSpace(Email) && !IsValidEmailFormat(Email))
+            errors.Add("Format email invalide");
+
         if (string.IsNullOrWhiteSpace(Password))
             errors.Add("Mot de passe requis");
-        else if (Password.Length < 8)
-            errors.Add("Mot de passe min 8 caract\u00e8res");
+        else
+        {
+            var policy = _settingsService.CurrentSettings.UserCreation.PasswordPolicy;
+            if (!PasswordPolicyHelper.IsCompliant(Password, policy, out var reason))
+                errors.Add(reason);
+        }
         if (Password != PasswordConfirm)
-            errors.Add("Mots de passe diff\u00e9rents");
+            errors.Add("Mots de passe différents");
         if (SelectedOU == null)
             errors.Add("OU destination requise");
 
@@ -660,11 +801,11 @@ public partial class CreateUserViewModel : ObservableObject
 
         try
         {
-            _logger.LogInformation("\u2795 Cr\u00e9ation utilisateur : {SAM} ({DisplayName})", SamAccountName, DisplayName);
-            _logger.LogInformation("  OU: {OU}", SelectedOU?.Path);
-            _logger.LogInformation("  Groupes: {Count}", SelectedGroupsCount);
+            _logger.LogInformation("Creating AD user: {SAM}", SamAccountName);
+            _logger.LogDebug("Target OU selected for user creation.");
+            _logger.LogDebug("Selected groups count: {Count}", SelectedGroupsCount);
 
-            // Construire le mod\u00e8le User
+            // Construire le modèle User
             var user = new User
             {
                 UserName = SamAccountName,
@@ -683,32 +824,33 @@ public partial class CreateUserViewModel : ObservableObject
                 IsEnabled = !AccountDisabled
             };
 
-            // Cr\u00e9er l'utilisateur dans AD
+            // Créer l'utilisateur dans AD
             var createdUser = await _adService.CreateUserAsync(
                 user,
                 SelectedOU?.Path ?? BuildDomainDN(_adService.ConnectedDomain ?? "contoso.local"),
                 Password,
                 MustChangePasswordNextLogon,
                 PasswordNeverExpires,
-                AccountDisabled);
+                AccountDisabled,
+                ExpirationDate);
 
-            _logger.LogInformation("\u2705 Utilisateur cr\u00e9\u00e9 : {SAM}", createdUser.UserName);
+            _logger.LogInformation("AD user created: {SAM}", createdUser.UserName);
 
-            // Ajouter aux groupes s\u00e9lectionn\u00e9s
+            // Ajouter aux groupes sélectionnés
             var selectedGroups = AvailableGroups.Where(g => g.IsSelected).ToList();
             if (selectedGroups.Count > 0)
             {
-                _logger.LogInformation("\ud83d\udc65 Ajout \u00e0 {Count} groupes...", selectedGroups.Count);
+                _logger.LogInformation("Adding user to selected groups ({Count}).", selectedGroups.Count);
                 foreach (var group in selectedGroups)
                 {
                     try
                     {
                         await _adService.AddUserToGroupAsync(createdUser.UserName, group.GroupName);
-                        _logger.LogInformation("\u2705 Ajout\u00e9 au groupe : {Group}", group.GroupName);
+                        _logger.LogDebug("User added to group: {Group}", group.GroupName);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "\u26a0\ufe0f \u00c9chec ajout groupe : {Group}", group.GroupName);
+                        _logger.LogWarning(ex, "Failed to add user to group: {Group}", group.GroupName);
                     }
                 }
             }
@@ -721,18 +863,22 @@ public partial class CreateUserViewModel : ObservableObject
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            _logger.LogInformation("\ud83c\udf89 Cr\u00e9ation utilisateur termin\u00e9e");
+            _logger.LogInformation("User creation completed.");
 
-            // Retour \u00e0 la page utilisateurs
+            // Retour à la page utilisateurs
             _navigationService.Navigate(typeof(Views.Pages.UsersPage));
+            
+            // Nettoyage mémoire des mots de passe
+            Password = string.Empty;
+            PasswordConfirm = string.Empty;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "\u274c Erreur cr\u00e9ation utilisateur");
+            _logger.LogError(ex, "Error while creating user.");
 
             // Message explicite selon le type d'erreur
             var msg = ex.Message;
-            if (ex.Message.Contains("r\u00e9f\u00e9rence", StringComparison.OrdinalIgnoreCase) ||
+            if (ex.Message.Contains("référence", StringComparison.OrdinalIgnoreCase) ||
                 ex.Message.Contains("referral", StringComparison.OrdinalIgnoreCase))
             {
                 msg = string.Format(_localization.GetString("CreateUser_ErrorOUNotFound"), SelectedOU?.Path);
@@ -763,7 +909,64 @@ public partial class CreateUserViewModel : ObservableObject
     [RelayCommand]
     private void Cancel()
     {
+        // Nettoyage mémoire des mots de passe avant navigation
+        Password = string.Empty;
+        PasswordConfirm = string.Empty;
+        StopClipboardTimer();
         _navigationService.Navigate(typeof(Views.Pages.UsersPage));
+    }
+
+    [RelayCommand]
+    private void Reset()
+    {
+        var confirm = MessageBox.Show(
+            _localization.GetString("CreateUser_ResetConfirm"),
+            _localization.GetString("CreateUser_Reset"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (confirm != MessageBoxResult.Yes)
+            return;
+
+        // Reset Identity
+        FirstName = "";
+        LastName = "";
+        DisplayName = "";
+        SamAccountName = "";
+        UserPrincipalName = "";
+        Email = "";
+        Initials = "";
+
+        // Reset Contact
+        PhoneNumber = "";
+        MobileNumber = "";
+
+        // Reset Organization
+        JobTitle = "";
+        Department = "";
+        Company = "";
+        Office = "";
+        Description = "";
+
+        // Reset Options
+        Password = "";
+        PasswordConfirm = "";
+        MustChangePasswordNextLogon = false;
+        PasswordNeverExpires = false;
+        AccountDisabled = false;
+        ExpirationDate = null;
+        ExpirationDays = null;
+
+        // Reset Groups
+        foreach (var group in AvailableGroups)
+        {
+            group.IsSelected = false;
+        }
+
+        // Reset OU
+        ApplyPreferredDefaultOu();
+
+        ValidateForm();
     }
 
     [RelayCommand]
@@ -771,7 +974,7 @@ public partial class CreateUserViewModel : ObservableObject
     {
         try
         {
-            _logger.LogInformation("Sauvegarde comme template demand\u00e9e");
+            _logger.LogInformation("Save as template requested.");
 
             // Dialog nom template
             var dialog = new Views.Dialogs.InputDialog(
@@ -792,7 +995,7 @@ public partial class CreateUserViewModel : ObservableObject
 
             var description = descDialog.ShowDialog() == true ? descDialog.ResultText : "";
 
-            // Cr\u00e9er template depuis les valeurs actuelles du formulaire
+            // Créer template depuis les valeurs actuelles du formulaire
             var template = new UserTemplate
             {
                 Name = templateName,
@@ -805,7 +1008,8 @@ public partial class CreateUserViewModel : ObservableObject
                 DefaultOU = SelectedOU?.Path,
                 Groups = AvailableGroups.Where(g => g.IsSelected).Select(g => g.GroupName).ToList(),
                 MustChangePasswordAtLogon = MustChangePasswordNextLogon,
-                IsEnabled = !AccountDisabled
+                IsEnabled = !AccountDisabled,
+                ExpirationDays = ExpirationDays
             };
 
             await _templateService.SaveTemplateAsync(template);
@@ -819,13 +1023,13 @@ public partial class CreateUserViewModel : ObservableObject
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            _logger.LogInformation("Template sauvegard\u00e9 : {Name}", templateName);
+            _logger.LogInformation("Template saved: {Name}", templateName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erreur sauvegarde template");
+            _logger.LogError(ex, "Error while saving template.");
             MessageBox.Show(
-                string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message),
+                _localization.GetString("CreateUser_TemplateSaveError"),
                 _localization.GetString("Common_Error"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -875,6 +1079,6 @@ public partial class CreateUserViewModel : ObservableObject
         AvailableOUs.Insert(0, preferred);
         SelectedOU = preferred;
 
-        _logger.LogInformation("OU par défaut appliquée depuis paramètres : {OU}", defaultOuPath);
+        _logger.LogInformation("Default OU applied from settings.");
     }
 }

@@ -16,21 +16,21 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
     private readonly ICacheService _cacheService;
     private readonly IAuditService _auditService;
     private readonly ISettingsService _settingsService;
+    private readonly ICredentialService _credentialService;
     private PrincipalContext? _context;
     private string? _connectedDomain;
     private string? _connectedUser;
-    private string? _adminUser;
-    private string? _adminPassword;
 
     /// <summary>
     /// Constructeur avec injection du logger et du service de cache.
     /// </summary>
-    public ActiveDirectoryService(ILogger<ActiveDirectoryService> logger, ICacheService cacheService, IAuditService auditService, ISettingsService settingsService)
+    public ActiveDirectoryService(ILogger<ActiveDirectoryService> logger, ICacheService cacheService, IAuditService auditService, ISettingsService settingsService, ICredentialService credentialService)
     {
         _logger = logger;
         _cacheService = cacheService;
         _auditService = auditService;
         _settingsService = settingsService;
+        _credentialService = credentialService;
     }
 
     /// <summary>
@@ -55,13 +55,13 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
     {
         try
         {
-            _logger.LogInformation("Tentative de connexion à Active Directory...");
-            _logger.LogInformation("Domaine: {Domain}, Utilisateur: {Username}", domain, username);
+            _logger.LogInformation("Tentative de connexion à Active Directory.");
+            _logger.LogDebug("Connexion AD demandée pour le domaine {Domain}.", domain);
 
             // Déconnexion si déjà connecté
             if (_context != null)
             {
-                _logger.LogWarning("Une connexion existante a été détectée. Déconnexion...");
+                _logger.LogWarning("Connexion AD existante détectée. Déconnexion préalable.");
                 await DisconnectAsync();
             }
 
@@ -82,28 +82,30 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             {
                 _connectedDomain = domain;
                 _connectedUser = username;
-                _adminUser = username;
-                _adminPassword = password;
-                _logger.LogInformation("✅ Connexion à Active Directory réussie !");
-                _logger.LogInformation("Domaine connecté: {Domain}", _connectedDomain);
+                
+                // Sauvegarde des credentials en session uniquement
+                _credentialService.SaveSessionCredentials(domain, username, password);
+
+                _logger.LogInformation("Connexion à Active Directory réussie.");
+                _logger.LogDebug("Domaine connecté: {Domain}", _connectedDomain);
                 return true;
             }
             else
             {
-                _logger.LogWarning("❌ Échec de connexion : Credentials invalides");
+                _logger.LogWarning("Échec de connexion Active Directory: identifiants invalides.");
                 await DisconnectAsync();
                 return false;
             }
         }
         catch (PrincipalServerDownException ex)
         {
-            _logger.LogError(ex, "❌ Erreur : Le serveur de domaine '{Domain}' est inaccessible", domain);
+            _logger.LogError(ex, "Serveur de domaine inaccessible.");
             await DisconnectAsync();
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur inattendue lors de la connexion à Active Directory");
+            _logger.LogError(ex, "Erreur inattendue lors de la connexion à Active Directory.");
             await DisconnectAsync();
             return false;
         }
@@ -118,12 +120,15 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             if (_context != null)
             {
-                _logger.LogInformation("Déconnexion d'Active Directory...");
+                _logger.LogInformation("Déconnexion d'Active Directory.");
                 _context.Dispose();
                 _context = null;
                 _connectedDomain = null;
                 _connectedUser = null;
-                _logger.LogInformation("✅ Déconnexion réussie");
+                
+                _credentialService.DeleteSessionCredentials();
+                
+                _logger.LogInformation("Déconnexion Active Directory terminée.");
             }
         });
     }
@@ -139,23 +144,23 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             var cachedUsers = await _cacheService.GetCachedUsersAsync();
             if (cachedUsers != null)
             {
-                _logger.LogInformation("⚡ Users chargés depuis cache : {Count}", cachedUsers.Count);
+                _logger.LogDebug("Utilisateurs chargés depuis le cache: {Count}", cachedUsers.Count);
                 return ApplyOUFilter(cachedUsers);
             }
         }
 
         if (!IsConnected)
         {
-            _logger.LogWarning("❌ Impossible de récupérer les utilisateurs : Non connecté à AD");
+            _logger.LogWarning("Impossible de récupérer les utilisateurs: non connecté à AD.");
             throw new InvalidOperationException("Non connecté à Active Directory. Appelez ConnectAsync() d'abord.");
         }
 
         try
         {
-            _logger.LogInformation("📋 Récupération des utilisateurs AD (depuis serveur)...");
+            _logger.LogInformation("Récupération des utilisateurs AD.");
             if (!string.IsNullOrWhiteSpace(searchFilter))
             {
-                _logger.LogInformation("Filtre de recherche: {SearchFilter}", searchFilter);
+                _logger.LogDebug("Récupération utilisateurs avec filtre actif.");
             }
 
             var users = new List<User>();
@@ -167,15 +172,19 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 if (includedOUs.Count > 0 && string.IsNullOrWhiteSpace(searchFilter))
                 {
                     // Scan ciblé : un DirectorySearcher par OU incluse
-                    _logger.LogInformation("🔍 Scan ciblé sur {Count} OU(s) incluse(s)", includedOUs.Count);
+                    _logger.LogDebug("Scan ciblé sur {Count} OU(s) incluse(s).", includedOUs.Count);
                     var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     foreach (var ouDn in includedOUs)
                     {
                         try
                         {
+                            var (_, sessionUser, sessionPass) = _credentialService.LoadSessionCredentials();
+                            if (string.IsNullOrWhiteSpace(sessionUser) || string.IsNullOrWhiteSpace(sessionPass))
+                                throw new InvalidOperationException("Credentials admin non disponibles.");
+
                             using var ouContext = new PrincipalContext(ContextType.Domain, _context!.Name, ouDn,
-                                _adminUser, _adminPassword);
+                                sessionUser, sessionPass);
                             var userPrincipal = new UserPrincipal(ouContext) { Name = "*" };
                             using var searcher = new PrincipalSearcher(userPrincipal);
                             var results = searcher.FindAll();
@@ -193,7 +202,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogWarning(ex, "Erreur scan OU ciblée : {OU}", ouDn);
+                            _logger.LogWarning(ex, "Erreur lors du scan d'une OU incluse.");
                         }
                     }
                 }
@@ -219,12 +228,12 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 }
             });
 
-            _logger.LogInformation("✅ {Count} utilisateur(s) récupéré(s) depuis AD", users.Count);
+            _logger.LogInformation("{Count} utilisateur(s) récupéré(s) depuis AD.", users.Count);
 
             // Appliquer le filtrage OU si configuré
             users = ApplyOUFilter(users);
 
-            _logger.LogInformation("✅ {Count} utilisateur(s) après filtrage OU", users.Count);
+            _logger.LogDebug("{Count} utilisateur(s) après filtrage OU.", users.Count);
 
             // Mettre en cache si requête sans filtre
             if (string.IsNullOrWhiteSpace(searchFilter))
@@ -236,7 +245,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur lors de la récupération des utilisateurs");
+            _logger.LogError(ex, "Erreur lors de la récupération des utilisateurs.");
             throw;
         }
     }
@@ -252,23 +261,23 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             var cachedGroups = await _cacheService.GetCachedGroupsAsync();
             if (cachedGroups != null)
             {
-                _logger.LogInformation("⚡ Groups chargés depuis cache : {Count}", cachedGroups.Count);
+                _logger.LogDebug("Groupes chargés depuis le cache: {Count}", cachedGroups.Count);
                 return cachedGroups;
             }
         }
 
         if (!IsConnected)
         {
-            _logger.LogWarning("❌ Impossible de récupérer les groupes : Non connecté à AD");
+            _logger.LogWarning("Impossible de récupérer les groupes: non connecté à AD.");
             throw new InvalidOperationException("Non connecté à Active Directory. Appelez ConnectAsync() d'abord.");
         }
 
         try
         {
-            _logger.LogInformation("📋 Récupération des groupes AD (depuis serveur)...");
+            _logger.LogInformation("Récupération des groupes AD.");
             if (!string.IsNullOrWhiteSpace(searchFilter))
             {
-                _logger.LogInformation("Filtre de recherche: {SearchFilter}", searchFilter);
+                _logger.LogDebug("Récupération groupes avec filtre actif.");
             }
 
             var groups = new List<Group>();
@@ -309,7 +318,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 }
             });
 
-            _logger.LogInformation("✅ {Count} groupe(s) récupéré(s)", groups.Count);
+            _logger.LogInformation("{Count} groupe(s) récupéré(s).", groups.Count);
 
             // Mettre en cache si requête sans filtre
             if (string.IsNullOrWhiteSpace(searchFilter))
@@ -321,7 +330,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur lors de la récupération des groupes");
+            _logger.LogError(ex, "Erreur lors de la récupération des groupes.");
             throw;
         }
     }
@@ -333,13 +342,13 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
     {
         if (!IsConnected)
         {
-            _logger.LogWarning("❌ Impossible de récupérer l'utilisateur : Non connecté à AD");
+            _logger.LogWarning("Impossible de récupérer l'utilisateur: non connecté à AD.");
             throw new InvalidOperationException("Non connecté à Active Directory. Appelez ConnectAsync() d'abord.");
         }
 
         try
         {
-            _logger.LogInformation("Recherche de l'utilisateur: {Username}", username);
+            _logger.LogDebug("Recherche d'un utilisateur AD.");
 
             User? user = null;
 
@@ -403,11 +412,11 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                         _logger.LogWarning(ex, "Impossible de charger les groupes de {UserName}", user.UserName);
                     }
 
-                    _logger.LogInformation("Utilisateur trouve: {DisplayName} ({GroupCount} groupes)", user.DisplayName, user.Groups.Count);
+                    _logger.LogDebug("Utilisateur trouvé ({GroupCount} groupes).", user.Groups.Count);
                 }
                 else
                 {
-                    _logger.LogWarning("⚠️ Utilisateur '{Username}' non trouvé", username);
+                    _logger.LogWarning("Utilisateur non trouvé dans AD.");
                 }
             });
 
@@ -415,37 +424,24 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur lors de la recherche de l'utilisateur {Username}", username);
+            _logger.LogError(ex, "Erreur lors de la recherche d'un utilisateur AD.");
             throw;
         }
     }
 
-    /// <summary>
-    /// Stocke les credentials admin pour les opérations ultérieures.
-    /// </summary>
-    public void StoreCredentials(string domain, string username, string password)
-    {
-        _connectedDomain = domain;
-        _adminUser = username;
-        _adminPassword = password;
-        _logger.LogInformation("Credentials admin stockés pour {Domain}/{Username}", domain, username);
-    }
-
-    /// <summary>
-    /// Crée un nouvel utilisateur dans Active Directory.
-    /// </summary>
     public async Task<User> CreateUserAsync(User user, string ouPath, string password,
-        bool mustChangePassword = true, bool passwordNeverExpires = false, bool accountDisabled = false)
+        bool mustChangePassword = true, bool passwordNeverExpires = false, bool accountDisabled = false, DateTime? accountExpirationDate = null)
     {
         if (!IsConnected)
             throw new InvalidOperationException("Non connecté à Active Directory.");
 
-        if (string.IsNullOrWhiteSpace(_adminUser) || string.IsNullOrWhiteSpace(_adminPassword))
+        var (sessionDomain, sessionUser, sessionPass) = _credentialService.LoadSessionCredentials();
+        if (string.IsNullOrWhiteSpace(sessionUser) || string.IsNullOrWhiteSpace(sessionPass))
             throw new InvalidOperationException("Credentials admin non disponibles.");
 
         try
         {
-            _logger.LogInformation("➕ Création utilisateur : {SAM} dans {OU}", user.UserName, ouPath);
+            _logger.LogInformation("Création d'un utilisateur AD: {SAM}", user.UserName);
 
             await Task.Run(() =>
             {
@@ -454,8 +450,8 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                     ContextType.Domain,
                     _connectedDomain!,
                     ouPath,
-                    _adminUser,
-                    _adminPassword);
+                    sessionUser,
+                    sessionPass);
 
                 // Créer le UserPrincipal
                 using var newUser = new UserPrincipal(ouContext)
@@ -469,7 +465,8 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                     Description = user.Description,
                     VoiceTelephoneNumber = string.IsNullOrWhiteSpace(user.Phone) ? null : user.Phone,
                     Enabled = !accountDisabled,
-                    PasswordNeverExpires = passwordNeverExpires
+                    PasswordNeverExpires = passwordNeverExpires,
+                    AccountExpirationDate = accountExpirationDate
                 };
 
                 // Définir le mot de passe
@@ -482,7 +479,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 // Sauvegarder dans AD
                 newUser.Save();
 
-                _logger.LogInformation("✅ Utilisateur créé dans AD : {SAM}", user.UserName);
+                _logger.LogInformation("Utilisateur créé dans AD: {SAM}", user.UserName);
 
                 // Propriétés étendues via DirectoryEntry (mobile, office, company, department, title)
                 try
@@ -505,11 +502,11 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                         de.Properties["title"].Value = user.JobTitle;
 
                     de.CommitChanges();
-                    _logger.LogInformation("✅ Propriétés étendues définies");
+                    _logger.LogDebug("Propriétés étendues définies pour l'utilisateur créé.");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "⚠️ Erreur définition propriétés étendues (utilisateur créé quand même)");
+                    _logger.LogWarning(ex, "Erreur lors de la définition des propriétés étendues (utilisateur déjà créé).");
                 }
 
                 // Mettre à jour le DN dans le modèle
@@ -526,7 +523,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             await _auditService.LogAsync(AuditActionType.CreateUser, AuditEntityType.User,
                 user.UserName, user.DisplayName, null, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur création utilisateur {SAM}", user.UserName);
+            _logger.LogError(ex, "Erreur lors de la création utilisateur {SAM}.", user.UserName);
             throw;
         }
     }
@@ -541,7 +538,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
         try
         {
-            _logger.LogInformation("👥 Chargement des membres du groupe {Group}", groupName);
+            _logger.LogInformation("Chargement des membres d'un groupe AD.");
             var members = new List<User>();
 
             await Task.Run(() =>
@@ -571,12 +568,12 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 }
             });
 
-            _logger.LogInformation("✅ {Count} membre(s) chargé(s) pour {Group}", members.Count, groupName);
+            _logger.LogInformation("{Count} membre(s) chargé(s) pour le groupe demandé.", members.Count);
             return members;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur chargement membres du groupe {Group}", groupName);
+            _logger.LogError(ex, "Erreur lors du chargement des membres du groupe demandé.");
             throw;
         }
     }
@@ -591,7 +588,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
         try
         {
-            _logger.LogInformation("👥 Ajout {User} au groupe {Group}", samAccountName, groupName);
+            _logger.LogInformation("Ajout d'un utilisateur à un groupe AD: {User}", samAccountName);
 
             await Task.Run(() =>
             {
@@ -606,7 +603,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 group.Members.Add(userPrincipal);
                 group.Save();
 
-                _logger.LogInformation("✅ {User} ajouté au groupe {Group}", samAccountName, groupName);
+                _logger.LogInformation("Utilisateur ajouté au groupe AD: {User}", samAccountName);
             });
 
             await _auditService.LogAsync(AuditActionType.AddUserToGroup, AuditEntityType.User,
@@ -616,7 +613,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             await _auditService.LogAsync(AuditActionType.AddUserToGroup, AuditEntityType.User,
                 samAccountName, samAccountName, new { Group = groupName }, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur ajout {User} au groupe {Group}", samAccountName, groupName);
+            _logger.LogError(ex, "Erreur lors de l'ajout d'un utilisateur à un groupe AD: {User}", samAccountName);
             throw;
         }
     }
@@ -631,7 +628,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
         try
         {
-            _logger.LogInformation("👥 Retrait {User} du groupe {Group}", samAccountName, groupName);
+            _logger.LogInformation("Retrait d'un utilisateur d'un groupe AD: {User}", samAccountName);
 
             await Task.Run(() =>
             {
@@ -646,7 +643,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 group.Members.Remove(userPrincipal);
                 group.Save();
 
-                _logger.LogInformation("✅ {User} retiré du groupe {Group}", samAccountName, groupName);
+                _logger.LogInformation("Utilisateur retiré d'un groupe AD: {User}", samAccountName);
             });
 
             await _auditService.LogAsync(AuditActionType.RemoveUserFromGroup, AuditEntityType.User,
@@ -656,7 +653,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             await _auditService.LogAsync(AuditActionType.RemoveUserFromGroup, AuditEntityType.User,
                 samAccountName, samAccountName, new { Group = groupName }, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur retrait {User} du groupe {Group}", samAccountName, groupName);
+            _logger.LogError(ex, "Erreur lors du retrait d'un utilisateur d'un groupe AD: {User}", samAccountName);
             throw;
         }
     }
@@ -671,7 +668,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
         try
         {
-            _logger.LogInformation("✏️ Mise à jour utilisateur : {SAM}", user.UserName);
+            _logger.LogInformation("Mise à jour d'un utilisateur AD: {SAM}", user.UserName);
 
             await Task.Run(() =>
             {
@@ -704,15 +701,15 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "⚠️ Erreur mise à jour propriétés étendues de {SAM}", user.UserName);
+                    _logger.LogWarning(ex, "Erreur lors de la mise à jour des propriétés étendues pour {SAM}", user.UserName);
                 }
 
-                _logger.LogInformation("✅ Utilisateur mis à jour dans AD : {SAM}", user.UserName);
+                _logger.LogInformation("Utilisateur mis à jour dans AD: {SAM}", user.UserName);
             });
 
             // Invalider le cache après modification
             await _cacheService.ClearCacheAsync();
-            _logger.LogInformation("🗑️ Cache invalidé après mise à jour de {SAM}", user.UserName);
+            _logger.LogDebug("Cache invalidé après mise à jour de l'utilisateur {SAM}", user.UserName);
 
             await _auditService.LogAsync(AuditActionType.UpdateUser, AuditEntityType.User,
                 user.UserName, user.DisplayName);
@@ -721,7 +718,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             await _auditService.LogAsync(AuditActionType.UpdateUser, AuditEntityType.User,
                 user.UserName, user.DisplayName, null, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur mise à jour utilisateur {SAM}", user.UserName);
+            _logger.LogError(ex, "Erreur lors de la mise à jour utilisateur {SAM}", user.UserName);
             throw;
         }
     }
@@ -736,7 +733,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
         try
         {
-            _logger.LogInformation("🔑 Reset mot de passe pour : {SAM}", samAccountName);
+            _logger.LogInformation("Réinitialisation du mot de passe pour l'utilisateur: {SAM}", samAccountName);
 
             await Task.Run(() =>
             {
@@ -751,7 +748,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
                 userPrincipal.Save();
 
-                _logger.LogInformation("✅ Mot de passe réinitialisé pour {SAM}", samAccountName);
+                _logger.LogInformation("Mot de passe réinitialisé pour l'utilisateur: {SAM}", samAccountName);
             });
 
             await _auditService.LogAsync(AuditActionType.ResetPassword, AuditEntityType.User,
@@ -761,7 +758,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             await _auditService.LogAsync(AuditActionType.ResetPassword, AuditEntityType.User,
                 samAccountName, samAccountName, null, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur reset mot de passe {SAM}", samAccountName);
+            _logger.LogError(ex, "Erreur lors de la réinitialisation du mot de passe pour {SAM}", samAccountName);
             throw;
         }
     }
@@ -777,7 +774,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         try
         {
             var action = enabled ? "Activation" : "Désactivation";
-            _logger.LogInformation("🔄 {Action} du compte : {SAM}", action, samAccountName);
+            _logger.LogInformation("{Action} du compte utilisateur: {SAM}", action, samAccountName);
 
             await Task.Run(() =>
             {
@@ -788,7 +785,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 userPrincipal.Enabled = enabled;
                 userPrincipal.Save();
 
-                _logger.LogInformation("✅ Compte {SAM} : {Action}", samAccountName, action);
+                _logger.LogInformation("Compte utilisateur mis à jour: {SAM} ({Action})", samAccountName, action);
             });
 
             // Invalider le cache
@@ -802,7 +799,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
             var auditAction = enabled ? AuditActionType.EnableUser : AuditActionType.DisableUser;
             await _auditService.LogAsync(auditAction, AuditEntityType.User,
                 samAccountName, samAccountName, null, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur activation/désactivation {SAM}", samAccountName);
+            _logger.LogError(ex, "Erreur lors de l'activation/désactivation de {SAM}", samAccountName);
             throw;
         }
     }
@@ -831,9 +828,13 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         if (!IsConnected)
             throw new InvalidOperationException("Non connecté à Active Directory.");
 
+        var (sessionDomain, sessionUser, sessionPass) = _credentialService.LoadSessionCredentials();
+        if (string.IsNullOrWhiteSpace(sessionUser) || string.IsNullOrWhiteSpace(sessionPass))
+            throw new InvalidOperationException("Credentials admin non disponibles.");
+
         try
         {
-            _logger.LogInformation("📦 Déplacement {User} vers {OU}", samAccountName, targetOuPath);
+            _logger.LogInformation("Déplacement d'un utilisateur vers une OU: {User}", samAccountName);
 
             await Task.Run(() =>
             {
@@ -845,17 +846,17 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
                 using var targetOu = new DirectoryEntry(
                     $"LDAP://{_connectedDomain}/{targetOuPath}",
-                    _adminUser,
-                    _adminPassword);
+                    sessionUser,
+                    sessionPass);
 
                 userDe.MoveTo(targetOu);
 
-                _logger.LogInformation("✅ {User} déplacé vers {OU}", samAccountName, targetOuPath);
+                _logger.LogInformation("Utilisateur déplacé vers l'OU cible: {User}", samAccountName);
             });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur déplacement {User} vers {OU}", samAccountName, targetOuPath);
+            _logger.LogError(ex, "Erreur lors du déplacement d'un utilisateur vers une OU: {User}", samAccountName);
             throw;
         }
     }
@@ -869,12 +870,13 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         if (!IsConnected)
             throw new InvalidOperationException("Non connecté à Active Directory.");
 
-        if (string.IsNullOrWhiteSpace(_adminUser) || string.IsNullOrWhiteSpace(_adminPassword))
+        var (_, sessionUser, sessionPass) = _credentialService.LoadSessionCredentials();
+        if (string.IsNullOrWhiteSpace(sessionUser) || string.IsNullOrWhiteSpace(sessionPass))
             throw new InvalidOperationException("Credentials admin non disponibles.");
 
         try
         {
-            _logger.LogInformation("➕ Création groupe : {Group} dans {OU}", groupName, ouPath);
+            _logger.LogInformation("Création d'un groupe AD: {Group}", groupName);
 
             var group = new Group
             {
@@ -888,8 +890,8 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                     ContextType.Domain,
                     _connectedDomain!,
                     ouPath,
-                    _adminUser,
-                    _adminPassword);
+                    sessionUser,
+                    sessionPass);
 
                 var scope = groupScope.ToLower() switch
                 {
@@ -910,7 +912,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
                 group.DistinguishedName = newGroup.DistinguishedName ?? string.Empty;
 
-                _logger.LogInformation("✅ Groupe créé dans AD : {Group}", groupName);
+                _logger.LogInformation("Groupe créé dans AD: {Group}", groupName);
             });
 
             await _auditService.LogAsync("CreateGroup", AuditEntityType.Group,
@@ -923,7 +925,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         {
             await _auditService.LogAsync("CreateGroup", AuditEntityType.Group,
                 groupName, groupName, null, false, ex.Message);
-            _logger.LogError(ex, "❌ Erreur création groupe {Group}", groupName);
+            _logger.LogError(ex, "Erreur lors de la création du groupe {Group}", groupName);
             throw;
         }
     }
@@ -1039,9 +1041,13 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
         if (!IsConnected)
             throw new InvalidOperationException("Non connecté à Active Directory.");
 
+        var (sessionDomain, sessionUser, sessionPass) = _credentialService.LoadSessionCredentials();
+        if (string.IsNullOrWhiteSpace(sessionUser) || string.IsNullOrWhiteSpace(sessionPass))
+            throw new InvalidOperationException("Credentials admin non disponibles.");
+
         try
         {
-            _logger.LogInformation("📂 Chargement des OUs depuis AD...");
+            _logger.LogInformation("Chargement des OU depuis AD.");
 
             var ous = new List<OrganizationalUnitInfo>();
 
@@ -1053,8 +1059,8 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
                 using var rootEntry = new DirectoryEntry(
                     $"LDAP://{_connectedDomain}/{domainDN}",
-                    _adminUser,
-                    _adminPassword);
+                    sessionUser,
+                    sessionPass);
 
                 using var searcher = new DirectorySearcher(rootEntry)
                 {
@@ -1081,12 +1087,12 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 }
             });
 
-            _logger.LogInformation("✅ {Count} OU(s) trouvée(s)", ous.Count);
+            _logger.LogInformation("{Count} OU(s) trouvée(s).", ous.Count);
             return ous;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur chargement OUs");
+            _logger.LogError(ex, "Erreur lors du chargement des OU.");
             throw;
         }
     }

@@ -67,4 +67,9 @@ public class UserTemplate
     /// Compte activé par défaut
     /// </summary>
     public bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Expiration du compte en jours après la création (null = n'expire jamais)
+    /// </summary>
+    public int? ExpirationDays { get; set; }
 }

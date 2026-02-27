@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-beta] - Unreleased
+
+### Added
+
+- **Configurable group loading** (perf): New setting in Active Directory tab - "Load groups on startup". Uncheck to skip `GetGroups()` during initial user load, significantly improving performance on large domains or AD 2012 R2. Groups remain fully accessible via double-click (live load).
+
+### Security
+
+- **Security hardening**: Clipboard auto-clears after 60s when a password is generated in the creation form. Session credentials are now cleaned up even on unexpected crashes. Input validation blocks LDAP injection characters in name fields and path traversal in network log paths. Exception messages no longer leak internal details to the user.
+- **In-Memory Password Protection**: Fixed a critical vulnerability where the Active Directory administrator password was stored as a long-lived plain-text string in memory. The application now leverages Windows Credential Manager `PersistanceType.Session` to dynamically retrieve credentials only when strictly needed for directory operations, drastically reducing the attack surface against memory dumps.
+- **Logging Hardening**: Cleaned and standardized security-sensitive logs in AD, reducing exposed identifiers in production-level messages, and moving path/details to debug level. Added explicit guidance that network log share ACL hardening (SMB/NTFS permissions) remains an infrastructure administrator responsibility. All application logs now use English as the default language for consistency and operational clarity. (no i18n at the moment)
+- **Configurable Password Policy**: Introduced a configurable password policy system in Settings with three levels (Easy: 8+ chars, Standard: 12+ chars with complexity, Strong: 14+ chars with pattern blocking). Password validation and generation now respect the selected policy across user creation and password reset workflows.
+
+### New Features & Improvements
+
+- **Flexible User Creation Formats**: Added settings to customize auto-generated user attributes:
+  - **Login Format (sAMAccountName/UPN)**: Choose between `First.Last`, `F.Last`, `Last.F`, or `Last`. (I need to add the option to customize it 100%)
+  - **Display Name Format**: Choose between `First Last` or `Last First`.
+  - **Duplicate Handling**: Automatically append a number (e.g. `first.last1`) or do nothing when a duplicate login is detected. (Same)
+  - **Custom Email Domain**: Added the ability to specify a custom domain for Email and UPN (e.g., `example.com`), overriding the default AD domain.
+- **Editable User Attributes**: The auto-generated `sAMAccountName` and `UserPrincipalName` fields are now manually editable in the creation form before submission.
+- **Account Expiration**: Added support for account expiration dates during user creation.
+  - **Exact Date**: Select a specific expiration date via a DatePicker.
+  - **Template Expiration (Days)**: Templates now support an "Expires in X days" setting, ideal for temporary accounts like contractors or interns.
+- **Settings UI**: Reorganized settings to include a dedicated "User Creation" tab.
+- **Localization**: Translated "Storage Mode" options (Local / Shared Network) in History and Templates settings.
+
+---
+
 ## [0.1.7-beta] - 2026-02-19
 
 ### Added
@@ -17,15 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.6-beta] - 2026-02-19
-
-### Added
-
-- **Configurable group loading** (perf): New setting in Active Directory tab - "Load groups on startup". Uncheck to skip `GetGroups()` during initial user load, significantly improving performance on large domains or AD 2012 R2. Groups remain fully accessible via double-click (live load).
-
----
-
-## [0.1.5-beta] - 2026-02-18
+## [0.1.6-beta] - 2026-02-18
 
 ### Improvements/Fixed
 
@@ -34,9 +55,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **OU visibility** (issue #4): Organizational Units are now displayed as `Parent OU → OU Name` (breadcrumb path) in all OU pickers (Settings, Create User, Groups). The full DN is shown as a tooltip.
 - **Cache TTL extended to 24h** (issue #2): Cache lifetime slider now goes up to 1440 min (24h) with snap-to-tick marks at 15, 30, 60, 120, 240, 480, 720 and 1440 min.
 
+---
+
 ## [0.1.4-beta] - 2026-02-17
 
 Correction for automatic update (release)
+
+---
 
 ## [0.1.0-beta] - 2026-02-16
 

@@ -12,6 +12,7 @@ public class CredentialService : ICredentialService
 {
     private readonly ILogger<CredentialService> _logger;
     private const string CredentialTarget = "ADFlowManager";
+    private const string SessionCredentialTarget = "ADFlowManager.Session";
 
     public CredentialService(ILogger<CredentialService> logger)
     {
@@ -22,7 +23,7 @@ public class CredentialService : ICredentialService
     {
         try
         {
-            _logger.LogInformation("💾 Sauvegarde credentials : {Domain}/{Username}", domain, username);
+            _logger.LogInformation("Saving persisted credentials for {Domain}/{Username}", domain, username);
 
             using var cred = new Credential
             {
@@ -35,15 +36,15 @@ public class CredentialService : ICredentialService
 
             if (!cred.Save())
             {
-                _logger.LogWarning("⚠️ Échec sauvegarde credentials");
+                _logger.LogWarning("Failed to persist credentials");
                 throw new InvalidOperationException("Impossible de sauvegarder les credentials");
             }
 
-            _logger.LogInformation("✅ Credentials sauvegardés dans Windows Credential Manager");
+            _logger.LogInformation("Credentials saved in Windows Credential Manager");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur sauvegarde credentials");
+            _logger.LogError(ex, "Error while saving persisted credentials");
             throw;
         }
     }
@@ -52,7 +53,7 @@ public class CredentialService : ICredentialService
     {
         try
         {
-            _logger.LogInformation("🔍 Chargement credentials sauvegardés...");
+            _logger.LogDebug("Loading persisted credentials from Windows Credential Manager");
 
             using var cred = new Credential
             {
@@ -62,14 +63,14 @@ public class CredentialService : ICredentialService
 
             if (!cred.Load())
             {
-                _logger.LogInformation("ℹ️ Aucun credentials sauvegardés");
+                _logger.LogDebug("No persisted credentials found");
                 return (null, null, null);
             }
 
             var parts = cred.Username?.Split('\\');
             if (parts == null || parts.Length != 2)
             {
-                _logger.LogWarning("⚠️ Format credentials invalide : {Username}", cred.Username);
+                _logger.LogWarning("Invalid persisted credential username format: {Username}", cred.Username);
                 return (null, null, null);
             }
 
@@ -77,13 +78,13 @@ public class CredentialService : ICredentialService
             var username = parts[1];
             var password = cred.Password;
 
-            _logger.LogInformation("✅ Credentials chargés : {Domain}/{Username}", domain, username);
+            _logger.LogInformation("Persisted credentials loaded for {Domain}/{Username}", domain, username);
 
             return (domain, username, password);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur chargement credentials");
+            _logger.LogError(ex, "Error while loading persisted credentials");
             return (null, null, null);
         }
     }
@@ -92,7 +93,7 @@ public class CredentialService : ICredentialService
     {
         try
         {
-            _logger.LogInformation("🗑️ Suppression credentials...");
+            _logger.LogInformation("Deleting persisted credentials");
 
             using var cred = new Credential
             {
@@ -102,16 +103,16 @@ public class CredentialService : ICredentialService
 
             if (cred.Delete())
             {
-                _logger.LogInformation("✅ Credentials supprimés");
+                _logger.LogInformation("Persisted credentials deleted");
             }
             else
             {
-                _logger.LogInformation("ℹ️ Aucun credentials à supprimer");
+                _logger.LogDebug("No persisted credentials to delete");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erreur suppression credentials");
+            _logger.LogError(ex, "Error while deleting persisted credentials");
         }
     }
 
@@ -130,6 +131,84 @@ public class CredentialService : ICredentialService
         catch
         {
             return false;
+        }
+    }
+
+    public void SaveSessionCredentials(string domain, string username, string password)
+    {
+        try
+        {
+            _logger.LogInformation("Saving session credentials for {Domain}/{Username}", domain, username);
+
+            using var cred = new Credential
+            {
+                Target = SessionCredentialTarget,
+                Username = $"{domain}\\{username}",
+                Password = password,
+                Type = CredentialType.Generic,
+                PersistanceType = PersistanceType.Session
+            };
+
+            if (!cred.Save())
+            {
+                _logger.LogWarning("Failed to save session credentials");
+                throw new InvalidOperationException("Impossible de sauvegarder les credentials session");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while saving session credentials");
+            throw;
+        }
+    }
+
+    public (string? domain, string? username, string? password) LoadSessionCredentials()
+    {
+        try
+        {
+            using var cred = new Credential
+            {
+                Target = SessionCredentialTarget,
+                Type = CredentialType.Generic
+            };
+
+            if (!cred.Load())
+            {
+                return (null, null, null);
+            }
+
+            var parts = cred.Username?.Split('\\');
+            if (parts == null || parts.Length != 2)
+            {
+                return (null, null, null);
+            }
+
+            return (parts[0], parts[1], cred.Password);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while loading session credentials");
+            return (null, null, null);
+        }
+    }
+
+    public void DeleteSessionCredentials()
+    {
+        try
+        {
+            _logger.LogInformation("Deleting session credentials");
+
+            using var cred = new Credential
+            {
+                Target = SessionCredentialTarget,
+                Type = CredentialType.Generic
+            };
+
+            cred.Delete();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while deleting session credentials");
         }
     }
 }

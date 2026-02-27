@@ -277,13 +277,53 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- À propos -->
-                    <Border Tag="6" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10">
+                    <!-- Création Utilisateur -->
+                    <Border Tag="7" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="7">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="PersonAdd24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="7">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_UserCreation}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="7">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- À propos -->
+                    <Border Tag="8" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="8">
                                         <Setter Property="Background" Value="#1A8B5CF6" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -295,7 +335,7 @@
                                     <Style TargetType="ui:SymbolIcon">
                                         <Setter Property="Foreground" Value="#A1A1AA" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="8">
                                                 <Setter Property="Foreground" Value="#8B5CF6" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -307,7 +347,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="#A1A1AA" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="8">
                                                 <Setter Property="Foreground" Value="#F5F5F5" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -547,8 +587,7 @@
                             </StackPanel>
 
                             <!-- Chargement des groupes -->
-                            <Border Height="1" Background="#3F3F46" Margin="0,0,0,20" />
-                            <StackPanel>
+                            <StackPanel Margin="0,0,0,24">
                                 <CheckBox
                                     IsChecked="{Binding ViewModel.LoadGroupsOnStartup}"
                                     Foreground="#F5F5F5"
@@ -559,6 +598,7 @@
                                 </CheckBox>
                                 <TextBlock Text="{ext:Localized Settings_LoadGroupsOnStartupDesc}" FontSize="12" Foreground="#71717A" TextWrapping="Wrap" Margin="24,0,0,0" />
                             </StackPanel>
+
                         </StackPanel>
 
                         <!-- ===== TAB 2 : CACHE ===== -->
@@ -957,13 +997,100 @@
                             </ui:Button>
                         </StackPanel>
 
-                        <!-- ===== TAB 6 : À PROPOS ===== -->
+                        <!-- ===== TAB 7 : CRÉATION UTILISATEUR ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="7">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_UserCreationTitle}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                            <TextBlock Text="{ext:Localized Settings_UserCreationDesc}" FontSize="13" Foreground="#71717A" TextWrapping="Wrap" Margin="0,0,0,24" />
+
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{ext:Localized Settings_LoginFormat}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ComboBox
+                                    ItemsSource="{Binding ViewModel.LoginFormats}"
+                                    SelectedItem="{Binding ViewModel.LoginFormat, UpdateSourceTrigger=PropertyChanged}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    HorizontalAlignment="Stretch" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{ext:Localized Settings_DisplayNameFormat}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ComboBox
+                                    ItemsSource="{Binding ViewModel.DisplayNameFormats}"
+                                    SelectedItem="{Binding ViewModel.DisplayNameFormat, UpdateSourceTrigger=PropertyChanged}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    HorizontalAlignment="Stretch" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,24">
+                                <TextBlock Text="{ext:Localized Settings_DuplicateHandling}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ComboBox
+                                    SelectedValue="{Binding ViewModel.DuplicateHandling, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectedValuePath="Tag"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="{ext:Localized Settings_DuplicateAppendNumber}" Tag="AppendNumber" Foreground="White" />
+                                    <ComboBoxItem Content="{ext:Localized Settings_DuplicateDoNothing}" Tag="DoNothing" Foreground="White" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{ext:Localized Settings_EmailDomain}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    Text="{Binding ViewModel.EmailDomain, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="ex: exemple.fr"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40" />
+                                <TextBlock Text="{ext:Localized Settings_EmailDomainDesc}" FontSize="11" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,24">
+                                <TextBlock Text="Password Policy" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ComboBox
+                                    ItemsSource="{Binding ViewModel.PasswordPolicies}"
+                                    SelectedItem="{Binding ViewModel.PasswordPolicy, UpdateSourceTrigger=PropertyChanged}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    HorizontalAlignment="Stretch" />
+                                <TextBlock FontSize="11" Foreground="#71717A" Margin="0,4,0,0" TextWrapping="Wrap">
+                                    <Run Text="Easy: 8+ chars, digit + special" />
+                                    <LineBreak />
+                                    <Run Text="Standard: 12+ chars, mixed case + digit + special" />
+                                    <LineBreak />
+                                    <Run Text="Strong: 14+ chars, complexity + pattern blocking" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ===== TAB 8 : À PROPOS ===== -->
                         <StackPanel MaxWidth="700" HorizontalAlignment="Center">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="8">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>

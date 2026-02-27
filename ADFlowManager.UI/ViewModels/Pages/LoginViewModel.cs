@@ -39,7 +39,7 @@ public partial class LoginViewModel : ObservableObject
             Username = savedUsername;
             Password = savedPassword;
             RememberMe = true;
-            _logger.LogInformation("✅ Credentials auto-remplis depuis Windows Credential Manager");
+            _logger.LogInformation("Credentials loaded from Windows Credential Manager.");
         }
     }
 
@@ -116,8 +116,9 @@ public partial class LoginViewModel : ObservableObject
             {
                 ErrorMessage = _localization.GetString("Login_Timeout");
                 ErrorVisibility = Visibility.Visible;
-                _logger.LogWarning("⏳ Timeout connexion AD pour {Domain}", Domain);
+                _logger.LogWarning("AD connection timeout.");
                 IsLoading = false;
+                Password = string.Empty; // Nettoyage mémoire
                 return;
             }
 
@@ -125,14 +126,14 @@ public partial class LoginViewModel : ObservableObject
 
             if (success)
             {
-                _logger.LogInformation("Connexion réussie : {Domain}/{Username}", Domain, Username);
+                _logger.LogInformation("AD connection successful: {Domain}/{Username}", Domain, Username);
                 ErrorMessage = "";
 
                 // Sauvegarder ou supprimer credentials selon choix utilisateur
                 if (RememberMe)
                 {
                     _credentialService.SaveCredentials(Domain, Username, Password);
-                    _logger.LogInformation("💾 Credentials sauvegardés pour prochaine session");
+                    _logger.LogInformation("Credentials persisted for future sessions.");
                 }
                 else
                 {
@@ -146,18 +147,19 @@ public partial class LoginViewModel : ObservableObject
             {
                 ErrorMessage = _localization.GetString("Login_Failed");
                 ErrorVisibility = Visibility.Visible;
-                _logger.LogWarning("Connexion échouée pour {Domain}/{Username}", Domain, Username);
+                _logger.LogWarning("AD connection failed for {Domain}/{Username}", Domain, Username);
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = string.Format(_localization.GetString("Login_Error"), ex.Message);
+            ErrorMessage = _localization.GetString("Login_ErrorGeneric");
             ErrorVisibility = Visibility.Visible;
-            _logger.LogError(ex, "Erreur lors de la connexion AD");
+            _logger.LogError(ex, "Error during AD login.");
         }
         finally
         {
             IsLoading = false;
+            Password = string.Empty; // Nettoyage mémoire du mot de passe en clair
         }
     }
 }
