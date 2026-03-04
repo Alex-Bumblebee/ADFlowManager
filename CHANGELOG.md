@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0-beta] - Unreleased
+
+### 🖥️ New: Computer Management Page
+
+Browse and manage all computers joined to your Active Directory domain.
+
+- **Computer list** with sortable columns: name, operating system, OS version, last logon, and enabled/disabled status
+- **Real-time search** to filter computers by name, OS, description or location
+- **Online status check**: ping a single computer or batch-check all machines in one click
+- **Details panel**: select a computer to see its full info (OS, description, location, last logon, Distinguished Name, creation date…)
+- **Detailed popup** (double-click): opens a dedicated window with 3 tabs - General, System, and Groups (lists all AD groups the computer belongs to)
+- **Smart caching**: computers load instantly from local cache on startup; refresh from Active Directory whenever you need
+
+### 📦 New: Package Deployment Page
+
+Deploy software packages (EXE, MSI, PS1) to one or more remote computers - no agent, no WinRM, no configuration needed on the target machines.
+
+**How it works:**
+1. Create a package with the built-in wizard: pick your installer, set silent install arguments, and ADFlowManager auto-detects metadata (product name, version, publisher) and computes a SHA-256 hash
+2. Select target computers from the cached AD list (search, filter, select all)
+3. Click Deploy - ADFlowManager copies the installer via SMB, runs it silently as SYSTEM via a temporary Windows service, and cleans up automatically afterward
+
+**Highlights:**
+- **Package creation dialog** with 3 tabs: General info, Installer settings (type, silent args, timeout, architecture requirements), and Advanced (custom steps, success criteria, JSON import)
+- **Signature verification badges**: each package shows a colored badge — green (signed & valid), red (invalid signature), or orange (unsigned)
+- **Batch deployment** to multiple computers in parallel with a live progress bar
+- **Safety built in**: SHA-256 hash check before each deployment, confirmation prompt for large batches (>5 PCs), automatic cleanup of temp files even on failure
+- **Event Log**: each deployment writes an entry in the target PC's Windows Event Log (Application, source "ADFlowManager")
+
+### 🔐 New: Package Signing & Security
+
+- **ECDSA package signing**: sign your packages with a cryptographic key (ECDSA P-256) stored in your Windows certificate store. Signatures are verified automatically before each deployment
+- **Signing key management** in Settings > Deployment: generate, export (PFX), import, or delete your signing key
+- **"Require signed packages" option**: when enabled, unsigned or tampered packages are blocked from deployment entirely
+- **Signature status at a glance**: every package in the list shows its verification status (Valid / Invalid / Unsigned) with a color-coded badge
+
+### ⚙️ New: Deployment Settings
+
+- New **Deployment tab** in Settings with three sections:
+  - **Package Storage**: local path (AppData) + optional shared network path for team collaboration
+  - **Package Signing**: key status, management buttons, and the "Require signatures" toggle
+  - **Deployment Limits**: maximum simultaneous deployments across all batches (default: 15)
+
+---
+
 ## [0.2.0-beta] - 27/02/2026
 
 ### Added

@@ -21,6 +21,12 @@ public interface ICacheService
     Task<List<Group>?> GetCachedGroupsAsync();
 
     /// <summary>
+    /// Récupère les ordinateurs depuis le cache SQLite si valide.
+    /// </summary>
+    /// <returns>Liste des ordinateurs cachés, ou null si cache expiré/vide.</returns>
+    Task<List<Computer>?> GetCachedComputersAsync();
+
+    /// <summary>
     /// Met en cache la liste des utilisateurs.
     /// </summary>
     Task CacheUsersAsync(List<User> users);
@@ -29,6 +35,11 @@ public interface ICacheService
     /// Met en cache la liste des groupes.
     /// </summary>
     Task CacheGroupsAsync(List<Group> groups);
+
+    /// <summary>
+    /// Met en cache la liste des ordinateurs.
+    /// </summary>
+    Task CacheComputersAsync(List<Computer> computers);
 
     /// <summary>
     /// Met à jour (ou ajoute) un seul utilisateur dans le cache sans toucher aux autres.
@@ -62,4 +73,6 @@ public class CacheStats
     public int UsersCount { get; set; }
     public DateTime? GroupsLastRefresh { get; set; }
     public int GroupsCount { get; set; }
+    public DateTime? ComputersLastRefresh { get; set; }
+    public int ComputersCount { get; set; }
 }

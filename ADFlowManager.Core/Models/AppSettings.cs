@@ -15,6 +15,7 @@ public class AppSettings
     public AuditSettings Audit { get; set; } = new();
     public TemplateSettings Templates { get; set; } = new();
     public GeneralSettings General { get; set; } = new();
+    public DeploymentSettings Deployment { get; set; } = new();
 
     /// <summary>
     /// Version config (pour migrations futures)
@@ -189,4 +190,38 @@ public class GeneralSettings
     /// Index langue : 0=Français, 1=English
     /// </summary>
     public int LanguageIndex { get; set; } = 0;
+}
+
+/// <summary>
+/// Configuration du système de déploiement de packages.
+/// </summary>
+public class DeploymentSettings
+{
+    /// <summary>
+    /// Chemin réseau pour packages partagés (optionnel).
+    /// Exemple : "\\server\share\ADFlowManager\Packages"
+    /// </summary>
+    public string NetworkPackagesPath { get; set; } = "";
+
+    /// <summary>
+    /// Timeout par défaut en secondes pour les installations.
+    /// </summary>
+    public int DefaultTimeoutSeconds { get; set; } = 300;
+
+    /// <summary>
+    /// Nombre maximum de déploiements en parallèle par batch.
+    /// </summary>
+    public int MaxParallelDeployments { get; set; } = 5;
+
+    /// <summary>
+    /// Nombre maximum global de déploiements simultanés (tous batchs confondus).
+    /// Prend effet au redémarrage de l'application.
+    /// </summary>
+    public int MaxGlobalDeployments { get; set; } = 15;
+
+    /// <summary>
+    /// Exige que tous les packages soient signés avant déploiement.
+    /// Si true, les packages non signés ou avec une signature invalide sont bloqués.
+    /// </summary>
+    public bool RequireSignedPackages { get; set; } = false;
 }

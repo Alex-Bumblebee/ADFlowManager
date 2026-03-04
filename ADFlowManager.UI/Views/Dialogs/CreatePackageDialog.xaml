@@ -1,0 +1,553 @@
+<ui:FluentWindow
+    x:Class="ADFlowManager.UI.Views.Dialogs.CreatePackageDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ext="clr-namespace:ADFlowManager.UI.Extensions"
+    xmlns:local="clr-namespace:ADFlowManager.UI.Views.Dialogs"
+    Title="{ext:Localized CreatePackage_Title}"
+    Width="720"
+    Height="750"
+    d:DesignHeight="750"
+    d:DesignWidth="720"
+    ExtendsContentIntoTitleBar="True"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    WindowBackdropType="Mica"
+    WindowCornerPreference="Round"
+    WindowStartupLocation="CenterOwner"
+    ResizeMode="NoResize"
+    mc:Ignorable="d"
+    x:Name="DialogRoot">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- === CONTENT === -->
+        <Grid Grid.Row="1" Margin="24,0,24,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ===== SUBTITLE ===== -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                <TextBlock
+                    x:Name="DialogSubtitle"
+                    Text="{ext:Localized CreatePackage_Subtitle}"
+                    FontSize="14"
+                    Foreground="#A1A1AA" />
+                <!-- Badge « propriétaire » visible uniquement en mode édition -->
+                <Border
+                    x:Name="OwnerBadge"
+                    Visibility="Collapsed"
+                    Background="#1A22C55E"
+                    BorderBrush="#22C55E"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="10,6"
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Shield24" FontSize="14" Foreground="#22C55E" Margin="0,0,6,0" />
+                        <TextBlock
+                            x:Name="OwnerBadgeText"
+                            FontSize="12"
+                            Foreground="#22C55E" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ===== TABS ===== -->
+            <TabControl
+                Grid.Row="1"
+                Background="Transparent"
+                BorderThickness="0"
+                Padding="0">
+
+                <!-- ====== Tab 1 : Général ====== -->
+                <TabItem Header="{ext:Localized CreatePackage_TabGeneral}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,16,0,0">
+
+                            <!-- Nom -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreatePackage_Name}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    x:Name="PackageName"
+                                    PlaceholderText="{ext:Localized CreatePackage_NameHint}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    FontSize="13" />
+                            </StackPanel>
+
+                            <!-- Version + Catégorie -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{ext:Localized CreatePackage_Version}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="PackageVersion"
+                                        PlaceholderText="{ext:Localized CreatePackage_VersionHint}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{ext:Localized CreatePackage_Category}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="PackageCategory"
+                                        PlaceholderText="{ext:Localized CreatePackage_CategoryHint}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Description -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreatePackage_Description}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    x:Name="PackageDescription"
+                                    PlaceholderText="{ext:Localized CreatePackage_DescriptionHint}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="80"
+                                    FontSize="13"
+                                    AcceptsReturn="True"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <!-- Auteur + Tags -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{ext:Localized CreatePackage_Author}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="PackageAuthor"
+                                        PlaceholderText="{ext:Localized CreatePackage_AuthorHint}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{ext:Localized CreatePackage_Tags}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="PackageTags"
+                                        PlaceholderText="{ext:Localized CreatePackage_TagsHint}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+                            </Grid>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ====== Tab 2 : Installateur ====== -->
+                <TabItem Header="{ext:Localized CreatePackage_TabInstaller}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,16,0,0">
+
+                            <!-- Type + Timeout -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{ext:Localized CreatePackage_InstallerType}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ComboBox
+                                        x:Name="InstallerType"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13"
+                                        SelectedIndex="0">
+                                        <ComboBoxItem Content="exe" />
+                                        <ComboBoxItem Content="msi" />
+                                        <ComboBoxItem Content="ps1" />
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{ext:Localized CreatePackage_Timeout}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="InstallerTimeout"
+                                        Text="0"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                    <TextBlock Text="{ext:Localized CreatePackage_TimeoutHint}" FontSize="11" Foreground="#52525B" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Path installateur -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreatePackage_InstallerPath}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox
+                                        x:Name="InstallerPath"
+                                        Grid.Column="0"
+                                        PlaceholderText="{ext:Localized CreatePackage_InstallerPathHint}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13"
+                                        Margin="0,0,8,0" />
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        Appearance="Secondary"
+                                        Click="BrowseInstaller_Click"
+                                        Height="40"
+                                        Width="40"
+                                        ToolTip="{ext:Localized CreatePackage_Browse}">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="FolderOpen24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Auto-detect info -->
+                            <Border
+                                x:Name="AutoDetectBanner"
+                                Background="#1A10B981"
+                                BorderBrush="#10B981"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,8"
+                                Margin="0,0,0,12"
+                                Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Foreground="#10B981" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock
+                                        x:Name="AutoDetectText"
+                                        FontSize="12"
+                                        Foreground="#10B981"
+                                        VerticalAlignment="Center"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Arguments -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreatePackage_Arguments}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    x:Name="InstallerArguments"
+                                    PlaceholderText="{ext:Localized CreatePackage_ArgumentsHint}"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    FontSize="13" />
+                            </StackPanel>
+
+                            <!-- Info SYSTEM -->
+                            <Border Background="#1E3A2E" CornerRadius="6" Padding="10" Margin="0,0,0,16">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="#34D399" Margin="0,0,8,0" />
+                                    <TextBlock
+                                        Text="{ext:Localized CreatePackage_SystemInfo}"
+                                        Foreground="#6EE7B7"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Hash SHA-256 (read-only, computed on browse) -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{ext:Localized CreatePackage_InstallerHash}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <ui:TextBox
+                                    x:Name="InstallerHashBox"
+                                    IsReadOnly="True"
+                                    PlaceholderText="{ext:Localized CreatePackage_HashPlaceholder}"
+                                    Background="#1E1E1E"
+                                    Foreground="#71717A"
+                                    BorderBrush="#3F3F46"
+                                    Height="40"
+                                    FontSize="11"
+                                    FontFamily="Consolas" />
+                            </StackPanel>
+
+                            <!-- Séparateur -->
+                            <Border Height="1" Background="#3F3F46" Margin="0,0,0,16" />
+
+                            <!-- REQUIREMENTS -->
+                            <TextBlock
+                                Text="{ext:Localized CreatePackage_Requirements}"
+                                FontSize="11"
+                                FontWeight="Bold"
+                                Foreground="#71717A"
+                                Margin="0,0,0,12" />
+
+                            <!-- Architecture + MinWindows -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{ext:Localized CreatePackage_Architecture}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ComboBox
+                                        x:Name="ReqArchitecture"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13"
+                                        SelectedIndex="0">
+                                        <ComboBoxItem Content="x64" />
+                                        <ComboBoxItem Content="x86" />
+                                        <ComboBoxItem Content="arm64" />
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{ext:Localized CreatePackage_MinWindows}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="ReqMinWindows"
+                                        PlaceholderText="{ext:Localized CreatePackage_MinWindowsHint}"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- MinDisk + MinRam -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{ext:Localized CreatePackage_MinDisk}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="ReqMinDisk"
+                                        PlaceholderText="0"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{ext:Localized CreatePackage_MinRam}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                    <ui:TextBox
+                                        x:Name="ReqMinRam"
+                                        PlaceholderText="0"
+                                        Background="#2D2D30"
+                                        Foreground="#F5F5F5"
+                                        BorderBrush="#3F3F46"
+                                        Height="40"
+                                        FontSize="13" />
+                                </StackPanel>
+                            </Grid>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ====== Tab 3 : Avancé (Steps + Criteria JSON) ====== -->
+                <TabItem Header="{ext:Localized CreatePackage_TabAdvanced}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,16,0,0">
+
+                            <!-- Warning : Steps not yet executed -->
+                            <Border
+                                Background="#1AF59E0B"
+                                BorderBrush="#F59E0B"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Margin="0,0,0,16">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="Warning24" FontSize="16" Foreground="#F59E0B" Margin="0,0,8,0" VerticalAlignment="Top" />
+                                    <TextBlock
+                                        Text="{ext:Localized CreatePackage_StepsWarning}"
+                                        FontSize="12"
+                                        Foreground="#FCD34D"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Steps JSON (saved but not executed) -->
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{ext:Localized CreatePackage_StepsJson}" FontSize="12" Foreground="#52525B" Margin="0,0,0,4" />
+                                <TextBlock Text="{ext:Localized CreatePackage_StepsJsonDesc}" FontSize="11" Foreground="#3F3F46" Margin="0,0,0,8" TextWrapping="Wrap" />
+                                <ui:TextBox
+                                    x:Name="StepsJson"
+                                    IsReadOnly="True"
+                                    Background="#141414"
+                                    Foreground="#52525B"
+                                    BorderBrush="#2D2D30"
+                                    Height="180"
+                                    FontSize="12"
+                                    FontFamily="Consolas"
+                                    AcceptsReturn="True"
+                                    TextWrapping="Wrap"
+                                    VerticalScrollBarVisibility="Auto" />
+                            </StackPanel>
+
+                            <!-- Success Criteria JSON -->
+                            <StackPanel Margin="0,0,0,8">
+                                <TextBlock Text="{ext:Localized CreatePackage_CriteriaJson}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <TextBlock Text="{ext:Localized CreatePackage_CriteriaJsonDesc}" FontSize="11" Foreground="#52525B" Margin="0,0,0,8" TextWrapping="Wrap" />
+                                <ui:TextBox
+                                    x:Name="CriteriaJson"
+                                    Background="#1E1E1E"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46"
+                                    Height="100"
+                                    FontSize="12"
+                                    FontFamily="Consolas"
+                                    AcceptsReturn="True"
+                                    TextWrapping="Wrap"
+                                    VerticalScrollBarVisibility="Auto" />
+                            </StackPanel>
+                            <!-- Warning : only fileExists supported -->
+                            <Border
+                                Background="#1AF59E0B"
+                                BorderBrush="#F59E0B"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Margin="0,0,0,16">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="Warning24" FontSize="16" Foreground="#F59E0B" Margin="0,0,8,0" VerticalAlignment="Top" />
+                                    <TextBlock
+                                        Text="{ext:Localized CreatePackage_CriteriaWarning}"
+                                        FontSize="12"
+                                        Foreground="#FCD34D"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Import JSON button -->
+                            <Border Height="1" Background="#3F3F46" Margin="0,0,0,16" />
+                            <ui:Button
+                                Content="{ext:Localized CreatePackage_ImportJson}"
+                                Appearance="Secondary"
+                                Click="ImportJson_Click"
+                                HorizontalAlignment="Left"
+                                Height="36"
+                                Padding="16,0">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="ArrowImport24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+
+            <!-- ===== FOOTER ===== -->
+            <Border
+                Grid.Row="2"
+                BorderBrush="#3F3F46"
+                BorderThickness="0,1,0,0"
+                Padding="0,12,0,0"
+                Margin="0,8,0,0">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Validation indicator -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse
+                            x:Name="ValidationDot"
+                            Width="8" Height="8"
+                            Fill="#EF4444"
+                            Margin="0,0,8,0" />
+                        <TextBlock
+                            x:Name="ValidationText"
+                            Text="{ext:Localized CreatePackage_ValidationRequired}"
+                            FontSize="12"
+                            Foreground="#71717A" />
+                    </StackPanel>
+
+                    <ui:Button
+                        Grid.Column="2"
+                        Content="{ext:Localized Common_Cancel}"
+                        Appearance="Secondary"
+                        Click="CancelButton_Click"
+                        Height="36"
+                        Padding="24,0"
+                        Margin="0,0,8,0" />
+                    <ui:Button
+                        Grid.Column="3"
+                        x:Name="ConfirmButton"
+                        Content="{ext:Localized CreatePackage_Create}"
+                        Appearance="Primary"
+                        Click="CreateButton_Click"
+                        Height="36"
+                        Padding="24,0" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- === TITLEBAR === -->
+        <ui:TitleBar
+            x:Name="TitleBar"
+            Title="{ext:Localized CreatePackage_Title}"
+            Grid.Row="0"
+            CloseWindowByDoubleClickOnIcon="True">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/Assets/logo.png" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+    </Grid>
+</ui:FluentWindow>

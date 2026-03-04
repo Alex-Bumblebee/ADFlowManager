@@ -1,0 +1,53 @@
+{
+  "Name": "7-Zip",
+  "Version": "23.01",
+  "Description": "Archiveur libre et open-source, supporte 7z, ZIP, GZIP, TAR et bien d'autres formats.",
+  "Category": "Utilitaires",
+  "Author": "Équipe IT",
+  "Tags": ["archiveur", "compression", "open-source"],
+  "Installer": {
+    "Type": "msi",
+    "Path": "\\\\SERVEUR-FICHIERS\\Partage$\\Logiciels\\7-Zip\\7z2301-x64.msi",
+    "Arguments": "/qn /norestart ALLUSERS=1",
+    "InstallerHash": "",
+    "TimeoutSeconds": 0
+  },
+  "Requirements": {
+    "MinWindowsVersion": "10.0.17763",
+    "Architecture": "x64",
+    "MinDiskSpaceMB": 50,
+    "MinRamMB": 512
+  },
+  "Steps": [
+    {
+      "Order": 1,
+      "Type": "preCheck",
+      "Action": "checkProcess",
+      "Parameters": {
+        "processName": "7zFM",
+        "action": "warn"
+      }
+    },
+    {
+      "Order": 2,
+      "Type": "install",
+      "Action": "execute",
+      "Parameters": {
+        "waitForExit": true
+      }
+    },
+    {
+      "Order": 3,
+      "Type": "postInstall",
+      "Action": "verifyFile",
+      "Parameters": {
+        "path": "C:\\Program Files\\7-Zip\\7zFM.exe"
+      }
+    }
+  ],
+  "SuccessCriteria": {
+    "Type": "fileExists",
+    "Path": "C:\\Program Files\\7-Zip\\7z.exe",
+    "ExpectedValue": true
+  }
+}

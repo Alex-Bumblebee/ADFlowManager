@@ -244,6 +244,12 @@ namespace ADFlowManager.UI
                 // Templates JSON (Singleton - après Settings)
                 services.AddSingleton<ITemplateService, TemplateService>();
 
+                // Computers & Deployment (Singleton - après Settings/Audit)
+                services.AddSingleton<IComputerService, ComputerService>();
+                services.AddSingleton<IPackageService, PackageService>();
+                services.AddSingleton<IPackageSigningService, PackageSigningService>();
+                services.AddSingleton<IDeploymentService, DeploymentService>();
+
                 services.AddScoped<IActiveDirectoryService, ActiveDirectoryService>();
                 services.AddSingleton<ICredentialService, CredentialService>();
 
@@ -277,6 +283,11 @@ namespace ADFlowManager.UI
                 services.AddSingleton<ViewModels.Pages.HistoriqueViewModel>();
                 services.AddSingleton<Views.Pages.TemplatesPage>();
                 services.AddSingleton<ViewModels.Pages.TemplatesViewModel>();
+                services.AddSingleton<Views.Pages.ComputersPage>();
+                services.AddSingleton<ViewModels.Pages.ComputersViewModel>();
+                services.AddSingleton<Views.Pages.PackageDeploymentPage>();
+                services.AddSingleton<ViewModels.Pages.PackageDeploymentViewModel>();
+                services.AddTransient<Views.Windows.ComputerDetailsWindow>();
             }).Build();
 
         /// <summary>

@@ -18,7 +18,7 @@ public class CacheService : ICacheService
     private readonly ISettingsService _settingsService;
     private const int DefaultTTL = 120;
     private const string SchemaVersionKey = "schema_version";
-    private const string CurrentSchemaVersion = "4"; // Incrémenter à chaque changement de schéma
+    private const string CurrentSchemaVersion = "5"; // Incrémenter à chaque changement de schéma
 
     public CacheService(ILogger<CacheService> logger, ISettingsService settingsService)
     {
@@ -237,6 +237,107 @@ public class CacheService : ICacheService
         }
     }
 
+    public async Task<List<Computer>?> GetCachedComputersAsync()
+    {
+        try
+        {
+            using var db = new CacheDbContext();
+
+            var ttl = (int)_settingsService.CurrentSettings.Cache.TtlMinutes;
+            if (!await IsCacheValidInternalAsync(db, "computers", ttl))
+            {
+                _logger.LogInformation("Cache computers expiré (> {TTL} min)", ttl);
+                return null;
+            }
+
+            var cached = await db.CachedComputers.AsNoTracking().ToListAsync();
+
+            if (cached.Count == 0)
+            {
+                _logger.LogInformation("Cache computers vide");
+                return null;
+            }
+
+            var computers = cached.Select(cc => new Computer
+            {
+                Name = cc.Name,
+                DistinguishedName = cc.DistinguishedName,
+                Description = cc.Description,
+                OperatingSystem = cc.OperatingSystem,
+                OperatingSystemVersion = cc.OperatingSystemVersion,
+                LastLogon = cc.LastLogon,
+                Enabled = cc.Enabled,
+                Location = cc.Location,
+                ManagedBy = cc.ManagedBy,
+                MemberOf = DeserializeMemberOf(cc.MemberOfJson),
+                Created = cc.Created,
+                Modified = cc.Modified,
+                IPv4Address = cc.IPv4Address,
+                MACAddress = cc.MACAddress,
+                IsOnline = false // Statut en ligne non persisté
+            }).ToList();
+
+            _logger.LogInformation("Cache computers valide : {Count} ordinateurs chargés", computers.Count);
+            return computers;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lecture cache computers");
+            return null;
+        }
+    }
+
+    public async Task CacheComputersAsync(List<Computer> computers)
+    {
+        try
+        {
+            _logger.LogInformation("Mise en cache de {Count} ordinateurs...", computers.Count);
+
+            using var db = new CacheDbContext();
+
+            await db.CachedComputers.ExecuteDeleteAsync();
+
+            var now = DateTime.Now;
+            var cachedComputers = computers.Select(c => new CachedComputer
+            {
+                Name = c.Name,
+                DistinguishedName = c.DistinguishedName,
+                Description = c.Description,
+                OperatingSystem = c.OperatingSystem,
+                OperatingSystemVersion = c.OperatingSystemVersion,
+                LastLogon = c.LastLogon,
+                Enabled = c.Enabled,
+                Location = c.Location,
+                ManagedBy = c.ManagedBy,
+                MemberOfJson = JsonSerializer.Serialize(c.MemberOf ?? []),
+                Created = c.Created,
+                Modified = c.Modified,
+                IPv4Address = c.IPv4Address,
+                MACAddress = c.MACAddress,
+                CachedAt = now
+            }).ToList();
+
+            await db.CachedComputers.AddRangeAsync(cachedComputers);
+
+            var metadata = await db.CacheMetadata.FindAsync("computers");
+            if (metadata == null)
+            {
+                metadata = new CacheMetadata { Key = "computers" };
+                db.CacheMetadata.Add(metadata);
+            }
+            metadata.LastRefresh = now;
+            metadata.ItemCount = computers.Count;
+
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("Cache computers mis à jour : {Count} ordinateurs", computers.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur mise en cache computers");
+        }
+    }
+
     public async Task CacheUserAsync(User user)
     {
         try
@@ -306,6 +407,7 @@ public class CacheService : ICacheService
 
             await db.CachedUsers.ExecuteDeleteAsync();
             await db.CachedGroups.ExecuteDeleteAsync();
+            await db.CachedComputers.ExecuteDeleteAsync();
             await db.CacheMetadata.ExecuteDeleteAsync();
 
             _logger.LogInformation("Cache vidé avec succès");
@@ -339,6 +441,7 @@ public class CacheService : ICacheService
 
             var usersMeta = await db.CacheMetadata.AsNoTracking().FirstOrDefaultAsync(m => m.Key == "users");
             var groupsMeta = await db.CacheMetadata.AsNoTracking().FirstOrDefaultAsync(m => m.Key == "groups");
+            var computersMeta = await db.CacheMetadata.AsNoTracking().FirstOrDefaultAsync(m => m.Key == "computers");
 
             if (usersMeta != null)
             {
@@ -350,6 +453,12 @@ public class CacheService : ICacheService
             {
                 stats.GroupsLastRefresh = groupsMeta.LastRefresh;
                 stats.GroupsCount = groupsMeta.ItemCount;
+            }
+
+            if (computersMeta != null)
+            {
+                stats.ComputersLastRefresh = computersMeta.LastRefresh;
+                stats.ComputersCount = computersMeta.ItemCount;
             }
         }
         catch (Exception ex)
@@ -419,5 +528,20 @@ public class CacheService : ICacheService
         public string? GroupName { get; set; }
         public string? Description { get; set; }
         public string? DistinguishedName { get; set; }
+    }
+
+    private static List<string> DeserializeMemberOf(string json)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(json) || json == "[]")
+                return [];
+
+            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        }
+        catch
+        {
+            return [];
+        }
     }
 }

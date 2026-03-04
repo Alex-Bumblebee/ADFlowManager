@@ -40,6 +40,9 @@
   <data name="Nav_History" xml:space="preserve"><value>History</value></data>
   <data name="Nav_Templates" xml:space="preserve"><value>Templates</value></data>
   <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_SectionDirectory" xml:space="preserve"><value>Directory</value></data>
+  <data name="Nav_SectionActions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Nav_SectionTools" xml:space="preserve"><value>Tools</value></data>
 
   <!-- ===== DASHBOARD ===== -->
   <data name="Dashboard_Version" xml:space="preserve"><value>Version</value></data>
@@ -324,10 +327,11 @@ Check complexity and minimum length requirements.</value></data>
   <data name="Settings_EmailDomain" xml:space="preserve"><value>Custom Email Domain (optional)</value></data>
   <data name="Settings_EmailDomainDesc" xml:space="preserve"><value>If set (e.g. example.com), will be used for email and UPN instead of the default AD domain.</value></data>
   <data name="Settings_CacheTitle" xml:space="preserve"><value>SQLite Cache</value></data>
-  <data name="Settings_CacheDesc" xml:space="preserve"><value>The cache speeds up loading of users and groups. Data is automatically refreshed according to the configured TTL.</value></data>
+  <data name="Settings_CacheDesc" xml:space="preserve"><value>The cache speeds up loading of users, groups and computers. Data is automatically refreshed according to the configured TTL.</value></data>
   <data name="Settings_LastRefresh" xml:space="preserve"><value>LAST REFRESH</value></data>
   <data name="Settings_CacheUsers" xml:space="preserve"><value>USERS</value></data>
   <data name="Settings_CacheGroups" xml:space="preserve"><value>GROUPS</value></data>
+  <data name="Settings_CacheComputers" xml:space="preserve"><value>COMPUTERS</value></data>
   <data name="Settings_InCache" xml:space="preserve"><value> cached</value></data>
   <data name="Settings_ClearCache" xml:space="preserve"><value>Clear Cache</value></data>
   <data name="Settings_RefreshNow" xml:space="preserve"><value>Refresh Now</value></data>
@@ -452,6 +456,190 @@ Current settings will be replaced.</value></data>
   <data name="Common_Info" xml:space="preserve"><value>Information</value></data>
   <data name="Common_Select" xml:space="preserve"><value>Select</value></data>
 
+  <!-- ===== COMPUTERS PAGE ===== -->
+  <data name="Nav_Computers" xml:space="preserve"><value>Computers</value></data>
+  <data name="Nav_Packages" xml:space="preserve"><value>Packages</value></data>
+  <data name="Computers_SearchPlaceholder" xml:space="preserve"><value>Search a computer...</value></data>
+  <data name="Computers_ComputerCount" xml:space="preserve"><value> computers</value></data>
+  <data name="Computers_CheckStatuses" xml:space="preserve"><value>Check statuses</value></data>
+  <data name="Computers_RefreshTooltip" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Computers_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="Computers_ColVersion" xml:space="preserve"><value>Version</value></data>
+  <data name="Computers_ColLastLogon" xml:space="preserve"><value>Last logon</value></data>
+  <data name="Computers_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Computers_SelectComputer" xml:space="preserve"><value>Select a computer</value></data>
+  <data name="Computers_ToViewDetails" xml:space="preserve"><value>to view details</value></data>
+  <data name="Computers_Information" xml:space="preserve"><value>INFORMATION</value></data>
+  <data name="Computers_VersionOS" xml:space="preserve"><value>OS Version</value></data>
+  <data name="Computers_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Computers_Location" xml:space="preserve"><value>Location</value></data>
+  <data name="Computers_LastLogon" xml:space="preserve"><value>Last logon</value></data>
+  <data name="Computers_DN" xml:space="preserve"><value>Distinguished Name</value></data>
+  <data name="Computers_Dates" xml:space="preserve"><value>DATES</value></data>
+  <data name="Computers_CreatedAt" xml:space="preserve"><value>Created on</value></data>
+  <data name="Computers_ModifiedAt" xml:space="preserve"><value>Modified on</value></data>
+  <data name="Computers_Actions" xml:space="preserve"><value>ACTIONS</value></data>
+  <data name="Computers_CheckStatus" xml:space="preserve"><value>Check status</value></data>
+  <data name="Computers_OpenDetails" xml:space="preserve"><value>Open details</value></data>
+  <data name="Computers_ShowingOf" xml:space="preserve"><value>Showing</value></data>
+  <data name="Computers_ComputerWord" xml:space="preserve"><value> computers</value></data>
+  <data name="Computers_LoadingComputers" xml:space="preserve"><value>Loading computers...</value></data>
+  <data name="Computers_CheckingStatuses" xml:space="preserve"><value>Checking statuses...</value></data>
+
+  <!-- ===== PACKAGES / DEPLOYMENT PAGE ===== -->
+  <data name="Packages_PackageCount" xml:space="preserve"><value> packages</value></data>
+  <data name="Packages_Selected" xml:space="preserve"><value> selected</value></data>
+  <data name="Packages_Deploy" xml:space="preserve"><value>Deploy</value></data>
+  <data name="Packages_AvailablePackages" xml:space="preserve"><value>Available packages</value></data>
+  <data name="Packages_SearchPlaceholder" xml:space="preserve"><value>Search a package...</value></data>
+  <data name="Packages_PCSearchPlaceholder" xml:space="preserve"><value>Search a computer...</value></data>
+  <data name="Packages_TargetComputers" xml:space="preserve"><value>Target computers</value></data>
+  <data name="Packages_SelectPCsForDeployment" xml:space="preserve"><value>Select PCs for deployment</value></data>
+  <data name="Packages_SelectAll" xml:space="preserve"><value>All</value></data>
+  <data name="Packages_DeselectAll" xml:space="preserve"><value>None</value></data>
+  <data name="Packages_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="Packages_ColSystem" xml:space="preserve"><value>System</value></data>
+  <data name="Packages_ColDescription" xml:space="preserve"><value>Description</value></data>
+  <data name="Packages_AvailableComputers" xml:space="preserve"><value> available computers</value></data>
+  <data name="Packages_DeployCompleted" xml:space="preserve"><value>Completed: {0}/{1} succeeded</value></data>
+  <data name="Packages_DeployResultTitle" xml:space="preserve"><value>Deployment Results</value></data>
+  <data name="Packages_DeployResultMessage" xml:space="preserve"><value>Deployment completed:
+
+Succeeded: {0}/{1}
+Failed: {2}</value></data>
+  <data name="Packages_DeployError" xml:space="preserve"><value>Deployment error:
+{0}</value></data>
+  <data name="Packages_DeleteConfirm" xml:space="preserve"><value>Delete package "{0}"?</value></data>
+  <data name="Packages_DeployMultiConfirm" xml:space="preserve"><value>You are about to deploy {0} package(s) ({1}) to {2} computer(s). This action is irreversible. Continue?</value></data>
+  <data name="Packages_TimeoutRunningTitle" xml:space="preserve"><value>Timeout — installation may have succeeded</value></data>
+  <data name="Packages_TimeoutRunningNote" xml:space="preserve"><value>⚠ The timeout was exceeded but the installer was still running on these PCs (installation probably succeeded):</value></data>
+  <data name="Packages_TimeoutRunningOffer" xml:space="preserve"><value>Deploying "{0}" to {1} exceeded the timeout ({2}s) but the installer was still running.
+
+The installation probably succeeded. Do you want to increase the timeout to {3}s for this package?</value></data>
+
+  <!-- ===== COMPUTER DETAILS WINDOW ===== -->
+  <data name="ComputerDetails_Title" xml:space="preserve"><value>Computer Details</value></data>
+  <data name="ComputerDetails_TabGeneral" xml:space="preserve"><value>General</value></data>
+  <data name="ComputerDetails_TabSystem" xml:space="preserve"><value>System</value></data>
+  <data name="ComputerDetails_TabGroups" xml:space="preserve"><value>Groups</value></data>
+  <data name="ComputerDetails_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ComputerDetails_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="ComputerDetails_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="ComputerDetails_Location" xml:space="preserve"><value>Location</value></data>
+  <data name="ComputerDetails_ManagedBy" xml:space="preserve"><value>Managed by</value></data>
+  <data name="ComputerDetails_DN" xml:space="preserve"><value>Distinguished Name</value></data>
+  <data name="ComputerDetails_CreatedAt" xml:space="preserve"><value>Created on</value></data>
+  <data name="ComputerDetails_ModifiedAt" xml:space="preserve"><value>Modified on</value></data>
+  <data name="ComputerDetails_OperatingSystem" xml:space="preserve"><value>Operating system</value></data>
+  <data name="ComputerDetails_Version" xml:space="preserve"><value>Version</value></data>
+  <data name="ComputerDetails_LastLogon" xml:space="preserve"><value>Last logon</value></data>
+  <data name="ComputerDetails_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="ComputerDetails_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="ComputerDetails_Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="ComputerDetails_NoGroups" xml:space="preserve"><value>No groups</value></data>
+
+  <!-- ===== CREATE PACKAGE DIALOG ===== -->
+  <data name="CreatePackage_Title" xml:space="preserve"><value>Create a package</value></data>
+  <data name="CreatePackage_Subtitle" xml:space="preserve"><value>Define the deployment package properties</value></data>
+  <data name="CreatePackage_TabGeneral" xml:space="preserve"><value>General</value></data>
+  <data name="CreatePackage_TabInstaller" xml:space="preserve"><value>Installer</value></data>
+  <data name="CreatePackage_TabAdvanced" xml:space="preserve"><value>Advanced</value></data>
+  <data name="CreatePackage_Name" xml:space="preserve"><value>Package name *</value></data>
+  <data name="CreatePackage_NameHint" xml:space="preserve"><value>E.g.: Google Chrome, 7-Zip</value></data>
+  <data name="CreatePackage_Version" xml:space="preserve"><value>Version *</value></data>
+  <data name="CreatePackage_VersionHint" xml:space="preserve"><value>E.g.: 1.0.0</value></data>
+  <data name="CreatePackage_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="CreatePackage_CategoryHint" xml:space="preserve"><value>E.g.: Browsers, Utilities</value></data>
+  <data name="CreatePackage_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="CreatePackage_DescriptionHint" xml:space="preserve"><value>Package description...</value></data>
+  <data name="CreatePackage_Author" xml:space="preserve"><value>Author</value></data>
+  <data name="CreatePackage_AuthorHint" xml:space="preserve"><value>E.g.: IT Team</value></data>
+  <data name="CreatePackage_Tags" xml:space="preserve"><value>Tags</value></data>
+  <data name="CreatePackage_TagsHint" xml:space="preserve"><value>Comma-separated</value></data>
+  <data name="CreatePackage_InstallerType" xml:space="preserve"><value>Installer type</value></data>
+  <data name="CreatePackage_Timeout" xml:space="preserve"><value>Timeout (seconds)</value></data>
+  <data name="CreatePackage_InstallerPath" xml:space="preserve"><value>Installer path</value></data>
+  <data name="CreatePackage_InstallerPathHint" xml:space="preserve"><value>\\server\share\setup.exe</value></data>
+  <data name="CreatePackage_Browse" xml:space="preserve"><value>Browse</value></data>
+  <data name="CreatePackage_BrowseInstallerTitle" xml:space="preserve"><value>Select installer</value></data>
+  <data name="CreatePackage_Arguments" xml:space="preserve"><value>Installation arguments</value></data>
+  <data name="CreatePackage_ArgumentsHint" xml:space="preserve"><value>E.g.: /S /silent /norestart</value></data>
+  <data name="CreatePackage_RunAsSystem" xml:space="preserve"><value>Run as SYSTEM</value></data>
+  <data name="CreatePackage_SystemInfo" xml:space="preserve"><value>Installation always runs as LOCAL SYSTEM via a temporary Windows service</value></data>
+  <data name="CreatePackage_InstallerHash" xml:space="preserve"><value>Installer SHA-256 hash</value></data>
+  <data name="CreatePackage_HashPlaceholder" xml:space="preserve"><value>Automatically computed when a file is selected</value></data>
+  <data name="CreatePackage_HashComputing" xml:space="preserve"><value>Computing hash...</value></data>
+  <data name="Packages_DeployBatchConfirm" xml:space="preserve"><value>You are about to deploy "{1}" to {0} computers. This action is irreversible. Continue?</value></data>
+  <data name="CreatePackage_Requirements" xml:space="preserve"><value>REQUIREMENTS</value></data>
+  <data name="CreatePackage_Architecture" xml:space="preserve"><value>Architecture</value></data>
+  <data name="CreatePackage_MinWindows" xml:space="preserve"><value>Minimum Windows version</value></data>
+  <data name="CreatePackage_MinWindowsHint" xml:space="preserve"><value>E.g.: 10.0.19041</value></data>
+  <data name="CreatePackage_MinDisk" xml:space="preserve"><value>Min. disk space (MB)</value></data>
+  <data name="CreatePackage_MinRam" xml:space="preserve"><value>Min. RAM (MB)</value></data>
+  <data name="CreatePackage_StepsJson" xml:space="preserve"><value>Deployment steps (JSON)</value></data>
+  <data name="CreatePackage_StepsJsonDesc" xml:space="preserve"><value>Define steps: preCheck, install, postInstall, cleanup. JSON array format.</value></data>
+  <data name="CreatePackage_CriteriaJson" xml:space="preserve"><value>Success criteria (JSON)</value></data>
+  <data name="CreatePackage_CriteriaJsonDesc" xml:space="preserve"><value>Type: fileExists, registryKey, exitCode. Single JSON object.</value></data>
+  <data name="CreatePackage_ImportJson" xml:space="preserve"><value>Import full JSON</value></data>
+  <data name="CreatePackage_ImportJsonTitle" xml:space="preserve"><value>Import JSON package</value></data>
+  <data name="CreatePackage_ImportSuccess" xml:space="preserve"><value>JSON imported successfully</value></data>
+  <data name="CreatePackage_ImportError" xml:space="preserve"><value>JSON import error</value></data>
+  <data name="CreatePackage_ValidationRequired" xml:space="preserve"><value>Name and version are required</value></data>
+  <data name="CreatePackage_InvalidStepsJson" xml:space="preserve"><value>Invalid steps JSON</value></data>
+  <data name="CreatePackage_InvalidCriteriaJson" xml:space="preserve"><value>Invalid criteria JSON</value></data>
+  <data name="CreatePackage_Create" xml:space="preserve"><value>Create package</value></data>
+  <data name="CreatePackage_AutoDetectSuccess" xml:space="preserve"><value>Auto-detected information: {0}</value></data>
+  <data name="CreatePackage_AutoDetectPartial" xml:space="preserve"><value>Partial detection — only the file name was retrieved</value></data>
+  <data name="CreatePackage_AutoDetectDone" xml:space="preserve"><value>Metadata detected</value></data>
+  <data name="CreatePackage_AutoDetectPS1" xml:space="preserve"><value>PowerShell script detected — type set automatically</value></data>
+  <data name="CreatePackage_TimeoutHint" xml:space="preserve"><value>0 = automatic based on file size</value></data>
+  <data name="CreatePackage_FrameworkDetected" xml:space="preserve"><value>{0} detected → suggested args: {1}</value></data>
+  <data name="CreatePackage_StepsWarning" xml:space="preserve"><value>Custom steps are saved in the package but are not yet executed by the deployment engine. This field is reserved for a future version.</value></data>
+  <data name="CreatePackage_CriteriaWarning" xml:space="preserve"><value>Only the "fileExists" criterion is currently checked after installation. The registryKey and exitCode types are ignored.</value></data>
+
+  <!-- Package editing -->
+  <data name="CreatePackage_EditTitle" xml:space="preserve"><value>Edit package</value></data>
+  <data name="CreatePackage_EditSubtitle" xml:space="preserve"><value>Modify the deployment package properties</value></data>
+  <data name="CreatePackage_Save" xml:space="preserve"><value>Save changes</value></data>
+  <data name="CreatePackage_EditLoaded" xml:space="preserve"><value>Package loaded for editing</value></data>
+  <data name="CreatePackage_OwnerBadge" xml:space="preserve"><value>You are the owner of this package</value></data>
+  <data name="CreatePackage_OwnerBadgeKey" xml:space="preserve"><value>Signing key: ...{0}</value></data>
+  <data name="Packages_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Packages_EditNoKey" xml:space="preserve"><value>This package is signed. You must hold the signing key to modify it.</value></data>
+
+  <!-- ===== DEPLOY CONFIRM DIALOG ===== -->
+  <data name="DeployConfirm_Title" xml:space="preserve"><value>Confirm deployment</value></data>
+  <data name="DeployConfirm_SummaryOne" xml:space="preserve"><value>Deploy {0} to {1}</value></data>
+  <data name="DeployConfirm_SummaryMany" xml:space="preserve"><value>Deploy {0} package(s) to {1} computer(s)</value></data>
+  <data name="DeployConfirm_SubtitleOnePkg" xml:space="preserve"><value>{0} v{1}</value></data>
+  <data name="DeployConfirm_SubtitleMultiPkg" xml:space="preserve"><value>{0} packages to deploy</value></data>
+  <data name="DeployConfirm_Deployments" xml:space="preserve"><value> deployment(s)</value></data>
+  <data name="DeployConfirm_PackagesHeader" xml:space="preserve"><value>{0} package(s)</value></data>
+  <data name="DeployConfirm_ComputersHeader" xml:space="preserve"><value>{0} computer(s)</value></data>
+  <data name="DeployConfirm_TimeoutAuto" xml:space="preserve"><value>auto</value></data>
+  <data name="DeployConfirm_EstimatedTime" xml:space="preserve"><value>Estimated time: {0}</value></data>
+  <data name="DeployConfirm_Irreversible" xml:space="preserve"><value>This action is irreversible. Verify your selection before confirming.</value></data>
+  <data name="DeployConfirm_Deploy" xml:space="preserve"><value>Deploy</value></data>
+
+  <!-- ===== DEPLOY RESULTS DIALOG ===== -->
+  <data name="DeployResults_Title" xml:space="preserve"><value>Deployment Results</value></data>
+  <data name="DeployResults_Success" xml:space="preserve"><value>Success</value></data>
+  <data name="DeployResults_RebootRequired" xml:space="preserve"><value>Success — reboot required</value></data>
+  <data name="DeployResults_Timeout" xml:space="preserve"><value>Timed out</value></data>
+  <data name="DeployResults_TimeoutProbablyOk" xml:space="preserve"><value>Timed out — likely installed</value></data>
+  <data name="DeployResults_FileLocked" xml:space="preserve"><value>File locked</value></data>
+  <data name="DeployResults_IntegrityError" xml:space="preserve"><value>Integrity error</value></data>
+  <data name="DeployResults_ConnectionError" xml:space="preserve"><value>Connection error</value></data>
+  <data name="DeployResults_Error" xml:space="preserve"><value>Failed</value></data>
+  <data name="DeployResults_HintFileLocked" xml:space="preserve"><value>Manually clean C:\Windows\ADFlowManager\Deploy on {0} then retry.</value></data>
+  <data name="DeployResults_HintTimeoutOk" xml:space="preserve"><value>Installation likely completed. Check to double the timeout.</value></data>
+  <data name="DeployResults_HintTimeout" xml:space="preserve"><value>Verify manually if the application is installed on {0}. Check to double the timeout.</value></data>
+  <data name="DeployResults_HintResidual" xml:space="preserve"><value>⚠ Residual files: {0}</value></data>
+  <data name="DeployResults_TimeoutOffer" xml:space="preserve"><value>Double timeout → {0}s</value></data>
+  <data name="DeployResults_TimeoutSaved" xml:space="preserve"><value>Timeouts updated for {0} package(s)</value></data>
+  <data name="DeployResults_Summary" xml:space="preserve"><value>{0} success, {1} warning(s), {2} failure(s)</value></data>
+  <data name="DeployResults_Close" xml:space="preserve"><value>Close</value></data>
+
   <!-- ===== MESSAGES ===== -->
   <data name="Msg_UserCreatedSuccess" xml:space="preserve"><value>User created successfully!</value></data>
   <data name="Msg_UserCreatedError" xml:space="preserve"><value>Error creating user</value></data>
@@ -480,5 +668,43 @@ Current settings will be replaced.</value></data>
   <data name="CreateUser_TemplateSaveError" xml:space="preserve"><value>Unable to save the template. Check the logs for details.</value></data>
   <data name="CreateUser_ErrorInvalidName" xml:space="preserve"><value>First name or last name contains unauthorized characters</value></data>
   <data name="Settings_InvalidPath" xml:space="preserve"><value>The path "{0}" contains forbidden sequences (.., ~). Please use an absolute path.</value></data>
+
+  <!-- ===== DEPLOYMENT SETTINGS ===== -->
+  <data name="Settings_Deployment" xml:space="preserve"><value>Deployment</value></data>
+  <data name="Settings_PackageStorage" xml:space="preserve"><value>Package Storage</value></data>
+  <data name="Settings_PackageStorageDesc" xml:space="preserve"><value>Packages are stored locally in AppData. An optional network path allows sharing packages between workstations.</value></data>
+  <data name="Settings_PackageStorageLocal" xml:space="preserve"><value>Local Folder (AppData)</value></data>
+  <data name="Settings_PackageStorageNetwork" xml:space="preserve"><value>Shared Network Path (optional)</value></data>
+  <data name="Settings_PackageStorageNetworkHint" xml:space="preserve"><value>Example: \\server\share\ADFlowManager\Packages</value></data>
+  <data name="Settings_SigningSection" xml:space="preserve"><value>Package Signing</value></data>
+  <data name="Settings_SigningDesc" xml:space="preserve"><value>ECDSA signing ensures package integrity and authenticity. Signed packages are automatically verified before each deployment.</value></data>
+  <data name="Settings_SigningKeyPresent" xml:space="preserve"><value>Signing key available</value></data>
+  <data name="Settings_SigningKeyAbsent" xml:space="preserve"><value>No signing key configured</value></data>
+  <data name="Settings_SigningThumbprint" xml:space="preserve"><value>Thumbprint: {0}</value></data>
+  <data name="Settings_GenerateKey" xml:space="preserve"><value>Generate Key</value></data>
+  <data name="Settings_ExportKey" xml:space="preserve"><value>Export (PFX)</value></data>
+  <data name="Settings_ImportKey" xml:space="preserve"><value>Import (PFX)</value></data>
+  <data name="Settings_DeleteKey" xml:space="preserve"><value>Delete Key</value></data>
+  <data name="Settings_GenerateKeyConfirm" xml:space="preserve"><value>Generate a new ECDSA P-256 key? The existing key will be replaced if present.</value></data>
+  <data name="Settings_DeleteKeyConfirm" xml:space="preserve"><value>Delete the signing key? Already signed packages will no longer be verifiable.</value></data>
+  <data name="Settings_ImportKeyReplaceConfirm" xml:space="preserve"><value>A signing key is already configured. Importing will replace it — packages signed with the old key will no longer be verifiable. Continue?</value></data>
+  <data name="Settings_KeyGenerated" xml:space="preserve"><value>ECDSA signing key generated successfully.</value></data>
+  <data name="Settings_KeyDeleted" xml:space="preserve"><value>Signing key deleted.</value></data>
+  <data name="Settings_KeyExported" xml:space="preserve"><value>Key exported to {0}</value></data>
+  <data name="Settings_KeyImported" xml:space="preserve"><value>Key imported successfully.</value></data>
+  <data name="Settings_PfxPassword" xml:space="preserve"><value>PFX Password (min. 8 characters)</value></data>
+  <data name="Settings_DeploymentLimits" xml:space="preserve"><value>Deployment Limits</value></data>
+  <data name="Settings_DeploymentLimitsDesc" xml:space="preserve"><value>Controls the maximum number of simultaneous deployments across the entire system.</value></data>
+  <data name="Settings_MaxGlobalDeployments" xml:space="preserve"><value>Maximum Simultaneous Deployments</value></data>
+  <data name="Settings_MaxGlobalDeploymentsHint" xml:space="preserve"><value>All batches combined. Takes effect on restart. (default: 15)</value></data>
+  <data name="Settings_DeploymentRestartNote" xml:space="preserve"><value>⚠ This setting takes effect on application restart.</value></data>
+
+  <!-- VULN-01 / VULN-14 -->
+  <data name="Settings_RequireSignedPackages" xml:space="preserve"><value>Require package signatures</value></data>
+  <data name="Settings_RequireSignedPackagesDesc" xml:space="preserve"><value>When enabled, only packages with a valid ECDSA signature can be deployed. Unsigned or invalid-signature packages will be blocked.</value></data>
+  <data name="Packages_SignatureValid" xml:space="preserve"><value>Signed ✓</value></data>
+  <data name="Packages_SignatureInvalid" xml:space="preserve"><value>Invalid signature</value></data>
+  <data name="Packages_Unsigned" xml:space="preserve"><value>Unsigned</value></data>
+  <data name="Deploy_UnsignedBlocked" xml:space="preserve"><value>Deploying unsigned packages is prohibited. Enable signing or disable the requirement in settings.</value></data>
 
 </root>
