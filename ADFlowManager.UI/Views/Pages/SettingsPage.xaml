@@ -277,6 +277,46 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Déploiement -->
+                    <Border Tag="6" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                        <Setter Property="Background" Value="#1A8B5CF6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="ArrowUpload24" FontSize="16" Margin="0,0,10,0">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                                <Setter Property="Foreground" Value="#8B5CF6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{ext:Localized Settings_Deployment}" FontSize="14" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#A1A1AA" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                                <Setter Property="Foreground" Value="#F5F5F5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Création Utilisateur -->
                     <Border Tag="7" Cursor="Hand" MouseLeftButtonDown="SidebarItem_Click" CornerRadius="6" Padding="12,10" Margin="0,0,0,2">
                         <Border.Style>
@@ -629,6 +669,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0">
@@ -661,6 +702,18 @@
                                             Foreground="#8B5CF6"
                                             Margin="0,6,0,0">
                                             <Run Text="{Binding ViewModel.CachedGroupsCount, Mode=OneWay}" />
+                                            <Run Text="{ext:Localized Settings_InCache}" Foreground="#A1A1AA" />
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3" Margin="16,0,0,0">
+                                        <TextBlock Text="{ext:Localized Settings_CacheComputers}" FontSize="10" FontWeight="Bold" Foreground="#71717A" />
+                                        <TextBlock
+                                            FontSize="15"
+                                            FontWeight="SemiBold"
+                                            Foreground="#8B5CF6"
+                                            Margin="0,6,0,0">
+                                            <Run Text="{Binding ViewModel.CachedComputersCount, Mode=OneWay}" />
                                             <Run Text="{ext:Localized Settings_InCache}" Foreground="#A1A1AA" />
                                         </TextBlock>
                                     </StackPanel>
@@ -995,6 +1048,206 @@
                                     <ui:SymbolIcon Symbol="Folder24" />
                                 </ui:Button.Icon>
                             </ui:Button>
+                        </StackPanel>
+
+                        <!-- ===== TAB 6 : DÉPLOIEMENT ===== -->
+                        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ViewModel.SelectedTab}" Value="6">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{ext:Localized Settings_Deployment}" FontSize="24" FontWeight="Bold" Foreground="#F5F5F5" Margin="0,0,0,24" />
+
+                            <!-- === Section : Stockage des packages === -->
+                            <StackPanel Margin="0,0,0,32">
+                                <TextBlock Text="{ext:Localized Settings_PackageStorage}" FontSize="18" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                                <TextBlock Text="{ext:Localized Settings_PackageStorageDesc}" FontSize="13" Foreground="#A1A1AA" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+                                <!-- Local path (readonly) -->
+                                <TextBlock Text="{ext:Localized Settings_PackageStorageLocal}" FontSize="14" Foreground="#D4D4D8" Margin="0,0,0,6" />
+                                <TextBox
+                                    Text="{Binding ViewModel.PackageLocalPath, Mode=OneWay}"
+                                    IsReadOnly="True"
+                                    Height="40"
+                                    Background="#252526"
+                                    Foreground="#71717A"
+                                    BorderBrush="#3F3F46"
+                                    Margin="0,0,0,16" />
+
+                                <!-- Network path -->
+                                <TextBlock Text="{ext:Localized Settings_PackageStorageNetwork}" FontSize="14" Foreground="#D4D4D8" Margin="0,0,0,6" />
+                                <TextBox
+                                    Text="{Binding ViewModel.NetworkPackagesPath, UpdateSourceTrigger=PropertyChanged}"
+                                    Height="40"
+                                    Background="#2D2D30"
+                                    Foreground="#F5F5F5"
+                                    BorderBrush="#3F3F46" />
+                                <TextBlock Text="{ext:Localized Settings_PackageStorageNetworkHint}" FontSize="12" Foreground="#71717A" Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <!-- === Section : Signature des packages === -->
+                            <StackPanel Margin="0,0,0,32">
+                                <TextBlock Text="{ext:Localized Settings_SigningSection}" FontSize="18" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                                <TextBlock Text="{ext:Localized Settings_SigningDesc}" FontSize="13" Foreground="#A1A1AA" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+                                <!-- Key status -->
+                                <Border
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,16">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#1A22C55E" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ViewModel.IsSigningKeyAvailable}" Value="False">
+                                                    <Setter Property="Background" Value="#1AEF4444" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Ellipse Width="10" Height="10" Margin="0,0,8,0">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="#22C55E" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ViewModel.IsSigningKeyAvailable}" Value="False">
+                                                                <Setter Property="Fill" Value="#EF4444" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="{ext:Localized Settings_SigningKeyPresent}" />
+                                                        <Setter Property="Foreground" Value="#22C55E" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ViewModel.IsSigningKeyAvailable}" Value="False">
+                                                                <Setter Property="Text" Value="{ext:Localized Settings_SigningKeyAbsent}" />
+                                                                <Setter Property="Foreground" Value="#EF4444" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <TextBlock
+                                            Text="{Binding ViewModel.SigningKeyThumbprint}"
+                                            FontSize="12"
+                                            Foreground="#71717A"
+                                            FontFamily="Consolas"
+                                            Visibility="{Binding ViewModel.IsSigningKeyAvailable, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Key management buttons -->
+                                <WrapPanel Orientation="Horizontal">
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_GenerateKey}"
+                                        Command="{Binding ViewModel.GenerateSigningKeyCommand}"
+                                        Appearance="Primary"
+                                        Margin="0,0,8,8"
+                                        Padding="16,0"
+                                        HorizontalAlignment="Left">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Key24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_ExportKey}"
+                                        Command="{Binding ViewModel.ExportSigningKeyCommand}"
+                                        IsEnabled="{Binding ViewModel.IsSigningKeyAvailable}"
+                                        Margin="0,0,8,8"
+                                        Padding="16,0"
+                                        HorizontalAlignment="Left">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="ArrowDownload24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_ImportKey}"
+                                        Command="{Binding ViewModel.ImportSigningKeyCommand}"
+                                        Margin="0,0,8,8"
+                                        Padding="16,0"
+                                        HorizontalAlignment="Left">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="ArrowUpload24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    <ui:Button
+                                        Content="{ext:Localized Settings_DeleteKey}"
+                                        Command="{Binding ViewModel.DeleteSigningKeyCommand}"
+                                        IsEnabled="{Binding ViewModel.IsSigningKeyAvailable}"
+                                        Appearance="Danger"
+                                        Margin="0,0,8,8"
+                                        Padding="16,0"
+                                        HorizontalAlignment="Left">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Delete24" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </WrapPanel>
+
+                                <!-- Require signed packages toggle -->
+                                <Border
+                                    CornerRadius="8"
+                                    Background="#1A3B82F6"
+                                    Padding="16"
+                                    Margin="0,16,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock
+                                                Text="{ext:Localized Settings_RequireSignedPackages}"
+                                                FontSize="14"
+                                                FontWeight="SemiBold"
+                                                Foreground="#F5F5F5" />
+                                            <TextBlock
+                                                Text="{ext:Localized Settings_RequireSignedPackagesDesc}"
+                                                FontSize="12"
+                                                Foreground="#71717A"
+                                                TextWrapping="Wrap"
+                                                Margin="0,4,0,0" />
+                                        </StackPanel>
+                                        <ui:ToggleSwitch
+                                            Grid.Column="1"
+                                            IsChecked="{Binding ViewModel.RequireSignedPackages}"
+                                            VerticalAlignment="Center"
+                                            Margin="16,0,0,0" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- === Section : Limites de déploiement === -->
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{ext:Localized Settings_DeploymentLimits}" FontSize="18" FontWeight="SemiBold" Foreground="#F5F5F5" Margin="0,0,0,8" />
+                                <TextBlock Text="{ext:Localized Settings_DeploymentLimitsDesc}" FontSize="13" Foreground="#A1A1AA" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+                                <TextBlock Text="{ext:Localized Settings_MaxGlobalDeployments}" FontSize="14" Foreground="#D4D4D8" Margin="0,0,0,6" />
+                                <ui:NumberBox
+                                    Value="{Binding ViewModel.MaxGlobalDeployments}"
+                                    Minimum="1"
+                                    Maximum="50"
+                                    SpinButtonPlacementMode="Compact"
+                                    Height="40"
+                                    HorizontalAlignment="Left"
+                                    Width="200" />
+                                <TextBlock Text="{ext:Localized Settings_MaxGlobalDeploymentsHint}" FontSize="12" Foreground="#71717A" Margin="0,4,0,8" />
+                                <TextBlock Text="{ext:Localized Settings_DeploymentRestartNote}" FontSize="12" Foreground="#F59E0B" />
+                            </StackPanel>
                         </StackPanel>
 
                         <!-- ===== TAB 7 : CRÉATION UTILISATEUR ===== -->

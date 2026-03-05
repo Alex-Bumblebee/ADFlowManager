@@ -9,6 +9,7 @@ public class CacheDbContext : DbContext
 
     public DbSet<CachedUser> CachedUsers { get; set; }
     public DbSet<CachedGroup> CachedGroups { get; set; }
+    public DbSet<CachedComputer> CachedComputers { get; set; }
     public DbSet<CacheMetadata> CacheMetadata { get; set; }
 
     public CacheDbContext()
@@ -34,5 +35,8 @@ public class CacheDbContext : DbContext
 
         modelBuilder.Entity<CachedGroup>()
             .HasIndex(g => g.CachedAt);
+
+        modelBuilder.Entity<CachedComputer>()
+            .HasIndex(c => c.CachedAt);
     }
 }

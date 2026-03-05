@@ -1,0 +1,45 @@
+{
+  "Name": "Notepad++",
+  "Version": "8.6.4",
+  "Description": "Éditeur de texte et de code source léger, avec coloration syntaxique et plugins.",
+  "Category": "Développement",
+  "Author": "Équipe IT",
+  "Tags": ["éditeur", "code", "texte", "développement"],
+  "Installer": {
+    "Type": "exe",
+    "Path": "\\\\SERVEUR-FICHIERS\\Partage$\\Logiciels\\NotepadPP\\npp.8.6.4.Installer.x64.exe",
+    "Arguments": "/S",
+    "InstallerHash": "",
+    "TimeoutSeconds": 0
+  },
+  "Requirements": {
+    "MinWindowsVersion": "10.0.17763",
+    "Architecture": "x64",
+    "MinDiskSpaceMB": 30,
+    "MinRamMB": 256
+  },
+  "Steps": [
+    {
+      "Order": 1,
+      "Type": "preCheck",
+      "Action": "checkProcess",
+      "Parameters": {
+        "processName": "notepad++",
+        "action": "warn"
+      }
+    },
+    {
+      "Order": 2,
+      "Type": "install",
+      "Action": "execute",
+      "Parameters": {
+        "waitForExit": true
+      }
+    }
+  ],
+  "SuccessCriteria": {
+    "Type": "fileExists",
+    "Path": "C:\\Program Files\\Notepad++\\notepad++.exe",
+    "ExpectedValue": true
+  }
+}

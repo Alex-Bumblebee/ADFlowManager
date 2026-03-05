@@ -22,6 +22,8 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly ICacheService _cacheService;
     private readonly IActiveDirectoryService _adService;
+    private readonly IComputerService _computerService;
+    private readonly IPackageSigningService _signingService;
     private readonly ILocalizationService _localization;
     private readonly UsersViewModel _usersViewModel;
 
@@ -99,6 +101,9 @@ public partial class SettingsViewModel : ObservableObject
     private int _cachedGroupsCount;
 
     [ObservableProperty]
+    private int _cachedComputersCount;
+
+    [ObservableProperty]
     private bool _isCacheRefreshing;
 
     // === Logs ===
@@ -135,6 +140,25 @@ public partial class SettingsViewModel : ObservableObject
 
     public List<string> TemplateStorageModes { get; }
 
+    // === Déploiement ===
+    [ObservableProperty]
+    private string _packageLocalPath = "";
+
+    [ObservableProperty]
+    private string _networkPackagesPath = "";
+
+    [ObservableProperty]
+    private int _maxGlobalDeployments = 15;
+
+    [ObservableProperty]
+    private bool _requireSignedPackages;
+
+    [ObservableProperty]
+    private bool _isSigningKeyAvailable;
+
+    [ObservableProperty]
+    private string _signingKeyThumbprint = "";
+
     // === À propos ===
     [ObservableProperty]
     private string _appVersion = "";
@@ -144,6 +168,8 @@ public partial class SettingsViewModel : ObservableObject
         ISettingsService settingsService,
         ICacheService cacheService,
         IActiveDirectoryService adService,
+        IComputerService computerService,
+        IPackageSigningService signingService,
         ILocalizationService localization,
         UsersViewModel usersViewModel)
     {
@@ -151,6 +177,8 @@ public partial class SettingsViewModel : ObservableObject
         _settingsService = settingsService;
         _cacheService = cacheService;
         _adService = adService;
+        _computerService = computerService;
+        _signingService = signingService;
         _localization = localization;
         _usersViewModel = usersViewModel;
 
@@ -216,6 +244,17 @@ public partial class SettingsViewModel : ObservableObject
             TemplateNetworkPath = s.Templates.NetworkFolderPath;
             TemplateLocalPath = s.Templates.LocalFolderPath;
 
+            // Déploiement
+            PackageLocalPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ADFlowManager", "Packages", "Local");
+            NetworkPackagesPath = s.Deployment.NetworkPackagesPath;
+            MaxGlobalDeployments = s.Deployment.MaxGlobalDeployments;
+            RequireSignedPackages = s.Deployment.RequireSignedPackages;
+
+            // Signature
+            RefreshSigningKeyStatus();
+
             _logger.LogInformation("Settings loaded into view model.");
         }
         catch (Exception ex)
@@ -272,6 +311,14 @@ public partial class SettingsViewModel : ObservableObject
                 StorageMode = TemplateStorageModeIndex == 1 ? "Network" : "Local",
                 NetworkFolderPath = TemplateNetworkPath?.Trim() ?? ""
             },
+            Deployment = new DeploymentSettings
+            {
+                NetworkPackagesPath = NetworkPackagesPath?.Trim() ?? "",
+                MaxGlobalDeployments = MaxGlobalDeployments,
+                RequireSignedPackages = RequireSignedPackages,
+                DefaultTimeoutSeconds = _settingsService.CurrentSettings.Deployment.DefaultTimeoutSeconds,
+                MaxParallelDeployments = _settingsService.CurrentSettings.Deployment.MaxParallelDeployments
+            },
             ConfigVersion = _settingsService.CurrentSettings.ConfigVersion
         };
     }
@@ -308,6 +355,7 @@ public partial class SettingsViewModel : ObservableObject
             }
 
             CachedGroupsCount = stats.GroupsCount;
+            CachedComputersCount = stats.ComputersCount;
         }
         catch (Exception ex)
         {
@@ -330,6 +378,8 @@ public partial class SettingsViewModel : ObservableObject
                 pathsToValidate[_localization.GetString("Settings_AuditNetworkPath")] = AuditNetworkPath;
             if (TemplateStorageModeIndex == 1 && !string.IsNullOrWhiteSpace(TemplateNetworkPath))
                 pathsToValidate[_localization.GetString("Settings_NetworkFolder")] = TemplateNetworkPath;
+            if (!string.IsNullOrWhiteSpace(NetworkPackagesPath))
+                pathsToValidate[_localization.GetString("Settings_PackageStorageNetwork")] = NetworkPackagesPath;
 
             foreach (var (label, path) in pathsToValidate)
             {
@@ -405,6 +455,7 @@ public partial class SettingsViewModel : ObservableObject
             LastCacheRefresh = _localization.GetString("Settings_CacheNever");
             CachedUsersCount = 0;
             CachedGroupsCount = 0;
+            CachedComputersCount = 0;
 
             _logger.LogInformation("Cache cleared.");
         }
@@ -429,10 +480,14 @@ public partial class SettingsViewModel : ObservableObject
             await _adService.GetUsersAsync();
             await _adService.GetGroupsAsync();
 
+            // Rafraîchir les ordinateurs depuis AD et mettre en cache
+            var computers = (await _computerService.GetComputersAsync()).ToList();
+            await _cacheService.CacheComputersAsync(computers);
+
             await LoadCacheStatsAsync();
 
-            _logger.LogInformation("Cache refreshed: {Users} users, {Groups} groups",
-                CachedUsersCount, CachedGroupsCount);
+            _logger.LogInformation("Cache refreshed: {Users} users, {Groups} groups, {Computers} computers",
+                CachedUsersCount, CachedGroupsCount, CachedComputersCount);
         }
         catch (Exception ex)
         {
@@ -686,6 +741,256 @@ public partial class SettingsViewModel : ObservableObject
 
         Process.Start("explorer.exe", path);
         _logger.LogInformation("Opening templates folder.");
+    }
+
+    // ===== SIGNING KEY MANAGEMENT =====
+
+    private void RefreshSigningKeyStatus()
+    {
+        try
+        {
+            IsSigningKeyAvailable = _signingService.IsSigningKeyAvailable();
+            SigningKeyThumbprint = IsSigningKeyAvailable
+                ? string.Format(_localization.GetString("Settings_SigningThumbprint"),
+                    _signingService.GetSigningKeyThumbprint() ?? "")
+                : "";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking signing key status.");
+            IsSigningKeyAvailable = false;
+            SigningKeyThumbprint = "";
+        }
+    }
+
+    [RelayCommand]
+    private void GenerateSigningKey()
+    {
+        var confirm = MessageBox.Show(
+            _localization.GetString("Settings_GenerateKeyConfirm"),
+            _localization.GetString("Settings_SigningSection"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (confirm != MessageBoxResult.Yes) return;
+
+        try
+        {
+            _signingService.GetOrCreateSigningKey();
+            RefreshSigningKeyStatus();
+
+            MessageBox.Show(
+                _localization.GetString("Settings_KeyGenerated"),
+                _localization.GetString("Common_Success"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            _logger.LogInformation("Signing key generated from Settings.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating signing key.");
+            MessageBox.Show(
+                string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message),
+                _localization.GetString("Common_Error"),
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    [RelayCommand]
+    private void ExportSigningKey()
+    {
+        try
+        {
+            // Ask for password
+            var passwordDialog = new Wpf.Ui.Controls.MessageBox
+            {
+                Title = _localization.GetString("Settings_ExportKey"),
+                Content = new System.Windows.Controls.TextBox
+                {
+                    Tag = "PfxPasswordBox",
+                    MinWidth = 300,
+                    FontSize = 14
+                },
+                PrimaryButtonText = "OK",
+                CloseButtonText = _localization.GetString("Common_Cancel")
+            };
+
+            // Use SaveFileDialog approach instead for simplicity
+            var password = PromptForPassword(_localization.GetString("Settings_PfxPassword"));
+            if (string.IsNullOrEmpty(password)) return;
+
+            if (password.Length < 8)
+            {
+                MessageBox.Show(
+                    _localization.GetString("Settings_PfxPassword"),
+                    _localization.GetString("Common_Error"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var dialog = new SaveFileDialog
+            {
+                Filter = "PFX (*.pfx)|*.pfx",
+                FileName = $"ADFlowManager-SigningKey-{DateTime.Now:yyyyMMdd}.pfx",
+                Title = _localization.GetString("Settings_ExportKey")
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            _signingService.ExportSigningKey(dialog.FileName, password);
+
+            MessageBox.Show(
+                string.Format(_localization.GetString("Settings_KeyExported"), dialog.FileName),
+                _localization.GetString("Common_Success"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            _logger.LogInformation("Signing key exported.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting signing key.");
+            MessageBox.Show(
+                string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message),
+                _localization.GetString("Common_Error"),
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    [RelayCommand]
+    private void ImportSigningKey()
+    {
+        try
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "PFX (*.pfx)|*.pfx",
+                Title = _localization.GetString("Settings_ImportKey")
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            // Warn if a key already exists — it will be replaced
+            if (_signingService.IsSigningKeyAvailable())
+            {
+                var overwrite = MessageBox.Show(
+                    _localization.GetString("Settings_ImportKeyReplaceConfirm"),
+                    _localization.GetString("Settings_SigningSection"),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (overwrite != MessageBoxResult.Yes) return;
+            }
+
+            var password = PromptForPassword(_localization.GetString("Settings_PfxPassword"));
+            if (string.IsNullOrEmpty(password)) return;
+
+            _signingService.ImportSigningKey(dialog.FileName, password);
+            RefreshSigningKeyStatus();
+
+            MessageBox.Show(
+                _localization.GetString("Settings_KeyImported"),
+                _localization.GetString("Common_Success"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            _logger.LogInformation("Signing key imported.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error importing signing key.");
+            MessageBox.Show(
+                string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message),
+                _localization.GetString("Common_Error"),
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    [RelayCommand]
+    private void DeleteSigningKey()
+    {
+        var confirm = MessageBox.Show(
+            _localization.GetString("Settings_DeleteKeyConfirm"),
+            _localization.GetString("Settings_SigningSection"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (confirm != MessageBoxResult.Yes) return;
+
+        try
+        {
+            _signingService.DeleteSigningKey();
+            RefreshSigningKeyStatus();
+
+            MessageBox.Show(
+                _localization.GetString("Settings_KeyDeleted"),
+                _localization.GetString("Common_Success"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            _logger.LogInformation("Signing key deleted from Settings.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting signing key.");
+            MessageBox.Show(
+                string.Format(_localization.GetString("Common_ErrorFormat"), ex.Message),
+                _localization.GetString("Common_Error"),
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>
+    /// Affiche un InputBox simple pour demander un mot de passe PFX.
+    /// Retourne null si annulé.
+    /// </summary>
+    private static string? PromptForPassword(string prompt)
+    {
+        var window = new Window
+        {
+            Title = prompt,
+            Width = 400,
+            Height = 160,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Owner = Application.Current.MainWindow,
+            ResizeMode = ResizeMode.NoResize,
+            Background = new System.Windows.Media.SolidColorBrush(
+                System.Windows.Media.Color.FromRgb(30, 30, 30))
+        };
+
+        var panel = new System.Windows.Controls.StackPanel { Margin = new Thickness(16) };
+        var label = new System.Windows.Controls.TextBlock
+        {
+            Text = prompt,
+            Foreground = System.Windows.Media.Brushes.White,
+            Margin = new Thickness(0, 0, 0, 8)
+        };
+        var passwordBox = new System.Windows.Controls.PasswordBox
+        {
+            Height = 32,
+            FontSize = 14
+        };
+        var okButton = new System.Windows.Controls.Button
+        {
+            Content = "OK",
+            Width = 80,
+            Height = 32,
+            Margin = new Thickness(0, 12, 0, 0),
+            HorizontalAlignment = HorizontalAlignment.Right
+        };
+
+        string? result = null;
+        okButton.Click += (_, _) =>
+        {
+            result = passwordBox.Password;
+            window.Close();
+        };
+
+        panel.Children.Add(label);
+        panel.Children.Add(passwordBox);
+        panel.Children.Add(okButton);
+        window.Content = panel;
+        window.ShowDialog();
+
+        return result;
     }
 
     [RelayCommand]

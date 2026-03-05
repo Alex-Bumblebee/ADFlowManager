@@ -31,6 +31,9 @@ namespace ADFlowManager.UI.ViewModels.Windows
                     Icon = new SymbolIcon { Symbol = SymbolRegular.Home24 },
                     TargetPageType = typeof(Views.Pages.DashboardPage)
                 },
+
+                new NavigationViewItemSeparator(),
+
                 new NavigationViewItem()
                 {
                     Content = localization.GetString("Nav_Users"),
@@ -45,10 +48,22 @@ namespace ADFlowManager.UI.ViewModels.Windows
                 },
                 new NavigationViewItem()
                 {
+                    Content = localization.GetString("Nav_Computers"),
+                    Icon = new SymbolIcon { Symbol = SymbolRegular.Desktop24 },
+                    TargetPageType = typeof(Views.Pages.ComputersPage)
+                },
+
+                new NavigationViewItemSeparator(),
+
+                new NavigationViewItem()
+                {
                     Content = localization.GetString("Nav_CreateUser"),
                     Icon = new SymbolIcon { Symbol = SymbolRegular.PersonAdd24 },
                     TargetPageType = typeof(Views.Pages.CreateUserPage)
                 },
+
+                new NavigationViewItemSeparator(),
+
                 new NavigationViewItem()
                 {
                     Content = localization.GetString("Nav_History"),
@@ -60,6 +75,12 @@ namespace ADFlowManager.UI.ViewModels.Windows
                     Content = localization.GetString("Nav_Templates"),
                     Icon = new SymbolIcon { Symbol = SymbolRegular.DocumentCopy24 },
                     TargetPageType = typeof(Views.Pages.TemplatesPage)
+                },
+                new NavigationViewItem()
+                {
+                    Content = localization.GetString("Nav_Packages"),
+                    Icon = new SymbolIcon { Symbol = SymbolRegular.Box24 },
+                    TargetPageType = typeof(Views.Pages.PackageDeploymentPage)
                 }
             };
 

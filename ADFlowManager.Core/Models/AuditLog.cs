@@ -31,6 +31,9 @@ public static class AuditActionType
     public const string RemoveUserFromGroup = "RemoveUserFromGroup";
     public const string CreateGroup = "CreateGroup";
     public const string Login = "Login";
+    public const string DeployPackage = "DeployPackage";
+    public const string CreatePackage = "CreatePackage";
+    public const string DeletePackage = "DeletePackage";
 }
 
 /// <summary>
@@ -40,5 +43,7 @@ public static class AuditEntityType
 {
     public const string User = "User";
     public const string Group = "Group";
+    public const string Computer = "Computer";
+    public const string Package = "Package";
     public const string System = "System";
 }

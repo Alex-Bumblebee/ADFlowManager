@@ -1,0 +1,61 @@
+{
+  "Name": "Google Chrome Enterprise",
+  "Version": "122.0.6261.95",
+  "Description": "Navigateur web Google Chrome - version entreprise avec gestion centralisée (GPO).",
+  "Category": "Navigateurs",
+  "Author": "Équipe IT",
+  "Tags": ["navigateur", "web", "google", "enterprise"],
+  "Installer": {
+    "Type": "msi",
+    "Path": "\\\\SERVEUR-FICHIERS\\Partage$\\Logiciels\\Chrome\\GoogleChromeStandaloneEnterprise64.msi",
+    "Arguments": "/qn /norestart",
+    "InstallerHash": "",
+    "TimeoutSeconds": 0
+  },
+  "Requirements": {
+    "MinWindowsVersion": "10.0.17763",
+    "Architecture": "x64",
+    "MinDiskSpaceMB": 300,
+    "MinRamMB": 2048
+  },
+  "Steps": [
+    {
+      "Order": 1,
+      "Type": "preCheck",
+      "Action": "checkProcess",
+      "Parameters": {
+        "processName": "chrome",
+        "action": "kill"
+      }
+    },
+    {
+      "Order": 2,
+      "Type": "install",
+      "Action": "execute",
+      "Parameters": {
+        "waitForExit": true
+      }
+    },
+    {
+      "Order": 3,
+      "Type": "postInstall",
+      "Action": "verifyFile",
+      "Parameters": {
+        "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      }
+    },
+    {
+      "Order": 4,
+      "Type": "cleanup",
+      "Action": "deleteFile",
+      "Parameters": {
+        "path": "%TEMP%\\chrome_installer.log"
+      }
+    }
+  ],
+  "SuccessCriteria": {
+    "Type": "fileExists",
+    "Path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "ExpectedValue": true
+  }
+}
