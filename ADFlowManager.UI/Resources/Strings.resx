@@ -487,6 +487,8 @@ Les paramètres actuels seront remplacés.</value></data>
   <data name="Computers_ComputerWord" xml:space="preserve"><value> ordinateurs</value></data>
   <data name="Computers_LoadingComputers" xml:space="preserve"><value>Chargement des ordinateurs...</value></data>
   <data name="Computers_CheckingStatuses" xml:space="preserve"><value>Vérification des statuts...</value></data>
+  <data name="Computers_Online" xml:space="preserve"><value>En ligne</value></data>
+  <data name="Computers_Offline" xml:space="preserve"><value>Hors ligne</value></data>
 
   <!-- ===== PACKAGES / DEPLOYMENT PAGE ===== -->
   <data name="Packages_PackageCount" xml:space="preserve"><value> packages</value></data>

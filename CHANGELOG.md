@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.0-beta] - Unreleased
+## [0.3.1-beta] - 06/03/2026
+
+### Fixed
+
+- **Packages — dialogue de résultats de déploiement (crash)** : le dialogue de résultats s'affichait toujours avec l'erreur « Erreur de déploiement » au lieu des résultats, que le déploiement ait réussi ou échoué. Cause : cinq valeurs de l'enum `SymbolRegular` utilisées dans `DeploymentResultsDialog.xaml` (`CheckmarkCircle16`, `Warning16`, `DismissCircle16`, `DocumentWarning24`, `Wrench24`) n'existent pas dans WPF-UI 4.2.0, ce qui provoquait une `XamlParseException` (BAML TypeConverter) à l'initialisation du dialogue. Remplacées par des équivalents valides (`CheckmarkCircle24`, `Warning24`, `DismissCircle24`, `DocumentDismiss16`, `Info24`).
+- **Computers — bouton « Vérifier le statut » non fonctionnel** : le ping s'exécutait correctement mais le résultat n'était jamais affiché. Double cause : `Computer.IsOnline` est une propriété simple sans `INotifyPropertyChanged`, empêchant toute mise à jour des bindings ; et le panneau de détails ne comportait aucun élément lié au statut réseau. Correctifs : ajout des propriétés observables `IsOnline` et `HasPingResult` sur `ComputerViewModel` ; ajout d'un badge **En ligne / Hors ligne** dans le panneau de détails, visible uniquement après une vérification ; passage de `BoolToStatusTextConverter` et du texte du badge par le `ResourceManager` i18n au lieu de strings hardcodées.
+
+---
+
+## [0.3.0-beta] - 05/03/2026
 
 ### 🖥️ New: Computer Management Page
 

@@ -474,10 +474,10 @@
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#EF4444" />
-                                                <Setter Property="Text" Value="Hors ligne" />
+                                                <Setter Property="Text" Value="{ext:Localized Computers_Offline}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding SelectedComputer.IsOnline}" Value="True">
-                                                        <Setter Property="Text" Value="En ligne" />
+                                                        <Setter Property="Text" Value="{ext:Localized Computers_Online}" />
                                                         <Setter Property="Foreground" Value="#10B981" />
                                                     </DataTrigger>
                                                 </Style.Triggers>

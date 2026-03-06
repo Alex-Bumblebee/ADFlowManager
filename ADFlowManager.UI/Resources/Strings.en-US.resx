@@ -485,6 +485,8 @@ Current settings will be replaced.</value></data>
   <data name="Computers_ComputerWord" xml:space="preserve"><value> computers</value></data>
   <data name="Computers_LoadingComputers" xml:space="preserve"><value>Loading computers...</value></data>
   <data name="Computers_CheckingStatuses" xml:space="preserve"><value>Checking statuses...</value></data>
+  <data name="Computers_Online" xml:space="preserve"><value>Online</value></data>
+  <data name="Computers_Offline" xml:space="preserve"><value>Offline</value></data>
 
   <!-- ===== PACKAGES / DEPLOYMENT PAGE ===== -->
   <data name="Packages_PackageCount" xml:space="preserve"><value> packages</value></data>
