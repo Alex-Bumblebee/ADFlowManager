@@ -16,6 +16,14 @@ public partial class ComputerViewModel : ObservableObject
     [ObservableProperty]
     private Computer _computer;
 
+    /// <summary>Résultat du dernier ping (true = en ligne, false = hors ligne).</summary>
+    [ObservableProperty]
+    private bool _isOnline;
+
+    /// <summary>Vrai si un ping a déjà été effectué au moins une fois.</summary>
+    [ObservableProperty]
+    private bool _hasPingResult;
+
     /// <summary>
     /// Événement déclenché quand IsSelected change.
     /// </summary>
@@ -213,8 +221,8 @@ public partial class ComputersViewModel : ObservableObject
         try
         {
             var isOnline = await _computerService.IsComputerOnlineAsync(SelectedComputer.Computer.Name);
-            SelectedComputer.Computer.IsOnline = isOnline;
-            OnPropertyChanged(nameof(SelectedComputer));
+            SelectedComputer.IsOnline = isOnline;
+            SelectedComputer.HasPingResult = true;
         }
         catch (Exception ex)
         {
@@ -235,7 +243,8 @@ public partial class ComputersViewModel : ObservableObject
         {
             var tasks = _allComputers.Select(async c =>
             {
-                c.Computer.IsOnline = await _computerService.IsComputerOnlineAsync(c.Computer.Name);
+                c.IsOnline = await _computerService.IsComputerOnlineAsync(c.Computer.Name);
+                c.HasPingResult = true;
             });
 
             await Task.WhenAll(tasks);

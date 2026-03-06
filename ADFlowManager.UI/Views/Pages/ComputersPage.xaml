@@ -402,7 +402,7 @@
                                 HorizontalAlignment="Center"
                                 Margin="0,4,0,8" />
 
-                            <!-- Badge statut -->
+                            <!-- Badge statut AD (activé/désactivé) -->
                             <Border
                                 HorizontalAlignment="Center"
                                 CornerRadius="12"
@@ -433,6 +433,58 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
+                            </Border>
+
+                            <!-- Badge statut réseau (ping) — visible uniquement après vérification -->
+                            <Border
+                                HorizontalAlignment="Center"
+                                CornerRadius="12"
+                                Padding="12,4"
+                                Margin="0,6,0,0"
+                                Visibility="{Binding SelectedComputer.HasPingResult, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#1AEF4444" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedComputer.IsOnline}" Value="True">
+                                                <Setter Property="Background" Value="#1A10B981" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon
+                                        Symbol="Wifi124"
+                                        FontSize="12"
+                                        Margin="0,0,5,0">
+                                        <ui:SymbolIcon.Style>
+                                            <Style TargetType="ui:SymbolIcon">
+                                                <Setter Property="Foreground" Value="#EF4444" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedComputer.IsOnline}" Value="True">
+                                                        <Setter Property="Foreground" Value="#10B981" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:SymbolIcon.Style>
+                                    </ui:SymbolIcon>
+                                    <TextBlock
+                                        FontSize="12"
+                                        FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#EF4444" />
+                                                <Setter Property="Text" Value="Hors ligne" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedComputer.IsOnline}" Value="True">
+                                                        <Setter Property="Text" Value="En ligne" />
+                                                        <Setter Property="Foreground" Value="#10B981" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
                             </Border>
                         </StackPanel>
 

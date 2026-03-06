@@ -88,7 +88,7 @@
                             Margin="0,0,6,0"
                             Visibility="Collapsed">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="CheckmarkCircle16" FontSize="13" Foreground="#22C55E" Margin="0,0,5,0" />
+                                <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="13" Foreground="#22C55E" Margin="0,0,5,0" />
                                 <TextBlock x:Name="SuccessBadgeText" FontSize="13" FontWeight="SemiBold" Foreground="#22C55E" />
                             </StackPanel>
                         </Border>
@@ -103,7 +103,7 @@
                             Margin="0,0,6,0"
                             Visibility="Collapsed">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Warning16" FontSize="13" Foreground="#F59E0B" Margin="0,0,5,0" />
+                                <ui:SymbolIcon Symbol="Warning24" FontSize="13" Foreground="#F59E0B" Margin="0,0,5,0" />
                                 <TextBlock x:Name="WarningBadgeText" FontSize="13" FontWeight="SemiBold" Foreground="#F59E0B" />
                             </StackPanel>
                         </Border>
@@ -117,7 +117,7 @@
                             Padding="12,5"
                             Visibility="Collapsed">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="DismissCircle16" FontSize="13" Foreground="#EF4444" Margin="0,0,5,0" />
+                                <ui:SymbolIcon Symbol="DismissCircle24" FontSize="13" Foreground="#EF4444" Margin="0,0,5,0" />
                                 <TextBlock x:Name="ErrorBadgeText" FontSize="13" FontWeight="SemiBold" Foreground="#EF4444" />
                             </StackPanel>
                         </Border>
@@ -389,7 +389,7 @@
                                                                     <Setter Property="Foreground" Value="#F59E0B" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusKind}" Value="locked">
-                                                                    <Setter Property="Symbol" Value="Wrench24" />
+                                                                    <Setter Property="Symbol" Value="Info24" />
                                                                     <Setter Property="Foreground" Value="#EAB308" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
@@ -427,7 +427,7 @@
                                             Padding="10,7"
                                             Visibility="{Binding HasResidualFiles, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <StackPanel Orientation="Horizontal">
-                                                <ui:SymbolIcon Symbol="DocumentWarning24" FontSize="12" Foreground="#EAB308" Margin="0,0,7,0" VerticalAlignment="Top" />
+                                                <ui:SymbolIcon Symbol="DocumentDismiss16" FontSize="12" Foreground="#EAB308" Margin="0,0,7,0" VerticalAlignment="Top" />
                                                 <TextBlock
                                                     Text="{Binding ResidualFilesText}"
                                                     FontSize="12"
