@@ -14,6 +14,7 @@ public partial class CompareUsersDialogViewModel : ObservableObject
 {
     private readonly IActiveDirectoryService _adService;
     private readonly ICacheService _cacheService;
+    private readonly ILocalizationService _localization;
     private readonly ILogger<CompareUsersDialogViewModel> _logger;
 
     private User _user1 = null!;
@@ -73,10 +74,12 @@ public partial class CompareUsersDialogViewModel : ObservableObject
     public CompareUsersDialogViewModel(
         IActiveDirectoryService adService,
         ICacheService cacheService,
+        ILocalizationService localization,
         ILogger<CompareUsersDialogViewModel> logger)
     {
         _adService = adService;
         _cacheService = cacheService;
+        _localization = localization;
         _logger = logger;
     }
 
@@ -251,14 +254,14 @@ public partial class CompareUsersDialogViewModel : ObservableObject
             await _cacheService.ClearCacheAsync();
 
             StatusMessage = errorCount == 0
-                ? $"{successCount} groupe(s) appliqué(s) avec succès"
-                : $"{successCount} succès, {errorCount} erreur(s)";
+                ? string.Format(_localization.GetString("Compare_StatusSuccess"), successCount)
+                : string.Format(_localization.GetString("Compare_StatusPartial"), successCount, errorCount);
 
             _logger.LogInformation("Apply result: {Success} success, {Errors} errors", successCount, errorCount);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Erreur : {ex.Message}";
+            StatusMessage = string.Format(_localization.GetString("Compare_StatusError"), ex.Message);
             _logger.LogError(ex, "Error while applying queued changes.");
         }
         finally

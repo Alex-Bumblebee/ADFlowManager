@@ -113,7 +113,7 @@ public partial class GroupsViewModel : ObservableObject
     [ObservableProperty]
     private int _newGroupScopeIndex; // 0 = Global, 1 = DomainLocal, 2 = Universal
 
-    public List<string> GroupTypes { get; } = ["Sécurité", "Distribution"];
+    public List<string> GroupTypes { get; }
     public List<string> GroupScopes { get; } = ["Global", "Domain Local", "Universal"];
 
     public bool HasSelection => SelectedGroup is not null;
@@ -130,6 +130,12 @@ public partial class GroupsViewModel : ObservableObject
         _settingsService = settingsService;
         _logger = logger;
         _localization = localization;
+
+        GroupTypes =
+        [
+            _localization.GetString("GroupCreate_TypeSecurity"),
+            _localization.GetString("GroupCreate_TypeDistribution")
+        ];
 
         _ = LoadGroupsAsync();
     }

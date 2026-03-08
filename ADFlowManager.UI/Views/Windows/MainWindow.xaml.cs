@@ -1,7 +1,6 @@
 ﻿using ADFlowManager.UI.ViewModels.Windows;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace ADFlowManager.UI.Views.Windows
@@ -18,8 +17,6 @@ namespace ADFlowManager.UI.Views.Windows
         {
             ViewModel = viewModel;
             DataContext = this;
-
-            SystemThemeWatcher.Watch(this);
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);

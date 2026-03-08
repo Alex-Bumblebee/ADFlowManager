@@ -411,7 +411,11 @@
 
                                 <!-- SAM Account Name (auto-généré) -->
                                 <StackPanel Margin="0,0,0,16">
-                                    <TextBlock Text="{ext:Localized CreateUser_LoginAuto}" FontSize="12" Foreground="#A1A1AA" Margin="0,0,0,6" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <TextBlock Text="{ext:Localized CreateUser_LoginAuto}" FontSize="12" Foreground="#A1A1AA" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Info24" FontSize="13" Foreground="#71717A" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                       ToolTip="{ext:Localized CreateUser_FormatSettingsHint}" />
+                                    </StackPanel>
                                     <ui:TextBox
                                         Text="{Binding SamAccountName, UpdateSourceTrigger=PropertyChanged}"
                                         PlaceholderText="jean.dupont"

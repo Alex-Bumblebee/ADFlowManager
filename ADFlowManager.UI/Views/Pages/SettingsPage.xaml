@@ -1270,7 +1270,9 @@
                                 <TextBlock Text="{ext:Localized Settings_LoginFormat}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
                                 <ComboBox
                                     ItemsSource="{Binding ViewModel.LoginFormats}"
-                                    SelectedItem="{Binding ViewModel.LoginFormat, UpdateSourceTrigger=PropertyChanged}"
+                                    DisplayMemberPath="Display"
+                                    SelectedValuePath="Id"
+                                    SelectedValue="{Binding ViewModel.LoginFormat, UpdateSourceTrigger=PropertyChanged}"
                                     Background="#2D2D30"
                                     Foreground="#F5F5F5"
                                     BorderBrush="#3F3F46"
@@ -1282,7 +1284,9 @@
                                 <TextBlock Text="{ext:Localized Settings_DisplayNameFormat}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
                                 <ComboBox
                                     ItemsSource="{Binding ViewModel.DisplayNameFormats}"
-                                    SelectedItem="{Binding ViewModel.DisplayNameFormat, UpdateSourceTrigger=PropertyChanged}"
+                                    DisplayMemberPath="Display"
+                                    SelectedValuePath="Id"
+                                    SelectedValue="{Binding ViewModel.DisplayNameFormat, UpdateSourceTrigger=PropertyChanged}"
                                     Background="#2D2D30"
                                     Foreground="#F5F5F5"
                                     BorderBrush="#3F3F46"
@@ -1318,21 +1322,23 @@
                             </StackPanel>
 
                             <StackPanel Margin="0,0,0,24">
-                                <TextBlock Text="Password Policy" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                                <TextBlock Text="{ext:Localized Settings_PasswordPolicy}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
                                 <ComboBox
                                     ItemsSource="{Binding ViewModel.PasswordPolicies}"
-                                    SelectedItem="{Binding ViewModel.PasswordPolicy, UpdateSourceTrigger=PropertyChanged}"
+                                    DisplayMemberPath="Display"
+                                    SelectedValuePath="Id"
+                                    SelectedValue="{Binding ViewModel.PasswordPolicy, UpdateSourceTrigger=PropertyChanged}"
                                     Background="#2D2D30"
                                     Foreground="#F5F5F5"
                                     BorderBrush="#3F3F46"
                                     Height="40"
                                     HorizontalAlignment="Stretch" />
                                 <TextBlock FontSize="11" Foreground="#71717A" Margin="0,4,0,0" TextWrapping="Wrap">
-                                    <Run Text="Easy: 8+ chars, digit + special" />
+                                    <Run Text="{ext:Localized Settings_Policy_EasyDesc}" />
                                     <LineBreak />
-                                    <Run Text="Standard: 12+ chars, mixed case + digit + special" />
+                                    <Run Text="{ext:Localized Settings_Policy_StandardDesc}" />
                                     <LineBreak />
-                                    <Run Text="Strong: 14+ chars, complexity + pattern blocking" />
+                                    <Run Text="{ext:Localized Settings_Policy_StrongDesc}" />
                                 </TextBlock>
                             </StackPanel>
                         </StackPanel>

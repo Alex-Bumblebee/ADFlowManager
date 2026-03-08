@@ -105,19 +105,33 @@ public partial class UsersPage : INavigableView<UsersViewModel>
         if (ViewModel.SelectedUser?.User is null) return;
 
         var user = ViewModel.SelectedUser.User;
-        var action = user.IsEnabled ? "désactiver" : "activer";
-        var result = System.Windows.MessageBox.Show(
-            $"Voulez-vous vraiment {action} le compte de {user.DisplayName} ({user.UserName}) ?",
-            "Confirmation",
-            System.Windows.MessageBoxButton.YesNo,
-            System.Windows.MessageBoxImage.Warning);
-
-        if (result != System.Windows.MessageBoxResult.Yes) return;
 
         var adService = App.Services.GetRequiredService<ADFlowManager.Core.Interfaces.Services.IActiveDirectoryService>();
         var cacheService = App.Services.GetRequiredService<ADFlowManager.Core.Interfaces.Services.ICacheService>();
         var settingsService = App.Services.GetRequiredService<ADFlowManager.Core.Interfaces.Services.ISettingsService>();
         var adSettings = settingsService.CurrentSettings.ActiveDirectory;
+
+        string confirmMsg;
+        if (user.IsEnabled)
+        {
+            confirmMsg = !string.IsNullOrWhiteSpace(adSettings.DisabledUserOU)
+                ? $"Voulez-vous vraiment désactiver le compte de {user.DisplayName} ({user.UserName}) ?\n\nL'utilisateur sera déplacé vers :\n{adSettings.DisabledUserOU}"
+                : $"Voulez-vous vraiment désactiver le compte de {user.DisplayName} ({user.UserName}) ?";
+        }
+        else
+        {
+            confirmMsg = !string.IsNullOrWhiteSpace(adSettings.DefaultUserOU)
+                ? $"Voulez-vous vraiment activer le compte de {user.DisplayName} ({user.UserName}) ?\n\nL'utilisateur sera déplacé vers :\n{adSettings.DefaultUserOU}"
+                : $"Voulez-vous vraiment activer le compte de {user.DisplayName} ({user.UserName}) ?";
+        }
+
+        var result = System.Windows.MessageBox.Show(
+            confirmMsg,
+            "Confirmation",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Warning);
+
+        if (result != System.Windows.MessageBoxResult.Yes) return;
 
         if (user.IsEnabled)
         {
@@ -129,6 +143,11 @@ public partial class UsersPage : INavigableView<UsersViewModel>
                 try
                 {
                     await adService.MoveUserToOUAsync(user.UserName, adSettings.DisabledUserOU);
+                    System.Windows.MessageBox.Show(
+                        $"Compte de {user.DisplayName} désactivé et déplacé vers :\n{adSettings.DisabledUserOU}",
+                        "Succès",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -138,6 +157,14 @@ public partial class UsersPage : INavigableView<UsersViewModel>
                         System.Windows.MessageBoxButton.OK,
                         System.Windows.MessageBoxImage.Warning);
                 }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show(
+                    $"Compte de {user.DisplayName} désactivé.",
+                    "Succès",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
             }
         }
         else
@@ -152,6 +179,11 @@ public partial class UsersPage : INavigableView<UsersViewModel>
                 try
                 {
                     await adService.MoveUserToOUAsync(user.UserName, adSettings.DefaultUserOU);
+                    System.Windows.MessageBox.Show(
+                        $"Compte de {user.DisplayName} activé et déplacé vers :\n{adSettings.DefaultUserOU}",
+                        "Succès",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -161,6 +193,14 @@ public partial class UsersPage : INavigableView<UsersViewModel>
                         System.Windows.MessageBoxButton.OK,
                         System.Windows.MessageBoxImage.Warning);
                 }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show(
+                    $"Compte de {user.DisplayName} activé.",
+                    "Succès",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
             }
 
             await cacheService.ClearCacheAsync();

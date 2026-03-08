@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:local="clr-namespace:ADFlowManager.UI.Views.Dialogs"
-    Title="Comparaison d'utilisateurs"
+    xmlns:ext="clr-namespace:ADFlowManager.UI.Extensions"
+    Title="{ext:Localized Compare_Title}"
     Width="1100"
     Height="700"
     d:DesignHeight="700"
@@ -141,7 +142,7 @@
                         <Border Grid.Row="0" Background="#203B82F6" Padding="14,10">
                             <Grid>
                                 <TextBlock
-                                    Text="Uniquement"
+                                    Text="{ext:Localized Compare_ColOnly}"
                                     FontSize="13"
                                     FontWeight="SemiBold"
                                     Foreground="#3B82F6"
@@ -207,7 +208,7 @@
                                                     Width="28"
                                                     Height="28"
                                                     Padding="0"
-                                                    ToolTip="Copier vers User 2"
+                                                    ToolTip="{ext:Localized Compare_CopyToUser2Tooltip}"
                                                     Command="{Binding DataContext.CopyToUser2Command, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}">
                                                     <ui:Button.Icon>
@@ -241,7 +242,7 @@
                         <Border Grid.Row="0" Background="#208B5CF6" Padding="14,10">
                             <Grid>
                                 <TextBlock
-                                    Text="Communs"
+                                    Text="{ext:Localized Compare_ColCommon}"
                                     FontSize="13"
                                     FontWeight="SemiBold"
                                     Foreground="#8B5CF6"
@@ -325,7 +326,7 @@
                         <Border Grid.Row="0" Background="#20F97316" Padding="14,10">
                             <Grid>
                                 <TextBlock
-                                    Text="Uniquement"
+                                    Text="{ext:Localized Compare_ColOnly}"
                                     FontSize="13"
                                     FontWeight="SemiBold"
                                     Foreground="#F97316"
@@ -369,7 +370,7 @@
                                                     Height="28"
                                                     Padding="0"
                                                     Margin="0,0,8,0"
-                                                    ToolTip="Copier vers User 1"
+                                                    ToolTip="{ext:Localized Compare_CopyToUser1Tooltip}"
                                                     Command="{Binding DataContext.CopyToUser1Command, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}">
                                                     <ui:Button.Icon>
@@ -427,13 +428,13 @@
                     <!-- Left: Quick actions -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
                         <ui:Button
-                            Content="Égaliser"
+                            Content="{ext:Localized Compare_Equalize}"
                             Appearance="Secondary"
                             Command="{Binding SyncBothCommand}"
                             Height="36"
                             Padding="16,0"
                             Margin="0,0,8,0"
-                            ToolTip="Copier tous les groupes dans les deux sens">
+                            ToolTip="{ext:Localized Compare_EqualizeTooltip}">
                             <ui:Button.Icon>
                                 <ui:SymbolIcon Symbol="ArrowSync24" />
                             </ui:Button.Icon>
@@ -445,7 +446,7 @@
                             Height="36"
                             Padding="16,0"
                             Margin="0,0,8,0"
-                            ToolTip="Copier tous les groupes de User 1 vers User 2">
+                            ToolTip="{ext:Localized Compare_CopyAllToUser2Tooltip}">
                             <ui:Button.Content>
                                 <TextBlock VerticalAlignment="Center">
                                     <Run Text="{Binding User1UserName, Mode=OneWay}" />
@@ -463,7 +464,7 @@
                             Command="{Binding CopyAllToUser1Command}"
                             Height="36"
                             Padding="16,0"
-                            ToolTip="Copier tous les groupes de User 2 vers User 1">
+                            ToolTip="{ext:Localized Compare_CopyAllToUser1Tooltip}">
                             <ui:Button.Content>
                                 <TextBlock VerticalAlignment="Center">
                                     <Run Text="{Binding User2UserName, Mode=OneWay}" />
@@ -490,7 +491,7 @@
                     <!-- Right: Apply + Close -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <ui:Button
-                            Content="Appliquer"
+                            Content="{ext:Localized Compare_Apply}"
                             Appearance="Primary"
                             Command="{Binding ApplyChangesCommand}"
                             IsEnabled="{Binding HasChanges}"
@@ -503,7 +504,7 @@
                         </ui:Button>
 
                         <ui:Button
-                            Content="Fermer"
+                            Content="{ext:Localized Common_Close}"
                             Appearance="Secondary"
                             Click="CloseButton_Click"
                             Height="36"
@@ -516,7 +517,7 @@
         <!-- === TITLEBAR === -->
         <ui:TitleBar
             x:Name="TitleBar"
-            Title="Comparaison d'utilisateurs"
+            Title="{ext:Localized Compare_Title}"
             Grid.Row="0"
             CloseWindowByDoubleClickOnIcon="True">
             <ui:TitleBar.Icon>

@@ -746,7 +746,7 @@
                                 Height="40" />
                             <ui:Button
                                 Grid.Column="1"
-                                ToolTip="Parcourir les OUs"
+                                ToolTip="{ext:Localized GroupCreate_BrowseOUTooltip}"
                                 Appearance="Secondary"
                                 Click="BrowseGroupOU_Click"
                                 Height="40"
@@ -768,7 +768,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Type" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                            <TextBlock Text="{ext:Localized GroupCreate_TypeLabel}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
                             <ComboBox
                                 ItemsSource="{Binding GroupTypes}"
                                 SelectedIndex="{Binding NewGroupTypeIndex}"
@@ -779,7 +779,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="Portée" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
+                            <TextBlock Text="{ext:Localized GroupCreate_ScopeLabel}" FontSize="13" Foreground="#A1A1AA" Margin="0,0,0,4" />
                             <ComboBox
                                 ItemsSource="{Binding GroupScopes}"
                                 SelectedIndex="{Binding NewGroupScopeIndex}"

@@ -14,6 +14,7 @@ public class SaveResultInfo
     public bool HasChanges { get; set; }
     public List<string> Changes { get; set; } = [];
     public string? ErrorMessage { get; set; }
+    public string OldDisplayName { get; set; } = "";
 }
 
 /// <summary>
@@ -293,6 +294,8 @@ public partial class UserDetailsViewModel : ObservableObject
         SaveError = "";
         LastSaveResult = null;
 
+        var oldDisplayName = _originalUser.DisplayName;
+
         try
         {
             _logger.LogInformation("Saving user to AD: {UserName}", UserName);
@@ -306,7 +309,7 @@ public partial class UserDetailsViewModel : ObservableObject
                 changes.Add($"{_localization.GetString("UserDetails_LastName")} : {_originalUser.LastName} → {LastName}");
             if (_originalUser.DisplayName != DisplayName)
                 changes.Add($"{_localization.GetString("UserDetails_DisplayName")} : {_originalUser.DisplayName} → {DisplayName}");
-            if (_originalUser.Description != Description)
+            if ((_originalUser.Description ?? "") != (Description ?? ""))
                 changes.Add($"{_localization.GetString("UserDetails_Description")} : {_originalUser.Description} → {Description}");
             if (_originalUser.Email != Email)
                 changes.Add($"{_localization.GetString("UserDetails_Email")} : {_originalUser.Email} → {Email}");
@@ -391,7 +394,8 @@ public partial class UserDetailsViewModel : ObservableObject
             {
                 Success = true,
                 HasChanges = changes.Count > 0,
-                Changes = changes
+                Changes = changes,
+                OldDisplayName = oldDisplayName
             };
 
             _logger.LogInformation("User {UserName} saved in AD and cache.", UserName);

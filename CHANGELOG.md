@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.3-beta] - 08/03/2026
+
+### Fixed
+
+- **Theme - settings theme now takes priority over system theme**: `SystemThemeWatcher.Watch(this)` was registered in `MainWindow`'s constructor, causing WPF-UI to immediately re-synchronize the app theme with the current Windows system theme on startup, overriding the value saved in `settings.json`. Removed the watcher entirely so the theme applied by `App.xaml.cs` (read from settings, defaulting to Dark) is never overridden by the OS.
+
+---
+
+## [0.3.2-beta] - 08/03/2026
+
+### Fixed
+
+- **User creation/details - description field error on empty value**: saving a user with an empty description was throwing `"Empty string is not supported by the property Principal.Description for this store type"`. Affected both the Create User form and the User Details edit window. Root cause: Active Directory requires `null` (not `""`) to clear a string attribute. Fixed by normalizing empty/whitespace description to `null` in both `CreateUserAsync` and `UpdateUserAsync`. The change detection in User Details now also treats `null` and `""` as equivalent, preventing a spurious "description changed" entry when there is no actual change.
+- **User details - notification title shows new name instead of original**: after renaming a user (first or last name), the save confirmation message displayed the already-updated display name in the title, making it unclear whose record was modified. The old display name is now captured before saving and shown in the notification ("Modifications enregistrées pour **OldName**").
+- **Groups - create dialog partially untranslated**: the "Type", "Portée" labels, the browse OU tooltip, and the group type values ("Sécurité", "Distribution") were hardcoded instead of using the localization system, causing them to always appear in French regardless of the selected language. All strings are now localized (`GroupCreate_TypeLabel`, `GroupCreate_ScopeLabel`, `GroupCreate_BrowseOUTooltip`, `GroupCreate_TypeSecurity`, `GroupCreate_TypeDistribution`).
+- **Settings - User Creation format options partially untranslated**: the Login Format, Display Name Format, and Password Policy combo box items were hardcoded strings used as both display labels and stored IDs ("Prenom.Nom", "Prenom Nom", "Easy"…). Introduced a `FormatOption(Id, Display)` type so items display translated names (FR: "Prénom.Nom" / EN: "First.Last", etc.) while the stored ID remains unchanged — no impact on existing `settings.json` files or the auto-generation logic in `CreateUserViewModel`. The hardcoded "Password Policy" label and its description lines are also now localized.
+- **Create User - format hint**: added a small ℹ info icon next to the Login (sAMAccountName) label with a tooltip indicating that the auto-generation format is configurable in Settings › User Creation.
+- **Packages - checkbox partially clipped**: the checkbox on each package list item had no left margin, causing its left edge to be cut off by the container. Added a 4 px left margin.
+- **Packages - empty badge squares visible**: the Version (purple), Category (blue), and Installer Type (green) badges were always rendered even when the corresponding field was empty, showing an empty colored square. Each badge now uses `StringToVisibilityConverter` and collapses automatically when the value is empty.
+- **Packages - category badge clarification**: the blue badge under the package name displays `Package.Category` (the category entered when creating the package); it is now hidden when the category is not set.
+- **Users - disable/enable confirmation and success messages now mention OU move**: when a `DisabledUserOU` (or `DefaultUserOU` for re-enable) is configured, the confirmation dialog now explicitly states the target OU the user will be moved to. A success notification is also shown after the operation completes, mentioning the destination OU. The `MoveUserToOUAsync` service method now records an audit log entry (`MoveUser` action) on both success and failure.
+- **Settings - network mode switch warning**: when saving settings with a newly enabled network path (Audit, Templates, or Logs), a confirmation dialog informs the user that the application will use the network location as the primary source going forward, and that local data is not deleted but becomes inactive. The save is aborted if the user cancels.
+- **Settings - automatic network folder creation**: when saving a network path that points to a non-existent directory, the application proposes to create the folder(s) automatically. A smart subfolder suggestion is applied when the entered path appears to be a base path (e.g., `\\server\Admin` in the Logs field → proposes `\\server\Admin\Logs`); the same applies to Templates (`\Templates`), Packages (`\Packages`), and History/Audit (`\History\audit-shared.db`). Paths are updated in the UI after creation.
+
+---
+
 ## [0.3.1-beta] - 06/03/2026
 
 ### Fixed

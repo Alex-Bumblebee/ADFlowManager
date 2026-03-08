@@ -36,7 +36,7 @@ public partial class UserDetailsWindow
             {
                 var summary = string.Join("\n", result.Changes.Select(c => $"  • {c}"));
                 System.Windows.MessageBox.Show(
-                    $"Modifications enregistrées pour {ViewModel.DisplayName} :\n\n{summary}",
+                    $"Modifications enregistrées pour {result.OldDisplayName} :\n\n{summary}",
                     "Sauvegarde réussie",
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Information);

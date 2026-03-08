@@ -73,10 +73,15 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _passwordPolicy = "Standard";
 
-    public List<string> LoginFormats { get; } = ["Prenom.Nom", "P.Nom", "Nom.P", "Nom"];
-    public List<string> DisplayNameFormats { get; } = ["Prenom Nom", "Nom Prenom"];
+    public record FormatOption(string Id, string Display)
+    {
+        public override string ToString() => Display;
+    }
+
+    public List<FormatOption> LoginFormats { get; }
+    public List<FormatOption> DisplayNameFormats { get; }
     public List<string> DuplicateHandlingOptions { get; } = ["AppendNumber", "DoNothing"];
-    public List<string> PasswordPolicies { get; } = ["Easy", "Standard", "Strong"];
+    public List<FormatOption> PasswordPolicies { get; }
 
     /// <summary>
     /// Liste des OUs disponibles dans le domaine AD (chargées à la demande).
@@ -184,6 +189,25 @@ public partial class SettingsViewModel : ObservableObject
 
         AuditStorageModes = [_localization.GetString("Settings_StorageLocal"), _localization.GetString("Settings_StorageNetwork")];
         TemplateStorageModes = [_localization.GetString("Settings_StorageLocal"), _localization.GetString("Settings_StorageNetwork")];
+
+        LoginFormats =
+        [
+            new FormatOption("Prenom.Nom", _localization.GetString("Settings_Format_FL")),
+            new FormatOption("P.Nom",      _localization.GetString("Settings_Format_FabL")),
+            new FormatOption("Nom.P",      _localization.GetString("Settings_Format_LF")),
+            new FormatOption("Nom",        _localization.GetString("Settings_Format_L"))
+        ];
+        DisplayNameFormats =
+        [
+            new FormatOption("Prenom Nom", _localization.GetString("Settings_Format_FirstLast")),
+            new FormatOption("Nom Prenom", _localization.GetString("Settings_Format_LastFirst"))
+        ];
+        PasswordPolicies =
+        [
+            new FormatOption("Easy",     _localization.GetString("Settings_Policy_Easy")),
+            new FormatOption("Standard", _localization.GetString("Settings_Policy_Standard")),
+            new FormatOption("Strong",   _localization.GetString("Settings_Policy_Strong"))
+        ];
 
         AppVersion = GetAssemblyVersion();
         LoadSettingsFromService();
@@ -391,6 +415,113 @@ public partial class SettingsViewModel : ObservableObject
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
                     return;
+                }
+            }
+
+            // Avertissement bascule vers réseau
+            var prev = _settingsService.CurrentSettings;
+            bool switchingToNetwork =
+                (AuditStorageModeIndex == 1 && prev.Audit.StorageMode != "Network") ||
+                (TemplateStorageModeIndex == 1 && prev.Templates.StorageMode != "Network") ||
+                (NetworkLogsEnabled && !prev.Logs.NetworkLogsEnabled);
+
+            if (switchingToNetwork)
+            {
+                var warnResult = MessageBox.Show(
+                    _localization.GetString("Settings_NetworkSwitchWarning"),
+                    _localization.GetString("Settings_NetworkSwitchTitle"),
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning);
+                if (warnResult != MessageBoxResult.OK) return;
+            }
+
+            // Proposition de création des dossiers réseau manquants
+            static string SuggestSubfolder(string path, string subfolder)
+            {
+                var trimmed = path.TrimEnd('\\', '/');
+                var last = Path.GetFileName(trimmed);
+                return string.Equals(last, subfolder, StringComparison.OrdinalIgnoreCase)
+                    ? trimmed
+                    : trimmed + @"\" + subfolder;
+            }
+
+            var dirProposals = new List<(string Label, string SuggestedPath, Action<string> Apply)>();
+
+            if (NetworkLogsEnabled && !string.IsNullOrWhiteSpace(NetworkLogPath))
+            {
+                var suggested = SuggestSubfolder(NetworkLogPath.Trim(), "Logs");
+                if (!Directory.Exists(NetworkLogPath.Trim()))
+                    dirProposals.Add(("Logs", suggested, p => NetworkLogPath = p));
+            }
+            if (TemplateStorageModeIndex == 1 && !string.IsNullOrWhiteSpace(TemplateNetworkPath))
+            {
+                var suggested = SuggestSubfolder(TemplateNetworkPath.Trim(), "Templates");
+                if (!Directory.Exists(TemplateNetworkPath.Trim()))
+                    dirProposals.Add(("Templates", suggested, p => TemplateNetworkPath = p));
+            }
+            if (!string.IsNullOrWhiteSpace(NetworkPackagesPath))
+            {
+                var suggested = SuggestSubfolder(NetworkPackagesPath.Trim(), "Packages");
+                if (!Directory.Exists(NetworkPackagesPath.Trim()))
+                    dirProposals.Add(("Packages", suggested, p => NetworkPackagesPath = p));
+            }
+            if (AuditStorageModeIndex == 1 && !string.IsNullOrWhiteSpace(AuditNetworkPath))
+            {
+                var isFilePath = AuditNetworkPath.Trim().EndsWith(".db", StringComparison.OrdinalIgnoreCase);
+                if (isFilePath)
+                {
+                    var auditDir = Path.GetDirectoryName(AuditNetworkPath.Trim()) ?? "";
+                    if (!string.IsNullOrWhiteSpace(auditDir))
+                    {
+                        var suggestedDir = SuggestSubfolder(auditDir, "History");
+                        var fileName = Path.GetFileName(AuditNetworkPath.Trim());
+                        var suggestedPath = Path.Combine(suggestedDir, fileName);
+                        if (!Directory.Exists(auditDir))
+                            dirProposals.Add(("History", suggestedPath, p => AuditNetworkPath = p));
+                    }
+                }
+                else
+                {
+                    var suggested = SuggestSubfolder(AuditNetworkPath.Trim(), "History");
+                    if (!Directory.Exists(AuditNetworkPath.Trim()))
+                        dirProposals.Add(("History", suggested + @"\audit-shared.db", p => AuditNetworkPath = p));
+                }
+            }
+
+            if (dirProposals.Count > 0)
+            {
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine(_localization.GetString("Settings_NetworkDirMissingIntro"));
+                sb.AppendLine();
+                foreach (var (l, suggested, _) in dirProposals)
+                    sb.AppendLine($"  • {l} : {suggested}");
+                sb.AppendLine();
+                sb.Append(_localization.GetString("Settings_NetworkDirCreatePrompt"));
+
+                var createResult = MessageBox.Show(
+                    sb.ToString(),
+                    _localization.GetString("Settings_NetworkDirCreateTitle"),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (createResult == MessageBoxResult.Yes)
+                {
+                    foreach (var (_, suggested, apply) in dirProposals)
+                    {
+                        try
+                        {
+                            var dirToCreate = suggested.EndsWith(".db", StringComparison.OrdinalIgnoreCase)
+                                ? Path.GetDirectoryName(suggested)!
+                                : suggested;
+                            Directory.CreateDirectory(dirToCreate);
+                            apply(suggested);
+                            _logger.LogInformation("Network directory created: {Path}", dirToCreate);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to create network directory: {Path}", suggested);
+                        }
+                    }
                 }
             }
 

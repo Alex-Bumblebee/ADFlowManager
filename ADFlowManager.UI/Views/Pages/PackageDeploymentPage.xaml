@@ -17,6 +17,7 @@
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     </Page.Resources>
 
     <Grid Margin="24,8,24,16">
@@ -202,7 +203,7 @@
                                                 Grid.Column="0"
                                                 IsChecked="{Binding IsSelected}"
                                                 VerticalAlignment="Top"
-                                                Margin="0,2,8,0" />
+                                                Margin="4,2,8,0" />
 
                                             <!-- Package info -->
                                             <StackPanel Grid.Column="1">
@@ -220,13 +221,16 @@
                                                     MaxHeight="40"
                                                     TextTrimming="CharacterEllipsis" />
                                                 <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                                    <Border Background="#1A8B5CF6" CornerRadius="4" Padding="6,2" Margin="0,0,4,0">
+                                                    <Border Background="#1A8B5CF6" CornerRadius="4" Padding="6,2" Margin="0,0,4,0"
+                                                            Visibility="{Binding Package.Version, Converter={StaticResource StringToVisibilityConverter}}">
                                                         <TextBlock Text="{Binding Package.Version}" FontSize="10" Foreground="#8B5CF6" FontWeight="SemiBold" />
                                                     </Border>
-                                                    <Border Background="#1A3B82F6" CornerRadius="4" Padding="6,2" Margin="0,0,4,0">
+                                                    <Border Background="#1A3B82F6" CornerRadius="4" Padding="6,2" Margin="0,0,4,0"
+                                                            Visibility="{Binding Package.Category, Converter={StaticResource StringToVisibilityConverter}}">
                                                         <TextBlock Text="{Binding Package.Category}" FontSize="10" Foreground="#3B82F6" FontWeight="SemiBold" />
                                                     </Border>
-                                                    <Border Background="#1A10B981" CornerRadius="4" Padding="6,2">
+                                                    <Border Background="#1A10B981" CornerRadius="4" Padding="6,2"
+                                                            Visibility="{Binding Package.Installer.Type, Converter={StaticResource StringToVisibilityConverter}}">
                                                         <TextBlock Text="{Binding Package.Installer.Type}" FontSize="10" Foreground="#10B981" FontWeight="SemiBold" />
                                                     </Border>
                                                     <!-- VULN-14 : Signature status badge -->

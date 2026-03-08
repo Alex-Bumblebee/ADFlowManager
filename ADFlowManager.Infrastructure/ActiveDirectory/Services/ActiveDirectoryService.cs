@@ -462,7 +462,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                     Surname = user.LastName,
                     DisplayName = user.DisplayName,
                     EmailAddress = user.Email,
-                    Description = user.Description,
+                    Description = string.IsNullOrWhiteSpace(user.Description) ? null : user.Description,
                     VoiceTelephoneNumber = string.IsNullOrWhiteSpace(user.Phone) ? null : user.Phone,
                     Enabled = !accountDisabled,
                     PasswordNeverExpires = passwordNeverExpires,
@@ -680,7 +680,7 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
                 userPrincipal.GivenName = user.FirstName;
                 userPrincipal.Surname = user.LastName;
                 userPrincipal.DisplayName = user.DisplayName;
-                userPrincipal.Description = user.Description;
+                userPrincipal.Description = string.IsNullOrWhiteSpace(user.Description) ? null : user.Description;
                 userPrincipal.EmailAddress = string.IsNullOrWhiteSpace(user.Email) ? null : user.Email;
                 userPrincipal.VoiceTelephoneNumber = string.IsNullOrWhiteSpace(user.Phone) ? null : user.Phone;
 
@@ -853,9 +853,14 @@ public class ActiveDirectoryService : IActiveDirectoryService, IDisposable
 
                 _logger.LogInformation("Utilisateur déplacé vers l'OU cible: {User}", samAccountName);
             });
+
+            await _auditService.LogAsync(AuditActionType.MoveUser, AuditEntityType.User,
+                samAccountName, samAccountName, new { TargetOU = targetOuPath });
         }
         catch (Exception ex)
         {
+            await _auditService.LogAsync(AuditActionType.MoveUser, AuditEntityType.User,
+                samAccountName, samAccountName, new { TargetOU = targetOuPath }, false, ex.Message);
             _logger.LogError(ex, "Erreur lors du déplacement d'un utilisateur vers une OU: {User}", samAccountName);
             throw;
         }

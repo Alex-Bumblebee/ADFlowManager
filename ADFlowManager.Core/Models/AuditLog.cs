@@ -26,6 +26,7 @@ public static class AuditActionType
     public const string UpdateUser = "UpdateUser";
     public const string DisableUser = "DisableUser";
     public const string EnableUser = "EnableUser";
+    public const string MoveUser = "MoveUser";
     public const string ResetPassword = "ResetPassword";
     public const string AddUserToGroup = "AddUserToGroup";
     public const string RemoveUserFromGroup = "RemoveUserFromGroup";
