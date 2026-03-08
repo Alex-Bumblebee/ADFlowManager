@@ -26,15 +26,15 @@ Faster AD Management • Modern Interface • Native Performance • Privacy-Fir
 
 ### Why ADFlowManager?
 
-Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error-prone. **ADFlowManager** replaces that workflow with a **modern desktop application** built on .NET 10, featuring:
+Managing Active Directory with PowerShell or legacy MMC snap-ins is slow, repetitive, and error-prone. **ADFlowManager** replaces that workflow with a **modern desktop application** that covers the full AD lifecycle — from user onboarding to offboarding, group management, computer monitoring, and even software deployment — all in one place.
 
-- **Faster AD Management** — Native .NET APIs with intelligent SQLite caching
-- **Modern Interface** — Intuitive WPF-UI design (dark theme, responsive)
-- **Native Performance** — No PowerShell overhead, async operations throughout
-- **Privacy-First** — Zero telemetry, 100% local data processing
-- **Open Source** — GPLv3 licensed, fully transparent codebase
+- **Full AD Lifecycle** — Create, edit, disable, move, and audit users without touching a single cmdlet
+- **Built-in Package Deployment** — Push software to your AD computers directly from the app
+- **Team-Ready** — Share templates, audit logs, and packages over a network share
+- **Native Performance** — .NET 10 with intelligent SQLite caching, no PowerShell overhead
+- **Privacy-First** — Zero telemetry, 100% local data processing, GPLv3 open source
 
-> **v0.1.0-beta** — First public beta. All planned features are implemented. Feedback welcome!
+> **v0.3.3-beta** — Active beta. Core features are stable and production-tested. Feedback welcome!
 
 ---
 
@@ -48,7 +48,7 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 5. Start managing your Active Directory!
 ```
 
-[![Download Beta](https://img.shields.io/badge/Download-v0.2.0--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.2.0-beta)
+[![Download Beta](https://img.shields.io/badge/Download-v0.3.3--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.3.3-beta)
 
 ---
 
@@ -58,7 +58,7 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 
 - **Create** users with full property support (General, Contact, Organization)
 - **Edit** any user attribute directly from the detail view (5 tabs)
-- **Disable / Enable** accounts with optional OU relocation
+- **Disable / Enable** accounts with automatic OU relocation
 - **Reset passwords** with strength indicator and secure generation
 - **Copy users** intelligently (copies org data & groups, skips personal info)
 - **Compare users** side-by-side and sync rights bidirectionally
@@ -71,6 +71,20 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 - **Add / Remove** members in bulk
 - **Create** new groups (Security or Distribution, any scope)
 - **View** group membership at a glance
+
+#### Computer Management
+
+- **Browse** all AD computers with search and filtering
+- **Check online status** with live ping directly from the list
+- **View** OS, last logon, and enabled/disabled status at a glance
+
+#### Package Deployment
+
+- **Deploy software** to AD computers in a few clicks
+- **Batch deployment** — target multiple machines in one operation
+- **Deployment results** — per-computer success/failure report
+- **Organize packages** by category, version, and installer type
+- **Network storage** — share your package library across the team
 
 #### Templates System
 
@@ -88,7 +102,7 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 
 #### Audit & Compliance
 
-- **Multi-user audit trail** — tracks every action (create, update, disable, enable, password reset, group changes)
+- **Multi-user audit trail** — tracks every action (create, update, disable, enable, password reset, group changes, OU moves)
 - **SQLite database** — local or network-shared for team visibility
 - **Filter** by date range, operator, action type, or target entity
 - **Export** audit logs to **CSV**
@@ -103,8 +117,8 @@ Managing Active Directory with PowerShell cmdlets is slow, repetitive, and error
 #### Modern Interface
 
 - **Dashboard** — real-time stats (users, groups, daily actions) and recent activity feed
-- **Dark theme** powered by [WPF-UI](https://github.com/lepoco/wpfui)
-- **7-tab Settings panel** — General, Active Directory, Cache, Logs, Audit, Templates, About
+- **Dark / Light theme** — respects your saved preference, never overridden by the OS
+- **Comprehensive Settings panel** — General, Active Directory, Cache, Logs, Audit, Templates, Packages, About
 - **Responsive** and intuitive navigation
 
 #### Security & Privacy
@@ -180,16 +194,16 @@ The startup project is `ADFlowManager.UI`.
 ADFlowManager/
 ├── ADFlowManager.Core/               # Domain layer
 │   ├── Interfaces/Services/           #   Service contracts (IAD, ICache, IAudit, ITemplate…)
-│   └── Models/                        #   Domain models (User, Group, UserTemplate, AuditLog…)
+│   └── Models/                        #   Domain models (User, Group, Computer, UserTemplate, AuditLog…)
 ├── ADFlowManager.Infrastructure/      # Data & integration layer
 │   ├── ActiveDirectory/Services/      #   AD operations (System.DirectoryServices)
 │   ├── Data/                          #   EF Core DbContexts (Cache, Audit) + entities
 │   ├── Security/                      #   Windows Credential Manager
 │   └── Services/                      #   Cache, Audit, Settings, Template services
 ├── ADFlowManager.UI/                  # Presentation layer (WPF + MVVM)
-│   ├── Views/Pages/                   #   8 pages (Dashboard, Users, Groups, Create, Templates…)
+│   ├── Views/Pages/                   #   Pages (Dashboard, Users, Groups, Computers, Packages, Create, Templates…)
 │   ├── Views/Windows/                 #   Login, Main, UserDetails windows
-│   ├── Views/Dialogs/                 #   7 dialogs (Compare, CopyRights, ResetPassword…)
+│   ├── Views/Dialogs/                 #   Dialogs (Compare, CopyRights, ResetPassword, Deployment results…)
 │   ├── ViewModels/                    #   Page & window ViewModels (CommunityToolkit.Mvvm)
 │   ├── Converters/                    #   XAML value converters
 │   └── Resources/                     #   i18n resource dictionaries (FR/EN)
@@ -230,6 +244,11 @@ ADFlowManager/
 3. View side-by-side group memberships
 4. Sync rights in either direction with one click
 
+**Deploy a Package**
+1. Navigate to **Packages**
+2. Select a package and choose the target computers
+3. Click **Deploy** — results show per-computer success or failure
+
 **Export Audit Logs**
 1. Navigate to **History**
 2. Set date range and filters (operator, action type)
@@ -249,7 +268,6 @@ ADFlowManager/
 - CSV/Excel export and import for users & groups
 - Advanced search with combined filters (AND/OR)
 - Custom configurable reports
-- Dark/Light theme toggle
 - Keyboard shortcuts
 - OU management (create, move, rename)
 - Naming policies automation
@@ -300,7 +318,6 @@ This project is licensed under the **GNU General Public License v3.0** — see t
 ### Acknowledgments
 
 - [WPF-UI](https://github.com/lepoco/wpfui) — Modern Fluent Design controls for WPF
-
 - [Velopack](https://github.com/velopack/velopack) — Seamless application updates
 - [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) — MVVM toolkit
 - [Serilog](https://github.com/serilog/serilog) — Structured logging
@@ -314,15 +331,15 @@ This project is licensed under the **GNU General Public License v3.0** — see t
 
 ### Pourquoi ADFlowManager ?
 
-Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et source d'erreurs. **ADFlowManager** remplace ce workflow par une **application de bureau moderne** construite sur .NET 10, avec :
+Gérer Active Directory via des cmdlets PowerShell ou les snap-ins MMC hérités est lent, répétitif et source d'erreurs. **ADFlowManager** remplace ce workflow par une **application de bureau moderne** qui couvre tout le cycle de vie AD — de l'onboarding à l'offboarding, la gestion des groupes, la supervision des postes, et même le déploiement de logiciels — le tout au même endroit.
 
-- **Gestion AD Plus Rapide** — APIs .NET natives avec cache SQLite intelligent
-- **Interface Moderne** — Design WPF-UI intuitif (thème sombre, responsive)
-- **Performance Native** — Aucune surcharge PowerShell, opérations async partout
-- **Privacy-First** — Zéro télémétrie, traitement 100 % local des données
-- **Open Source** — Licence GPLv3, code entièrement transparent
+- **Cycle de vie AD complet** — Créer, modifier, désactiver, déplacer et auditer sans toucher à une seule cmdlet
+- **Déploiement de packages intégré** — Pousser des logiciels vers vos postes AD directement depuis l'application
+- **Prêt pour l'équipe** — Partagez les templates, logs d'audit et packages via un partage réseau
+- **Performance native** — .NET 10 avec cache SQLite intelligent, aucune surcharge PowerShell
+- **Privacy-First** — Zéro télémétrie, traitement 100 % local, GPLv3 open source
 
-> **v0.1.0-beta** — Première bêta publique. Toutes les fonctionnalités prévues sont implémentées. Vos retours sont les bienvenus !
+> **v0.3.3-beta** — Bêta active. Les fonctionnalités principales sont stables et testées en production. Vos retours sont les bienvenus !
 
 ---
 
@@ -336,7 +353,7 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 5. Commencez à gérer votre Active Directory !
 ```
 
-[![Télécharger la Bêta](https://img.shields.io/badge/T%C3%A9l%C3%A9charger-v0.2.0--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.2.0-beta)
+[![Télécharger la Bêta](https://img.shields.io/badge/T%C3%A9l%C3%A9charger-v0.3.3--beta-brightgreen?style=for-the-badge)](https://github.com/Alex-Bumblebee/ADFlowManager/releases/tag/v0.3.3-beta)
 
 ---
 
@@ -346,7 +363,7 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 
 - **Créer** des utilisateurs avec support complet des propriétés (Général, Contact, Organisation)
 - **Modifier** n'importe quel attribut depuis la vue détaillée (5 onglets)
-- **Désactiver / Activer** des comptes avec déplacement optionnel d'OU
+- **Désactiver / Activer** des comptes avec déplacement automatique d'OU
 - **Réinitialiser les mots de passe** avec indicateur de force et génération sécurisée
 - **Copier des utilisateurs** intelligemment (copie données org & groupes, ignore les infos personnelles)
 - **Comparer des utilisateurs** côte à côte et synchroniser les droits dans les deux sens
@@ -358,7 +375,21 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 - **Parcourir** tous les groupes AD avec recherche et filtrage
 - **Ajouter / Supprimer** des membres en masse
 - **Créer** de nouveaux groupes (Sécurité ou Distribution, toute portée)
-- **Visualiser** l'appartenance aux groupes en un coup d'oeil
+- **Visualiser** l'appartenance aux groupes en un coup d'œil
+
+#### Gestion des Ordinateurs
+
+- **Parcourir** tous les postes AD avec recherche et filtrage
+- **Vérifier le statut en ligne** avec ping en direct directement depuis la liste
+- **Visualiser** l'OS, la dernière connexion et le statut activé/désactivé en un coup d'œil
+
+#### Déploiement de Packages
+
+- **Déployer des logiciels** vers des postes AD en quelques clics
+- **Déploiement en masse** — cibler plusieurs machines en une seule opération
+- **Rapport de déploiement** — résultat succès/échec par machine
+- **Organiser les packages** par catégorie, version et type d'installeur
+- **Stockage réseau** — partagez votre bibliothèque de packages avec toute l'équipe
 
 #### Système de Templates
 
@@ -376,7 +407,7 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 
 #### Audit & Conformité
 
-- **Piste d'audit multi-utilisateurs** — trace chaque action (création, modification, désactivation, activation, reset mot de passe, changements de groupes)
+- **Piste d'audit multi-utilisateurs** — trace chaque action (création, modification, désactivation, activation, reset mot de passe, changements de groupes, déplacements d'OU)
 - **Base de données SQLite** — locale ou partagée en réseau pour visibilité d'équipe
 - **Filtrer** par période, opérateur, type d'action ou entité cible
 - **Exporter** les logs d'audit en **CSV**
@@ -391,8 +422,8 @@ Gérer Active Directory avec des cmdlets PowerShell est lent, répétitif et sou
 #### Interface Moderne
 
 - **Tableau de bord** — statistiques en temps réel (utilisateurs, groupes, actions du jour) et fil d'activité récente
-- **Thème sombre** propulsé par [WPF-UI](https://github.com/lepoco/wpfui)
-- **Panneau Paramètres à 7 onglets** — Général, Active Directory, Cache, Logs, Audit, Templates, À propos
+- **Thème Sombre / Clair** — respecte votre préférence sauvegardée, jamais écrasé par l'OS
+- **Panneau Paramètres complet** — Général, Active Directory, Cache, Logs, Audit, Templates, Packages, À propos
 - Navigation **responsive** et intuitive
 
 #### Sécurité & Vie Privée
@@ -468,16 +499,16 @@ Le projet de démarrage est `ADFlowManager.UI`.
 ADFlowManager/
 ├── ADFlowManager.Core/               # Couche domaine
 │   ├── Interfaces/Services/           #   Contrats de services (IAD, ICache, IAudit, ITemplate…)
-│   └── Models/                        #   Modèles du domaine (User, Group, UserTemplate, AuditLog…)
+│   └── Models/                        #   Modèles du domaine (User, Group, Computer, UserTemplate, AuditLog…)
 ├── ADFlowManager.Infrastructure/      # Couche données & intégration
 │   ├── ActiveDirectory/Services/      #   Opérations AD (System.DirectoryServices)
 │   ├── Data/                          #   DbContexts EF Core (Cache, Audit) + entités
 │   ├── Security/                      #   Windows Credential Manager
 │   └── Services/                      #   Services Cache, Audit, Settings, Template
 ├── ADFlowManager.UI/                  # Couche présentation (WPF + MVVM)
-│   ├── Views/Pages/                   #   8 pages (Dashboard, Users, Groups, Create, Templates…)
+│   ├── Views/Pages/                   #   Pages (Dashboard, Users, Groups, Computers, Packages, Create, Templates…)
 │   ├── Views/Windows/                 #   Fenêtres Login, Main, UserDetails
-│   ├── Views/Dialogs/                 #   7 dialogues (Compare, CopyRights, ResetPassword…)
+│   ├── Views/Dialogs/                 #   Dialogues (Compare, CopyRights, ResetPassword, Résultats déploiement…)
 │   ├── ViewModels/                    #   ViewModels pages & fenêtres (CommunityToolkit.Mvvm)
 │   ├── Converters/                    #   Convertisseurs XAML
 │   └── Resources/                     #   Dictionnaires i18n (FR/EN)
@@ -518,6 +549,11 @@ ADFlowManager/
 3. Visualisez les appartenances aux groupes côte à côte
 4. Synchronisez les droits dans les deux sens en un clic
 
+**Déployer un package**
+1. Naviguez vers **Packages**
+2. Sélectionnez un package et choisissez les postes cibles
+3. Cliquez sur **Déployer** — les résultats affichent le succès ou l'échec par machine
+
 **Exporter les logs d'audit**
 1. Naviguez vers **Historique**
 2. Définissez la période et les filtres (opérateur, type d'action)
@@ -537,7 +573,6 @@ ADFlowManager/
 - Export/Import CSV et Excel pour utilisateurs et groupes
 - Recherche avancée avec filtres combinés (ET/OU)
 - Rapports personnalisables et configurables
-- Basculement thème Sombre/Clair
 - Raccourcis clavier
 - Gestion des OUs (création, déplacement, renommage)
 - Politiques de nommage automatisées
